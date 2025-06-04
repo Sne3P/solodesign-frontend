@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import {
   motion,
   useScroll,
@@ -261,16 +261,22 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
 
-  useEffect(() => {
-    if (globalPos && cardRef.current && containerRef?.current) {
+  const updateLocalPosition = useCallback(
+    (pos) => {
+      if (!cardRef.current || !containerRef?.current) return
       const cardRect = cardRef.current.getBoundingClientRect()
       const containerRect = containerRef.current.getBoundingClientRect()
-      const relativeX = globalPos.x - (cardRect.left - containerRect.left)
-      const relativeY = globalPos.y - (cardRect.top - containerRect.top)
+      const relativeX = pos.x - (cardRect.left - containerRect.left)
+      const relativeY = pos.y - (cardRect.top - containerRect.top)
       localX.set(relativeX)
       localY.set(relativeY)
-    }
-  }, [globalPos, containerRef, localX, localY])
+    },
+    [containerRef, localX, localY]
+  )
+
+  useEffect(() => {
+    if (globalPos) updateLocalPosition(globalPos)
+  }, [globalPos, updateLocalPosition])
 
   const handleHoverStart = () => hoverState.set(1)
   const handleHoverEnd = () => hoverState.set(0)

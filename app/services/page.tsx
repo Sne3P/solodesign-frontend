@@ -80,8 +80,20 @@ const services = [
 
 // -------------------- Components --------------------
 
-const ServiceCard = ({ service, index }) => {
-  const cardRef = useRef(null)
+interface Service {
+  icon: React.ReactNode
+  title: string
+  description: string
+  tools: string[]
+}
+
+interface ServiceCardProps {
+  service: Service
+  index: number
+}
+
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
+  const cardRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
   const controls = useAnimation()
 
@@ -110,7 +122,7 @@ const ServiceCard = ({ service, index }) => {
 
   const toolVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: (i) => ({
+    visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
@@ -156,8 +168,19 @@ const ServiceCard = ({ service, index }) => {
   )
 }
 
-const ProcessStep = ({ step, index, totalSteps }) => {
-  const ref = useRef(null)
+interface ProcessStepData {
+  title: string
+  description: string
+}
+
+interface ProcessStepProps {
+  step: ProcessStepData
+  index: number
+  totalSteps: number
+}
+
+const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) => {
+  const ref = useRef<HTMLDivElement>(null)
   const isInView = useInView(ref, { once: false, amount: 0.5, margin: "-100px" })
   const controls = useAnimation()
 
@@ -224,11 +247,16 @@ const ProcessStep = ({ step, index, totalSteps }) => {
 /*
   GlowingCards : Conteneur captant le mouvement de la souris, même hors des cases.
 */
-const GlowingCards = ({ children }) => {
-  const containerRef = useRef(null)
+interface GlowingCardsProps {
+  children: React.ReactElement[] | React.ReactElement
+}
+
+const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
     setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }
@@ -255,8 +283,15 @@ const GlowingCards = ({ children }) => {
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
 */
-const GlowingCard = ({ children, index, globalPos, containerRef }) => {
-  const cardRef = useRef(null)
+interface GlowingCardProps {
+  children: React.ReactNode
+  index: number
+  globalPos?: { x: number; y: number }
+  containerRef?: React.RefObject<HTMLDivElement>
+}
+
+const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, containerRef }) => {
+  const cardRef = useRef<HTMLDivElement>(null)
   const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
@@ -275,19 +310,22 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
   const handleHoverStart = () => hoverState.set(1)
   const handleHoverEnd = () => hoverState.set(0)
 
-  const glowOpacity = useTransform([localX, localY], ([x, y]) => {
-    if (!cardRef.current) return 0
-    const { offsetWidth: width, offsetHeight: height } = cardRef.current
-    const centerX = width / 2
-    const centerY = height / 2
-    const distance = Math.hypot(x - centerX, y - centerY)
-    return Math.max(0, 1 - distance / (width / 1.5))
-  })
+  const glowOpacity = useTransform<[number, number], number>(
+    [localX, localY],
+    ([x, y]) => {
+      if (!cardRef.current) return 0
+      const { offsetWidth: width, offsetHeight: height } = cardRef.current
+      const centerX = width / 2
+      const centerY = height / 2
+      const distance = Math.hypot(Number(x) - centerX, Number(y) - centerY)
+      return Math.max(0, 1 - distance / (width / 1.5))
+    },
+  )
 
-  const background = useTransform(
+  const background = useTransform<[number, number, number, number], string>(
     [localX, localY, glowOpacity, hoverState],
     ([x, y, opacity, h]) =>
-      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${opacity * 0.2 * h}), transparent)`
+      `radial-gradient(circle 150px at ${Number(x)}px ${Number(y)}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
   )
 
   return (

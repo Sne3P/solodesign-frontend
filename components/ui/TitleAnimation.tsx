@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion';
 
-const TitleAnimation = ({ texte }) => (
+interface TitleAnimationProps {
+  texte: string;
+}
+
+const TitleAnimation: React.FC<TitleAnimationProps> = ({ texte }) => (
   <motion.h1 className="text-5xl md:text-7xl font-bold relative">
     {texte.split('').map((char, index) => (
       <motion.span

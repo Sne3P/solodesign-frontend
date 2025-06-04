@@ -22,7 +22,7 @@ const ProjectsSection = () => {
   );
   const router = useRouter();
 
-  const handleProjectClick = (projectId) => {
+  const handleProjectClick = (projectId: number) => {
     // Animation de sortie
     document.body.style.overflow = 'hidden';
     const element = document.getElementById('projects-section');

@@ -1,31 +1,35 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { ParallaxProvider } from 'react-scroll-parallax'
-import { useScroll, useSpring, motion } from 'framer-motion'
-import SocialLinks from '../components/layout/SocialLinks'
-import MenuButton from '../components/layout/MenuButton'
-import ScrollArrow from '../components/layout/ScrollArrow'
-import Cursor from '../components/layout/Cursor'
-import HeroSection from '../components/sections/HeroSection'
-import ProjectsSection from '../components/sections/ProjectsSection'
-import ServicesSection from '../components/sections/ServicesSection'
-import AboutSection from '../components/sections/AboutSection'
-import ContactSection from '../components/sections/ContactSection'
-import Footer from '../components/sections/Footer'
-import LogoTitle from '../components/layout/LogoTitle'  // Ajout du LogoTitle
+import React, { useState, useEffect } from "react";
+import { ParallaxProvider } from "react-scroll-parallax";
+import { useScroll, useSpring, motion } from "framer-motion";
+import SocialLinks from "../components/layout/SocialLinks";
+import MenuButton from "../components/layout/MenuButton";
+import ScrollArrow from "../components/layout/ScrollArrow";
+import Cursor from "../components/layout/Cursor";
+import HeroSection from "../components/sections/HeroSection";
+import ProjectsSection from "../components/sections/ProjectsSection";
+import ServicesSection from "../components/sections/ServicesSection";
+import AboutSection from "../components/sections/AboutSection";
+import ContactSection from "../components/sections/ContactSection";
+import Footer from "../components/sections/Footer";
+import LogoTitle from "../components/layout/LogoTitle"; // Ajout du LogoTitle
 
 const Portfolio = () => {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const progressionDefilementFluide = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progressionDefilementFluide = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
 
   useEffect(() => {
-    document.body.classList.add('cursor-none')
+    document.body.classList.add("cursor-none");
     return () => {
-      document.body.classList.remove('cursor-none')
-    }
-  }, [])
+      document.body.classList.remove("cursor-none");
+    };
+  }, []);
 
   return (
     <ParallaxProvider>
@@ -36,15 +40,23 @@ const Portfolio = () => {
         {/* Liens sociaux */}
         <SocialLinks />
 
-        {/* Bouton de menu */}
         <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
-        {/* Sections */}
+        {/* Sections stacking order: Contact & Services above About */}
         <HeroSection />
         <ProjectsSection />
-        <ServicesSection />
-        <AboutSection />
-        <ContactSection />
+
+        {/* AboutSection is rendered first, but with lower z-index */}
+
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ServicesSection />
+        </div>
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <AboutSection />
+        </div>
+        <div style={{ position: "relative", zIndex: 2 }}>
+          <ContactSection />
+        </div>
 
         {/* Pied de page */}
         <Footer />
@@ -65,24 +77,25 @@ const Portfolio = () => {
         <motion.div
           className="fixed inset-0 pointer-events-none z-10"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
+            backgroundImage:
+              "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
           }}
           animate={{
-            backgroundPosition: ['0px 0px', '0px -30px']
+            backgroundPosition: ["0px 0px", "0px -30px"],
           }}
           transition={{
             backgroundPosition: {
               repeat: Infinity,
               repeatType: "loop",
               duration: 10,
-              ease: "linear"
-            }
+              ease: "linear",
+            },
           }}
         />
       </div>
     </ParallaxProvider>
-  )
-}
+  );
+};
 
-export default Portfolio
+export default Portfolio;

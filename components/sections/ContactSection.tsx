@@ -1,10 +1,13 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import SectionTitle from '../ui/SectionTitle';
+import React from "react";
+import { motion } from "framer-motion";
+import SectionTitle from "../ui/SectionTitle";
 
 const ContactSection = () => (
-  <section id="contact" className="py-16 sm:py-24 md:py-32 bg-white text-black">
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section
+    id="contact"
+    className="py-16 sm:py-24 md:py-32 bg-white text-black min-h-screen"
+  >
+    <div className="max-w-6xl mt-52 mx-auto px-4 sm:px-6 lg:px-8 ">
       <SectionTitle>Contactez-nous</SectionTitle>
       <div className="flex flex-col md:flex-row gap-8 sm:gap-12 md:gap-16">
         <div className="w-full md:w-1/2">
@@ -15,19 +18,24 @@ const ContactSection = () => (
               viewport={{ once: true }}
               variants={{
                 masque: { opacity: 0, y: 20, rotate: -2 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   rotate: 0,
                   transition: {
                     type: "spring",
                     stiffness: 200,
-                    damping: 15
-                  }
-                }
+                    damping: 15,
+                  },
+                },
               }}
             >
-              <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+              <label
+                htmlFor="nom"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Nom
+              </label>
               <motion.input
                 type="text"
                 id="nom"
@@ -44,20 +52,25 @@ const ContactSection = () => (
               viewport={{ once: true }}
               variants={{
                 masque: { opacity: 0, y: 20, rotate: 2 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   rotate: 0,
                   transition: {
                     type: "spring",
                     stiffness: 200,
                     damping: 15,
-                    delay: 0.1
-                  }
-                }
+                    delay: 0.1,
+                  },
+                },
               }}
             >
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email
+              </label>
               <motion.input
                 type="email"
                 id="email"
@@ -74,20 +87,25 @@ const ContactSection = () => (
               viewport={{ once: true }}
               variants={{
                 masque: { opacity: 0, y: 20, rotate: -2 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   rotate: 0,
                   transition: {
                     type: "spring",
                     stiffness: 200,
                     damping: 15,
-                    delay: 0.2
-                  }
-                }
+                    delay: 0.2,
+                  },
+                },
               }}
             >
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+              <label
+                htmlFor="message"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Message
+              </label>
               <motion.textarea
                 id="message"
                 name="message"
@@ -108,17 +126,17 @@ const ContactSection = () => (
               viewport={{ once: true }}
               variants={{
                 masque: { opacity: 0, y: 20, rotate: 2 },
-                visible: { 
-                  opacity: 1, 
+                visible: {
+                  opacity: 1,
                   y: 0,
                   rotate: 0,
                   transition: {
                     type: "spring",
                     stiffness: 200,
                     damping: 15,
-                    delay: 0.3
-                  }
-                }
+                    delay: 0.3,
+                  },
+                },
               }}
             >
               Envoyer le Message
@@ -133,21 +151,19 @@ const ContactSection = () => (
             viewport={{ once: true }}
             variants={{
               masque: { opacity: 0, scale: 0.8, rotate: -5 },
-              visible: { 
-                opacity: 1, 
+              visible: {
+                opacity: 1,
                 scale: 1,
                 rotate: 0,
                 transition: {
                   type: "spring",
                   stiffness: 200,
-                  damping: 15
-                }
-              }
+                  damping: 15,
+                },
+              },
             }}
-
           >
-              Créons ensemble quelque chose d'extraordinaire.
-
+            Créons ensemble quelque chose d'extraordinaire.
           </motion.div>
         </div>
       </div>

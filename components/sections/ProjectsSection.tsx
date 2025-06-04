@@ -58,7 +58,7 @@ const ProjectsSection = () => {
   const refsProjets = useRef<Array<HTMLDivElement | null>>([]);
   const router = useRouter();
 
-  const handleProjectClick = (projectId) => {
+  const handleProjectClick = (projectId: number) => {
     // Animation de sortie
     document.body.style.overflow = "hidden";
     const element = document.getElementById("projects-section");

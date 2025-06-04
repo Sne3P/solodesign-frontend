@@ -77,14 +77,184 @@ const services = [
 
 // -------------------- Components --------------------
 
+
+interface Service {
+  icon: React.ReactNode
+  title: string
+  description: string
+  tools: string[]
+}
+
+interface ServiceCardProps {
+  service: Service
+  index: number
+}
+
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
+  const controls = useAnimation()
+
+  useEffect(() => {
+    if (isInView) controls.start("visible")
+    else controls.start("hidden")
+  }, [isInView, controls])
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 },
+    },
+  }
+
+  const iconVariants = {
+    hidden: { scale: 0.8, rotate: -5 },
+    visible: {
+      scale: 1,
+      rotate: 0,
+      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 + 0.2 },
+    },
+  }
+
+  const toolVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: index * 0.1 + i * 0.05 + 0.3,
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+      },
+    }),
+  }
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className="bg-white text-black p-6 rounded-lg shadow-lg transform-gpu"
+      variants={cardVariants}
+      initial="hidden"
+      animate={controls}
+      whileHover={{
+        scale: 1.05,
+        rotate: [0, -2, 2, -2, 2, 0],
+        transition: { type: "spring", stiffness: 600, damping: 15 },
+      }}
+    >
+      <motion.div className="mb-4 text-3xl" variants={iconVariants}>
+        {service.icon}
+      </motion.div>
+      <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
+      <p className="text-gray-600 mb-4">{service.description}</p>
+      <div className="flex flex-wrap gap-2">
+        {service.tools.map((tool, toolIndex) => (
+          <motion.span
+            key={toolIndex}
+            className="bg-gray-200 text-gray-800 px-2 py-1 rounded text-sm transition-colors duration-200"
+            variants={toolVariants}
+            custom={toolIndex}
+          >
+            {tool}
+          </motion.span>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+interface ProcessStepData {
+  title: string
+  description: string
+}
+
+interface ProcessStepProps {
+  step: ProcessStepData
+  index: number
+  totalSteps: number
+}
+
+const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: false, amount: 0.5, margin: "-100px" })
+  const controls = useAnimation()
+
+  useEffect(() => {
+    if (isInView) controls.start("visible")
+    else controls.start("hidden")
+  }, [isInView, controls])
+
+  const variants = {
+    hidden: { opacity: 0, x: index % 2 === 0 ? -20 : 20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 },
+    },
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      className="flex items-center mb-8 group cursor-pointer"
+      variants={variants}
+      initial="hidden"
+      animate={controls}
+      whileHover="hover"
+    >
+      <div className="relative">
+        <motion.div
+          className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center font-bold text-xl mr-4"
+          variants={{
+            hover: {
+              scale: 1.1,
+              boxShadow: "0 0 8px rgba(255,255,255,0.5)",
+              transition: { type: "spring", stiffness: 800, damping: 20 },
+            },
+          }}
+        >
+          {index + 1}
+        </motion.div>
+        {index < totalSteps - 1 && (
+          <motion.div
+            className="absolute left-6 top-12 w-0.5 bg-white h-[calc(100%+2rem)] origin-top"
+            initial={{ scaleY: 0 }}
+            animate={{ scaleY: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          />
+        )}
+      </div>
+      <motion.div
+        variants={{
+          hover: {
+            x: 5,
+            transition: { type: "spring", stiffness: 600, damping: 20 },
+          },
+        }}
+      >
+        <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+        <p>{step.description}</p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 /*
   GlowingCards : Conteneur captant le mouvement de la souris, même hors des cases.
 */
-const GlowingCards = ({ children }) => {
-  const containerRef = useRef(null)
+interface GlowingCardsProps {
+  children: React.ReactElement[] | React.ReactElement
+}
+
+const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
+  const containerRef = useRef<HTMLDivElement>(null)
   const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
     setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }
@@ -112,8 +282,15 @@ const GlowingCards = ({ children }) => {
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
 */
-const GlowingCard = ({ children, index, globalPos, containerRef }) => {
-  const cardRef = useRef(null)
+interface GlowingCardProps {
+  children: React.ReactNode
+  index: number
+  globalPos?: { x: number; y: number }
+  containerRef?: React.RefObject<HTMLDivElement>
+}
+
+const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, containerRef }) => {
+  const cardRef = useRef<HTMLDivElement>(null)
   const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
@@ -138,19 +315,22 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
   const handleHoverStart = () => hoverState.set(1)
   const handleHoverEnd = () => hoverState.set(0)
 
-  const glowOpacity = useTransform([localX, localY], ([x, y]) => {
-    if (!cardRef.current) return 0
-    const { offsetWidth: width, offsetHeight: height } = cardRef.current
-    const centerX = width / 2
-    const centerY = height / 2
-    const distance = Math.hypot(x - centerX, y - centerY)
-    return Math.max(0, 1 - distance / (width / 1.5))
-  })
+  const glowOpacity = useTransform<[number, number], number>(
+    [localX, localY],
+    ([x, y]) => {
+      if (!cardRef.current) return 0
+      const { offsetWidth: width, offsetHeight: height } = cardRef.current
+      const centerX = width / 2
+      const centerY = height / 2
+      const distance = Math.hypot(Number(x) - centerX, Number(y) - centerY)
+      return Math.max(0, 1 - distance / (width / 1.5))
+    },
+  )
 
-  const background = useTransform(
+  const background = useTransform<[number, number, number, number], string>(
     [localX, localY, glowOpacity, hoverState],
     ([x, y, opacity, h]) =>
-      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${opacity * 0.2 * h}), transparent)`
+      `radial-gradient(circle 150px at ${Number(x)}px ${Number(y)}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
   )
 
 

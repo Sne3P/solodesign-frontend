@@ -96,14 +96,14 @@ const ContactPage = () => {
             transition={{ duration: 0.3 }}
           >
             <Link href="/" passHref>
-              <motion.span
+              <motion.a
                 className="bg-white text-black p-2 rounded-full inline-block cursor-pointer"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={(e) => handleExit(e, "/")}
               >
                 <ArrowLeft size={24} />
-              </motion.span>
+              </motion.a>
             </Link>
           </motion.div>
 
@@ -198,6 +198,75 @@ const ContactPage = () => {
     </ParallaxProvider>
   )
 }
+
+type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement>
+
+const InputField: React.FC<InputFieldProps> = React.memo(
+  ({ type, name, placeholder, required }) => (
+    <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <motion.input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        required={required}
+      className="w-full px-6 py-4 bg-white bg-opacity-5 text-white placeholder-white placeholder-opacity-50 focus:outline-none transition-colors z-10 relative"
+      whileFocus={{ scale: 1.02 }}
+    />
+    <motion.div
+      className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-20"
+      initial={{ x: "-100%" }}
+      whileHover={{ x: "100%" }}
+      transition={{ duration: 0.5 }}
+    />
+  </motion.div>
+  )
+)
+InputField.displayName = "InputField"
+
+type TextareaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
+
+const TextareaField: React.FC<TextareaFieldProps> = React.memo(
+  ({ name, placeholder, required }) => (
+    <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <motion.textarea
+        name={name}
+        placeholder={placeholder}
+        required={required}
+      className="w-full px-6 py-4 bg-white bg-opacity-5 text-white placeholder-white placeholder-opacity-50 focus:outline-none transition-colors resize-none h-40 z-10 relative"
+      whileFocus={{ scale: 1.02 }}
+    />
+    <motion.div
+      className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-20"
+      initial={{ x: "-100%" }}
+      whileHover={{ x: "100%" }}
+      transition={{ duration: 0.5 }}
+    />
+  </motion.div>
+  )
+)
+TextareaField.displayName = "TextareaField"
+
+const BackgroundAnimation = React.memo(() => (
+  <motion.div
+    className="fixed inset-0 pointer-events-none z-10"
+    style={{
+      backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
+      backgroundSize: "30px 30px",
+    }}
+    animate={{
+      backgroundPosition: ["0px 0px", "0px -30px"],
+    }}
+    transition={{
+      backgroundPosition: {
+        repeat: Number.POSITIVE_INFINITY,
+        repeatType: "loop",
+        duration: 10,
+        ease: "linear",
+      },
+    }}
+  />
+))
+BackgroundAnimation.displayName = "BackgroundAnimation"
 
 
 export default ContactPage

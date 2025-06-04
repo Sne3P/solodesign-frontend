@@ -55,9 +55,7 @@ const projets = [
 ];
 
 const ProjectsSection = () => {
-  const refsProjets = useRef(
-    Array.from({ length: 6 }, () => createRef<HTMLDivElement>())
-  );
+  const refsProjets = useRef<Array<HTMLDivElement | null>>([]);
   const router = useRouter();
 
   const handleProjectClick = (projectId) => {
@@ -87,7 +85,7 @@ const ProjectsSection = () => {
           {projets.map((projet, index) => (
             <motion.div
               key={projet.id}
-              ref={refsProjets.current[index]}
+              ref={(el) => (refsProjets.current[index] = el)}
               className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 md:gap-16"
               initial="masque"
               whileInView="visible"

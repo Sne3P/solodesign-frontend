@@ -270,7 +270,7 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
       localX.set(relativeX)
       localY.set(relativeY)
     }
-  }, [globalPos, containerRef])
+  }, [globalPos, containerRef, localX, localY])
 
   const handleHoverStart = () => hoverState.set(1)
   const handleHoverEnd = () => hoverState.set(0)

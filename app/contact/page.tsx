@@ -218,6 +218,7 @@ const InputField = React.memo(({ type, name, placeholder, required }) => (
     />
   </motion.div>
 ))
+InputField.displayName = "InputField"
 
 const TextareaField = React.memo(({ name, placeholder, required }) => (
   <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -236,6 +237,7 @@ const TextareaField = React.memo(({ name, placeholder, required }) => (
     />
   </motion.div>
 ))
+TextareaField.displayName = "TextareaField"
 
 const BackgroundAnimation = React.memo(() => (
   <motion.div
@@ -257,6 +259,7 @@ const BackgroundAnimation = React.memo(() => (
     }}
   />
 ))
+BackgroundAnimation.displayName = "BackgroundAnimation"
 
 export default ContactPage
 

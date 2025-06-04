@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 
 const ScrollArrow = () => (
   <motion.div
@@ -9,7 +9,10 @@ const ScrollArrow = () => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 2.5, duration: 0.5, type: "spring" }}
   >
-    <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+    <motion.div
+      animate={{ y: [0, 10, 0] }}
+      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+    >
       <ChevronDown size={32} className="text-white" />
     </motion.div>
   </motion.div>

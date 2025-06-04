@@ -1,12 +1,12 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Instagram, Twitter, Linkedin, Dribbble } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { Instagram, Twitter, Linkedin, Dribbble } from "lucide-react";
 
 const socialLinks = [
-  { Icon: Twitter, href: '#', label: 'Twitter' },
-  { Icon: Instagram, href: '#', label: 'Instagram' },
-  { Icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { Icon: Dribbble, href: '#', label: 'Dribbble' },
+  { Icon: Twitter, href: "#", label: "Twitter" },
+  { Icon: Instagram, href: "#", label: "Instagram" },
+  { Icon: Linkedin, href: "#", label: "LinkedIn" },
+  { Icon: Dribbble, href: "#", label: "Dribbble" },
 ];
 
 const SocialLinks: React.FC = () => {
@@ -15,7 +15,13 @@ const SocialLinks: React.FC = () => {
       className="fixed left-6 top-1/2 transform -translate-y-1/2 z-[9999] flex flex-col space-y-6 mix-blend-difference"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 1.5, duration: 0.5, type: "spring", stiffness: 100, damping: 10 }}
+      transition={{
+        delay: 1.5,
+        duration: 0.5,
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      }}
     >
       {socialLinks.map(({ Icon, href, label }, index) => (
         <motion.a

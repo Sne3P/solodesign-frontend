@@ -1,7 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useInView,
+  useAnimation,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import {
   Code,
   Paintbrush,
@@ -21,11 +29,6 @@ import MenuButton from "../../components/layout/MenuButton";
 import LogoTitle from "../../components/layout/LogoTitle";
 import Cursor from "../../components/layout/Cursor";
 import Footer from "../../components/sections/Footer";
-import {
-  ServiceCard,
-  ProcessStep,
-  GlowingCard,
-} from "../../components/pages/services";
 import React from "react";
 
 // -------------------- Data --------------------
@@ -77,50 +80,51 @@ const services = [
 
 // -------------------- Components --------------------
 
-
-interface Service {
-  icon: React.ReactNode
-  title: string
-  description: string
-  tools: string[]
-}
-
-interface ServiceCardProps {
-  service: Service
-  index: number
-}
-
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
-  const controls = useAnimation()
+const ServiceCard = ({ service, index }) => {
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, {
+    once: false,
+    amount: 0.2,
+    margin: "-100px",
+  });
+  const controls = useAnimation();
 
   useEffect(() => {
-    if (isInView) controls.start("visible")
-    else controls.start("hidden")
-  }, [isInView, controls])
+    if (isInView) controls.start("visible");
+    else controls.start("hidden");
+  }, [isInView, controls]);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 },
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+        delay: index * 0.1,
+      },
     },
-  }
+  };
 
   const iconVariants = {
     hidden: { scale: 0.8, rotate: -5 },
     visible: {
       scale: 1,
       rotate: 0,
-      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 + 0.2 },
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+        delay: index * 0.1 + 0.2,
+      },
     },
-  }
+  };
 
   const toolVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: (i: number) => ({
+    visible: (i) => ({
       opacity: 1,
       x: 0,
       transition: {
@@ -130,7 +134,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
         damping: 15,
       },
     }),
-  }
+  };
 
   return (
     <motion.div
@@ -163,38 +167,36 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
         ))}
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-interface ProcessStepData {
-  title: string
-  description: string
-}
-
-interface ProcessStepProps {
-  step: ProcessStepData
-  index: number
-  totalSteps: number
-}
-
-const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) => {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: false, amount: 0.5, margin: "-100px" })
-  const controls = useAnimation()
+const ProcessStep = ({ step, index, totalSteps }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, {
+    once: false,
+    amount: 0.5,
+    margin: "-100px",
+  });
+  const controls = useAnimation();
 
   useEffect(() => {
-    if (isInView) controls.start("visible")
-    else controls.start("hidden")
-  }, [isInView, controls])
+    if (isInView) controls.start("visible");
+    else controls.start("hidden");
+  }, [isInView, controls]);
 
   const variants = {
     hidden: { opacity: 0, x: index % 2 === 0 ? -20 : 20 },
     visible: {
       opacity: 1,
       x: 0,
-      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 },
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+        delay: index * 0.1,
+      },
     },
-  }
+  };
 
   return (
     <motion.div
@@ -239,25 +241,20 @@ const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) =>
         <p>{step.description}</p>
       </motion.div>
     </motion.div>
-  )
-}
+  );
+};
 
 /*
   GlowingCards : Conteneur captant le mouvement de la souris, même hors des cases.
 */
-interface GlowingCardsProps {
-  children: React.ReactElement[] | React.ReactElement
-}
+const GlowingCards = ({ children }) => {
+  const containerRef = useRef(null);
+  const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 });
 
-const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-  }
+  const handleMouseMove = (e) => {
+    const rect = containerRef.current.getBoundingClientRect();
+    setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
 
   const handleMouseLeave = () => {
     setGlobalPos({ x: -1000, y: -1000 });
@@ -281,58 +278,67 @@ const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
 */
-interface GlowingCardProps {
-  children: React.ReactNode
-  index: number
-  globalPos?: { x: number; y: number }
-  containerRef?: React.RefObject<HTMLDivElement>
-}
-
-const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, containerRef }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
-  const localX = useMotionValue(0)
-  const localY = useMotionValue(0)
-
-  const updateLocalPosition = useCallback(
-    (pos) => {
-      if (!cardRef.current || !containerRef?.current) return;
-      const cardRect = cardRef.current.getBoundingClientRect();
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const relativeX = pos.x - (cardRect.left - containerRect.left);
-      const relativeY = pos.y - (cardRect.top - containerRect.top);
-      localX.set(relativeX);
-      localY.set(relativeY);
-    },
-    [containerRef, localX, localY]
-  );
+const GlowingCard = ({ children, index, globalPos, containerRef }) => {
+  const cardRef = useRef(null);
+  const hoverState = useSpring(0, { stiffness: 300, damping: 30 });
+  const localX = useMotionValue(0);
+  const localY = useMotionValue(0);
 
   useEffect(() => {
-    if (globalPos) updateLocalPosition(globalPos);
-  }, [globalPos, updateLocalPosition]);
+    if (globalPos && cardRef.current && containerRef?.current) {
+      const cardRect = cardRef.current.getBoundingClientRect();
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const relativeX = globalPos.x - (cardRect.left - containerRect.left);
+      const relativeY = globalPos.y - (cardRect.top - containerRect.top);
+      localX.set(relativeX);
+      localY.set(relativeY);
+    }
+  }, [globalPos, containerRef]);
 
   const handleHoverStart = () => hoverState.set(1);
   const handleHoverEnd = () => hoverState.set(0);
 
-  const glowOpacity = useTransform<[number, number], number>(
-    [localX, localY],
-    ([x, y]) => {
-      if (!cardRef.current) return 0
-      const { offsetWidth: width, offsetHeight: height } = cardRef.current
-      const centerX = width / 2
-      const centerY = height / 2
-      const distance = Math.hypot(Number(x) - centerX, Number(y) - centerY)
-      return Math.max(0, 1 - distance / (width / 1.5))
-    },
-  )
+  const glowOpacity = useTransform([localX, localY], ([x, y]) => {
+    if (!cardRef.current) return 0;
+    const { offsetWidth: width, offsetHeight: height } = cardRef.current;
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const distance = Math.hypot(x - centerX, y - centerY);
+    return Math.max(0, 1 - distance / (width / 1.5));
+  });
 
-  const background = useTransform<[number, number, number, number], string>(
+  const background = useTransform(
     [localX, localY, glowOpacity, hoverState],
     ([x, y, opacity, h]) =>
-      `radial-gradient(circle 150px at ${Number(x)}px ${Number(y)}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
-  )
+      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${
+        opacity * 0.2 * h
+      }), transparent)`
+  );
 
-
+  return (
+    <motion.div
+      ref={cardRef}
+      onClick={() => {}} // Rendre cliquable pour activer le custom cursor
+      className="cursor-pointer relative overflow-hidden bg-white bg-opacity-5 p-6 rounded-lg backdrop-blur-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      whileHover={{
+        scale: 1.02,
+        transition: { type: "spring", stiffness: 400, damping: 20 },
+      }}
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
+    >
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background }}
+      />
+      <div className="relative z-10">{children}</div>
+    </motion.div>
+  );
+};
 
 // -------------------- Main Page --------------------
 

@@ -110,9 +110,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <LogoTitle className="text-black" />
-        <SocialLinks className="text-black" />
-        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} className="text-black" />
+        <LogoTitle />
+        <SocialLinks />
+        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
         <motion.div
           className="fixed top-24 left-8 z-50 bg-black text-white p-3 rounded-full cursor-pointer"
@@ -265,8 +265,8 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
           </AnimatedSection>
         </main>
 
-        <Footer className="bg-gray-100 text-black" />
-        <ScrollArrow className="text-black" />
+        <Footer />
+        <ScrollArrow />
         <Cursor />
 
         <motion.div

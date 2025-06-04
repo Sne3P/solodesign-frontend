@@ -5,7 +5,7 @@ import Image from 'next/image';
 import SectionTitle from '../ui/SectionTitle';
 
 const AboutSection = () => (
-  <Parallax y={[-50, 50]}>
+  <Parallax translateY={[-50, 50]}>
     <section id="à propos" className="py-16 sm:py-24 md:py-32 mb-16 sm:mb-24 md:mb-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle>À Propos de Nous</SectionTitle>

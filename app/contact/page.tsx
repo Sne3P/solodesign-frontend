@@ -132,7 +132,7 @@ const ContactPage = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, delay: 0.1, type: "spring", stiffness: 100, damping: 10 }}
               >
-                Prêt à donner vie à votre projet ? Contactez-nous dès aujourd'hui pour une consultation gratuite et
+                Prêt à donner vie à votre projet ? Contactez-nous dès aujourd’hui pour une consultation gratuite et
                 découvrez comment nous pouvons transformer votre vision en réalité.
               </motion.p>
             </Parallax>

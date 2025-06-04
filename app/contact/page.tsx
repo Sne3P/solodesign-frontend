@@ -17,7 +17,6 @@ const Footer = lazy(() => import("../../components/sections/Footer"))
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [isExiting, setIsExiting] = useState(false)
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -66,7 +65,6 @@ const ContactPage = () => {
 
   const handleExit = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
-    setIsExiting(true)
     setTimeout(() => {
       router.push(href)
     }, 500) // Correspond à la durée de l'animation de sortie

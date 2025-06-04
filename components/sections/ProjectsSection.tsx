@@ -7,6 +7,8 @@ import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
 import { useRouter } from 'next/navigation';
 
+const MotionImage = motion(Image);
+
 const projets = [
   { id: 1, titre: "Monochrome", desc: "Une plateforme e-commerce élégante pour une marque de mode minimaliste", image: "/placeholder.svg?height=600&width=800" },
   { id: 2, titre: "Minimal", desc: "Identité de marque pour une galerie d'art contemporain mettant en valeur des œuvres avant-gardistes", image: "/placeholder.svg?height=600&width=800" },
@@ -70,9 +72,11 @@ const ProjectsSection = () => {
                     }
                   }}
                 >
-                  <motion.img
+                  <MotionImage
                     src={projet.image}
                     alt={projet.titre}
+                    width={800}
+                    height={600}
                     className="w-full h-[300px] sm:h-[400px] md:h-[450px] object-cover rounded-lg shadow-lg"
                     whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? -2 : 2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 10 }}

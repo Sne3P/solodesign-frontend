@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import {
   motion,
   useScroll,
@@ -106,6 +106,52 @@ const GlowingCards = ({ children }) => {
     </motion.div>
   )
 }
+
+
+/*
+  GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
+  Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
+*/
+const GlowingCard = ({ children, index, globalPos, containerRef }) => {
+  const cardRef = useRef(null)
+  const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
+  const localX = useMotionValue(0)
+  const localY = useMotionValue(0)
+
+  const updateLocalPosition = useCallback(
+    (pos) => {
+      if (!cardRef.current || !containerRef?.current) return
+      const cardRect = cardRef.current.getBoundingClientRect()
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const relativeX = pos.x - (cardRect.left - containerRect.left)
+      const relativeY = pos.y - (cardRect.top - containerRect.top)
+      localX.set(relativeX)
+      localY.set(relativeY)
+    },
+    [containerRef, localX, localY]
+  )
+
+  useEffect(() => {
+    if (globalPos) updateLocalPosition(globalPos)
+  }, [globalPos, updateLocalPosition])
+
+  const handleHoverStart = () => hoverState.set(1)
+  const handleHoverEnd = () => hoverState.set(0)
+
+  const glowOpacity = useTransform([localX, localY], ([x, y]) => {
+    if (!cardRef.current) return 0
+    const { offsetWidth: width, offsetHeight: height } = cardRef.current
+    const centerX = width / 2
+    const centerY = height / 2
+    const distance = Math.hypot(x - centerX, y - centerY)
+    return Math.max(0, 1 - distance / (width / 1.5))
+  })
+
+  const background = useTransform(
+    [localX, localY, glowOpacity, hoverState],
+    ([x, y, opacity, h]) =>
+      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${opacity * 0.2 * h}), transparent)`
+  )
 
 
 

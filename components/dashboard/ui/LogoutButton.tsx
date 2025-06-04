@@ -23,7 +23,7 @@ export default function LogoutButton() {
         description: "Vous avez été déconnecté avec succès",
       });
       router.replace("/login");
-    } catch (error) {
+    } catch {
       showToast({
         type: "error",
         title: "Erreur de déconnexion",

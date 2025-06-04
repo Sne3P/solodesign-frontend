@@ -1,43 +1,57 @@
-import React, { useEffect, useRef } from "react"
-import { motion, useAnimation, useInView } from "framer-motion"
+import React, { useEffect, useRef } from "react";
+import { motion, useAnimation, useInView } from "framer-motion";
 
 interface ServiceCardProps {
   service: {
-    icon: React.ReactNode
-    title: string
-    description: string
-    tools: string[]
-  }
-  index: number
+    icon: string; // Change to string for image URL
+    title: string;
+    description: string;
+    tools: string[];
+  };
+  index: number;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
-  const controls = useAnimation()
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, {
+    once: false,
+    amount: 0.2,
+    margin: "-100px",
+  });
+  const controls = useAnimation();
 
   useEffect(() => {
-    if (isInView) controls.start("visible")
-    else controls.start("hidden")
-  }, [isInView, controls])
+    if (isInView) controls.start("visible");
+    else controls.start("hidden");
+  }, [isInView, controls]);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 },
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+        delay: index * 0.1,
+      },
     },
-  }
+  };
 
   const iconVariants = {
     hidden: { scale: 0.8, rotate: -5 },
     visible: {
       scale: 1,
       rotate: 0,
-      transition: { type: "spring", stiffness: 250, damping: 15, delay: index * 0.1 + 0.2 },
+      transition: {
+        type: "spring",
+        stiffness: 250,
+        damping: 15,
+        delay: index * 0.1 + 0.2,
+      },
     },
-  }
+  };
 
   const toolVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -51,7 +65,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
         damping: 15,
       },
     }),
-  }
+  };
 
   return (
     <motion.div
@@ -67,7 +81,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
       }}
     >
       <motion.div className="mb-4 text-3xl" variants={iconVariants}>
-        {service.icon}
+        <img
+          src={service.icon}
+          alt={service.title}
+          className="w-12 h-12 object-contain mx-auto"
+        />
       </motion.div>
       <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
       <p className="text-gray-600 mb-4">{service.description}</p>
@@ -84,9 +102,9 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
         ))}
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-ServiceCard.displayName = "ServiceCard"
+ServiceCard.displayName = "ServiceCard";
 
-export default ServiceCard
+export default ServiceCard;

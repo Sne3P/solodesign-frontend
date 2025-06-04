@@ -5,30 +5,11 @@ import { Menu, X } from "lucide-react"
 import Link from "next/link"
 
 interface MenuButtonProps {
-  /** Initial open state when the component manages its own state */
   initialMenuOpen?: boolean
-  /** Controlled open state */
-  menuOpen?: boolean
-  /** Setter for controlled state */
-  setMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const MenuButton: React.FC<MenuButtonProps> = ({
-  initialMenuOpen = false,
-  menuOpen,
-  setMenuOpen,
-}) => {
-  const [internalMenuOpen, setInternalMenuOpen] = useState(initialMenuOpen)
-  const isControlled = typeof menuOpen === "boolean" && setMenuOpen
-  const actualMenuOpen = isControlled ? menuOpen : internalMenuOpen
-
-  const toggleMenu = () => {
-    if (isControlled && setMenuOpen) {
-      setMenuOpen((open) => !open)
-    } else {
-      setInternalMenuOpen((prev) => !prev)
-    }
-  }
+const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
+  const [menuOpen, setMenuOpen] = useState(initialMenuOpen)
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
   const [isRedirecting, setIsRedirecting] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -60,11 +41,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
 
   const handleNavigation = (path: string) => {
     setIsRedirecting(true)
-    if (isControlled && setMenuOpen) {
-      setMenuOpen(false)
-    } else {
-      setInternalMenuOpen(false)
-    }
+    setMenuOpen(false)
 
     if (path.startsWith("/#")) {
       const sectionId = path.substring(2)
@@ -110,22 +87,22 @@ const MenuButton: React.FC<MenuButtonProps> = ({
         <motion.button
           ref={buttonRef}
           className="bg-white text-black w-12 h-24 sm:w-16 sm:h-32 rounded-l-full flex items-center justify-start pl-2 sm:pl-4 group z-[10000] overflow-visible"
-          onClick={() => !isRedirecting && toggleMenu()}
+          onClick={() => !isRedirecting && setMenuOpen(!menuOpen)}
           whileHover={{
             scale: 1.1,
             transition: { type: "spring", stiffness: 400, damping: 12 },
           }}
           whileTap={{ scale: 0.95 }}
-          aria-expanded={actualMenuOpen}
-          aria-label={actualMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
           <motion.div
             initial={{ x: 0 }}
-            animate={{ x: actualMenuOpen ? -5 : 0 }}
+            animate={{ x: menuOpen ? -5 : 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <motion.div whileHover={{ rotate: 90 }} transition={{ type: "spring", stiffness: 300, damping: 10 }}>
-              {actualMenuOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <Menu size={20} className="sm:w-6 sm:h-6" />}
+              {menuOpen ? <X size={20} className="sm:w-6 sm:h-6" /> : <Menu size={20} className="sm:w-6 sm:h-6" />}
             </motion.div>
           </motion.div>
         </motion.button>
@@ -137,7 +114,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({
       </motion.div>
 
       <AnimatePresence>
-        {actualMenuOpen && (
+        {menuOpen && (
           <motion.div
             className="fixed inset-0 bg-white text-black z-40 flex items-center justify-center overflow-hidden"
             initial={{ clipPath: `circle(0px at ${buttonPosition.x}px ${buttonPosition.y}px)` }}

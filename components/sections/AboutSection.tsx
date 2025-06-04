@@ -1,11 +1,10 @@
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import SectionTitle from '../ui/SectionTitle';
 
 const AboutSection = () => (
-  <Parallax translateY={[-50, 50]}>
+  <Parallax y={[-50, 50]}>
     <section id="à propos" className="py-16 sm:py-24 md:py-32 mb-16 sm:mb-24 md:mb-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle>À Propos de Nous</SectionTitle>
@@ -33,11 +32,9 @@ const AboutSection = () => (
             transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <Image
-              src="/placeholder.svg"
+            <img
+              src="../placeholder.svg"
               alt="À Propos de Solo Design"
-              width={800}
-              height={600}
               className="w-full h-[250px] sm:h-[350px] md:h-[400px] object-cover rounded-lg shadow-lg"
             />
           </motion.div>

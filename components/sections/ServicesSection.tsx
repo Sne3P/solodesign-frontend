@@ -16,7 +16,7 @@ const ServicesSection = () => (
       <SectionTitle>Nos Services</SectionTitle>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 md:gap-16">
         {services.map((service, index) => (
-          <Parallax key={service.titre} translateY={[-20, 20]}>
+          <Parallax key={service.titre} y={[-20, 20]} tagOuter="div">
             <motion.div
               className="bg-gray-100 p-6 sm:p-8 rounded-lg shadow-lg relative overflow-hidden service-card z-[100]"
               initial="masque"

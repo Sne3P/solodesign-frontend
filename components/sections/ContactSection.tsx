@@ -144,10 +144,8 @@ const ContactSection = () => (
                 }
               }
             }}
-
           >
-              Créons ensemble quelque chose d'extraordinaire.
-
+            Créons ensemble quelque chose d'extraordinaire.
           </motion.div>
         </div>
       </div>

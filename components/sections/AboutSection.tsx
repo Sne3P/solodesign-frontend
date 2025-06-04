@@ -1,6 +1,7 @@
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import SectionTitle from '../ui/SectionTitle';
 
 const AboutSection = () => (
@@ -32,9 +33,11 @@ const AboutSection = () => (
             transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            <img
-              src="../placeholder.svg"
+            <Image
+              src="/placeholder.svg"
               alt="À Propos de Solo Design"
+              width={800}
+              height={600}
               className="w-full h-[250px] sm:h-[350px] md:h-[400px] object-cover rounded-lg shadow-lg"
             />
           </motion.div>

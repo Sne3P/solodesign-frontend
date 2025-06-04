@@ -13,6 +13,7 @@ const ScrollArrow = lazy(() => import("../../components/layout/ScrollArrow"))
 const Cursor = lazy(() => import("../../components/layout/Cursor"))
 const LogoTitle = lazy(() => import("../../components/layout/LogoTitle"))
 const Footer = lazy(() => import("../../components/sections/Footer"))
+import { InputField, TextareaField, BackgroundAnimation } from "../../components/pages/contact"
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -266,6 +267,7 @@ const BackgroundAnimation = React.memo(() => (
   />
 ))
 BackgroundAnimation.displayName = "BackgroundAnimation"
+
 
 export default ContactPage
 

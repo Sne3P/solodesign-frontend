@@ -1,14 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import {
   motion,
   useScroll,
   useSpring,
-  useInView,
-  useAnimation,
-  useMotionValue,
-  useTransform,
 } from "framer-motion"
 import {
   Code,
@@ -29,6 +25,7 @@ import MenuButton from "../../components/layout/MenuButton"
 import LogoTitle from "../../components/layout/LogoTitle"
 import Cursor from "../../components/layout/Cursor"
 import Footer from "../../components/sections/Footer"
+import { ServiceCard, ProcessStep, GlowingCard } from "../../components/pages/services"
 import React from "react"
 
 // -------------------- Data --------------------
@@ -79,6 +76,7 @@ const services = [
 ]
 
 // -------------------- Components --------------------
+
 
 interface Service {
   icon: React.ReactNode
@@ -279,6 +277,7 @@ const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
   )
 }
 
+
 /*
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
@@ -296,16 +295,22 @@ const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, c
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
 
-  useEffect(() => {
-    if (globalPos && cardRef.current && containerRef?.current) {
+  const updateLocalPosition = useCallback(
+    (pos) => {
+      if (!cardRef.current || !containerRef?.current) return
       const cardRect = cardRef.current.getBoundingClientRect()
       const containerRect = containerRef.current.getBoundingClientRect()
-      const relativeX = globalPos.x - (cardRect.left - containerRect.left)
-      const relativeY = globalPos.y - (cardRect.top - containerRect.top)
+      const relativeX = pos.x - (cardRect.left - containerRect.left)
+      const relativeY = pos.y - (cardRect.top - containerRect.top)
       localX.set(relativeX)
       localY.set(relativeY)
-    }
-  }, [globalPos, containerRef, localX, localY])
+    },
+    [containerRef, localX, localY]
+  )
+
+  useEffect(() => {
+    if (globalPos) updateLocalPosition(globalPos)
+  }, [globalPos, updateLocalPosition])
 
   const handleHoverStart = () => hoverState.set(1)
   const handleHoverEnd = () => hoverState.set(0)
@@ -328,27 +333,7 @@ const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, c
       `radial-gradient(circle 150px at ${Number(x)}px ${Number(y)}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
   )
 
-  return (
-    <motion.div
-      ref={cardRef}
-      onClick={() => {}} // Rendre cliquable pour activer le custom cursor
-      className="cursor-pointer relative overflow-hidden bg-white bg-opacity-5 p-6 rounded-lg backdrop-blur-md"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      whileHover={{
-        scale: 1.02,
-        transition: { type: "spring", stiffness: 400, damping: 20 },
-      }}
-      whileTap={{ scale: 0.98 }}
-      onHoverStart={handleHoverStart}
-      onHoverEnd={handleHoverEnd}
-    >
-      <motion.div className="absolute inset-0 pointer-events-none" style={{ background }} />
-      <div className="relative z-10">{children}</div>
-    </motion.div>
-  )
-}
+
 
 // -------------------- Main Page --------------------
 

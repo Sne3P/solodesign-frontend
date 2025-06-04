@@ -1,11 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface SectionTitleProps {
-  children: React.ReactNode;
-}
-
-const SectionTitle: React.FC<SectionTitleProps> = ({ children }) => (
+const SectionTitle = ({ children }) => (
   <motion.h2
     className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 sm:mb-16 md:mb-20 text-center"
     initial={{ opacity: 0, y: 50, rotate: -5 }}

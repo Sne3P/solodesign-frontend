@@ -1,7 +1,15 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { useEffect, useRef, useState } from "react"
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useInView,
+  useAnimation,
+  useMotionValue,
+  useTransform,
+} from "framer-motion"
 import {
   Code,
   Paintbrush,
@@ -13,20 +21,15 @@ import {
   Users,
   Lightbulb,
   TrendingUp,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import SocialLinks from "../../components/layout/SocialLinks";
-import MenuButton from "../../components/layout/MenuButton";
-import LogoTitle from "../../components/layout/LogoTitle";
-import Cursor from "../../components/layout/Cursor";
-import Footer from "../../components/sections/Footer";
-import {
-  ServiceCard,
-  ProcessStep,
-  GlowingCard,
-} from "../../components/pages/services";
-import React from "react";
+} from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import SocialLinks from "../../components/layout/SocialLinks"
+import MenuButton from "../../components/layout/MenuButton"
+import LogoTitle from "../../components/layout/LogoTitle"
+import Cursor from "../../components/layout/Cursor"
+import Footer from "../../components/sections/Footer"
+import React from "react"
 
 // -------------------- Data --------------------
 
@@ -73,25 +76,12 @@ const services = [
       "Mise en ligne et gestion de vos applications dans le cloud avec une scalabilité optimale.",
     tools: ["AWS", "Google Cloud", "Docker", "Kubernetes", "CI/CD"],
   },
-];
+]
 
 // -------------------- Components --------------------
 
-
-interface Service {
-  icon: React.ReactNode
-  title: string
-  description: string
-  tools: string[]
-}
-
-interface ServiceCardProps {
-  service: Service
-  index: number
-}
-
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
+const ServiceCard = ({ service, index }) => {
+  const cardRef = useRef(null)
   const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
   const controls = useAnimation()
 
@@ -120,7 +110,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
 
   const toolVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: (i: number) => ({
+    visible: (i) => ({
       opacity: 1,
       x: 0,
       transition: {
@@ -166,19 +156,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, index }) => {
   )
 }
 
-interface ProcessStepData {
-  title: string
-  description: string
-}
-
-interface ProcessStepProps {
-  step: ProcessStepData
-  index: number
-  totalSteps: number
-}
-
-const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) => {
-  const ref = useRef<HTMLDivElement>(null)
+const ProcessStep = ({ step, index, totalSteps }) => {
+  const ref = useRef(null)
   const isInView = useInView(ref, { once: false, amount: 0.5, margin: "-100px" })
   const controls = useAnimation()
 
@@ -245,23 +224,18 @@ const ProcessStep: React.FC<ProcessStepProps> = ({ step, index, totalSteps }) =>
 /*
   GlowingCards : Conteneur captant le mouvement de la souris, même hors des cases.
 */
-interface GlowingCardsProps {
-  children: React.ReactElement[] | React.ReactElement
-}
-
-const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
-  const containerRef = useRef<HTMLDivElement>(null)
+const GlowingCards = ({ children }) => {
+  const containerRef = useRef(null)
   const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return
+  const handleMouseMove = (e) => {
     const rect = containerRef.current.getBoundingClientRect()
     setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }
 
   const handleMouseLeave = () => {
-    setGlobalPos({ x: -1000, y: -1000 });
-  };
+    setGlobalPos({ x: -1000, y: -1000 })
+  }
 
   return (
     <motion.div
@@ -274,78 +248,78 @@ const GlowingCards: React.FC<GlowingCardsProps> = ({ children }) => {
         React.cloneElement(child, { globalPos, containerRef })
       )}
     </motion.div>
-  );
-};
+  )
+}
 
 /*
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
 */
-interface GlowingCardProps {
-  children: React.ReactNode
-  index: number
-  globalPos?: { x: number; y: number }
-  containerRef?: React.RefObject<HTMLDivElement>
-}
-
-const GlowingCard: React.FC<GlowingCardProps> = ({ children, index, globalPos, containerRef }) => {
-  const cardRef = useRef<HTMLDivElement>(null)
+const GlowingCard = ({ children, index, globalPos, containerRef }) => {
+  const cardRef = useRef(null)
   const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
 
-  const updateLocalPosition = useCallback(
-    (pos) => {
-      if (!cardRef.current || !containerRef?.current) return;
-      const cardRect = cardRef.current.getBoundingClientRect();
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const relativeX = pos.x - (cardRect.left - containerRect.left);
-      const relativeY = pos.y - (cardRect.top - containerRect.top);
-      localX.set(relativeX);
-      localY.set(relativeY);
-    },
-    [containerRef, localX, localY]
-  );
-
   useEffect(() => {
-    if (globalPos) updateLocalPosition(globalPos);
-  }, [globalPos, updateLocalPosition]);
+    if (globalPos && cardRef.current && containerRef?.current) {
+      const cardRect = cardRef.current.getBoundingClientRect()
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const relativeX = globalPos.x - (cardRect.left - containerRect.left)
+      const relativeY = globalPos.y - (cardRect.top - containerRect.top)
+      localX.set(relativeX)
+      localY.set(relativeY)
+    }
+  }, [globalPos, containerRef, localX, localY])
 
-  const handleHoverStart = () => hoverState.set(1);
-  const handleHoverEnd = () => hoverState.set(0);
+  const handleHoverStart = () => hoverState.set(1)
+  const handleHoverEnd = () => hoverState.set(0)
 
-  const glowOpacity = useTransform<[number, number], number>(
-    [localX, localY],
-    ([x, y]) => {
-      if (!cardRef.current) return 0
-      const { offsetWidth: width, offsetHeight: height } = cardRef.current
-      const centerX = width / 2
-      const centerY = height / 2
-      const distance = Math.hypot(Number(x) - centerX, Number(y) - centerY)
-      return Math.max(0, 1 - distance / (width / 1.5))
-    },
-  )
+  const glowOpacity = useTransform([localX, localY], ([x, y]) => {
+    if (!cardRef.current) return 0
+    const { offsetWidth: width, offsetHeight: height } = cardRef.current
+    const centerX = width / 2
+    const centerY = height / 2
+    const distance = Math.hypot(x - centerX, y - centerY)
+    return Math.max(0, 1 - distance / (width / 1.5))
+  })
 
-  const background = useTransform<[number, number, number, number], string>(
+  const background = useTransform(
     [localX, localY, glowOpacity, hoverState],
     ([x, y, opacity, h]) =>
-      `radial-gradient(circle 150px at ${Number(x)}px ${Number(y)}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
+      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${opacity * 0.2 * h}), transparent)`
   )
 
-
+  return (
+    <motion.div
+      ref={cardRef}
+      onClick={() => {}} // Rendre cliquable pour activer le custom cursor
+      className="cursor-pointer relative overflow-hidden bg-white bg-opacity-5 p-6 rounded-lg backdrop-blur-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      whileHover={{
+        scale: 1.02,
+        transition: { type: "spring", stiffness: 400, damping: 20 },
+      }}
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={handleHoverStart}
+      onHoverEnd={handleHoverEnd}
+    >
+      <motion.div className="absolute inset-0 pointer-events-none" style={{ background }} />
+      <div className="relative z-10">{children}</div>
+    </motion.div>
+  )
+}
 
 // -------------------- Main Page --------------------
 
 const ServicesPage = () => {
-  const [mounted, setMounted] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  const router = useRouter()
 
   const processSteps = [
     {
@@ -378,28 +352,25 @@ const ServicesPage = () => {
       description:
         "Nous déployons votre projet et fournissons un support continu pour assurer son succès à long terme.",
     },
-  ];
+  ]
 
   useEffect(() => {
-    setMounted(true);
-    document.body.style.backgroundColor = "black";
-    document.body.style.color = "white";
+    setMounted(true)
+    document.body.style.backgroundColor = "black"
+    document.body.style.color = "white"
     return () => {
-      document.body.style.backgroundColor = "";
-      document.body.style.color = "";
-    };
-  }, []);
+      document.body.style.backgroundColor = ""
+      document.body.style.color = ""
+    }
+  }, [])
 
-  if (!mounted) return null;
+  if (!mounted) return null
 
-  const MotionLink = motion(Link);
+  const MotionLink = motion(Link)
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-white origin-left z-50"
-        style={{ scaleX }}
-      />
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-white origin-left z-50" style={{ scaleX }} />
 
       <LogoTitle />
       <SocialLinks />
@@ -416,10 +387,7 @@ const ServicesPage = () => {
         <MotionLink
           href="/"
           className="bg-white text-black p-3 rounded-full flex items-center justify-center"
-          whileHover={{
-            scale: 1.1,
-            transition: { type: "spring", stiffness: 600, damping: 15 },
-          }}
+          whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
           whileTap={{ scale: 0.9 }}
         >
           <ArrowLeft size={28} />
@@ -464,12 +432,7 @@ const ServicesPage = () => {
           whileInView={{ opacity: 1, y: 0, rotate: 0 }}
           exit={{ opacity: 0, y: -20, rotate: 5 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 15,
-            delay: 0.2,
-          }}
+          transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
         >
           Nos Expertises
         </motion.h2>
@@ -495,23 +458,13 @@ const ServicesPage = () => {
           whileInView={{ opacity: 1, y: 0, rotate: 0 }}
           exit={{ opacity: 0, y: -20, rotate: 5 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 15,
-            delay: 0.2,
-          }}
+          transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
         >
           Notre Processus
         </motion.h2>
         <div className="relative">
           {processSteps.map((step, index) => (
-            <ProcessStep
-              key={index}
-              step={step}
-              index={index}
-              totalSteps={processSteps.length}
-            />
+            <ProcessStep key={index} step={step} index={index} totalSteps={processSteps.length} />
           ))}
         </div>
       </motion.div>
@@ -531,12 +484,7 @@ const ServicesPage = () => {
           whileInView={{ opacity: 1, y: 0, rotate: 0 }}
           exit={{ opacity: 0, y: -20, rotate: 5 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 15,
-            delay: 0.2,
-          }}
+          transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
         >
           Pourquoi Nous Choisir
         </motion.h2>
@@ -551,14 +499,12 @@ const ServicesPage = () => {
             {
               icon: <Lightbulb size={48} />,
               title: "Innovation",
-              description:
-                "Toujours à la pointe de la technologie pour offrir des solutions modernes et efficaces.",
+              description: "Toujours à la pointe de la technologie pour offrir des solutions modernes et efficaces.",
             },
             {
               icon: <TrendingUp size={48} />,
               title: "Résultats",
-              description:
-                "Un engagement envers l'excellence et des résultats mesurables pour votre entreprise.",
+              description: "Un engagement envers l'excellence et des résultats mesurables pour votre entreprise.",
             },
           ].map((item, index) => (
             <GlowingCard key={index} index={index}>
@@ -566,18 +512,11 @@ const ServicesPage = () => {
                 className="mx-auto mb-4 text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: 0.1 + index * 0.2,
-                }}
+                transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 + index * 0.2 }}
               >
                 {item.icon}
               </motion.div>
-              <h3 className="text-xl font-bold mb-2 text-center">
-                {item.title}
-              </h3>
+              <h3 className="text-xl font-bold mb-2 text-center">{item.title}</h3>
               <p className="text-center">{item.description}</p>
             </GlowingCard>
           ))}
@@ -602,10 +541,7 @@ const ServicesPage = () => {
         </motion.h2>
         <motion.button
           className="bg-white text-black px-8 py-3 rounded-full text-lg font-bold"
-          whileHover={{
-            scale: 1.1,
-            transition: { type: "spring", stiffness: 600, damping: 15 },
-          }}
+          whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
           whileTap={{ scale: 0.9 }}
           onClick={() => router.push("/contact")}
         >
@@ -623,15 +559,10 @@ const ServicesPage = () => {
           backgroundSize: "30px 30px",
         }}
         animate={{ backgroundPosition: ["0px 0px", "0px -30px"] }}
-        transition={{
-          repeat: Infinity,
-          repeatType: "loop",
-          duration: 10,
-          ease: "linear",
-        }}
+        transition={{ repeat: Infinity, repeatType: "loop", duration: 10, ease: "linear" }}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ServicesPage;
+export default ServicesPage

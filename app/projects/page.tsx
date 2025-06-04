@@ -122,15 +122,15 @@ export default function ProjectsPage() {
               key={currentProject}
               custom={direction}
               className="w-full max-w-4xl px-4"
-              initial={{
-                x: direction > 0 ? "100%" : "-100%",
+              initial={(custom) => ({
+                x: custom > 0 ? "100%" : "-100%",
                 opacity: 0,
-              }}
+              })}
               animate={{ x: 0, opacity: 1 }}
-              exit={{
-                x: direction < 0 ? "100%" : "-100%",
+              exit={(custom) => ({
+                x: custom < 0 ? "100%" : "-100%",
                 opacity: 0,
-              }}
+              })}
               transition={{
                 x: { type: "spring", stiffness: 300, damping: 30 },
                 opacity: { duration: 0.2 },

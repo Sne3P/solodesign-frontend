@@ -17,7 +17,6 @@ const Footer = lazy(() => import("../../components/sections/Footer"))
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [isExiting, setIsExiting] = useState(false)
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -66,7 +65,6 @@ const ContactPage = () => {
 
   const handleExit = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault()
-    setIsExiting(true)
     setTimeout(() => {
       router.push(href)
     }, 500) // Correspond à la durée de l'animation de sortie
@@ -132,7 +130,7 @@ const ContactPage = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, delay: 0.1, type: "spring", stiffness: 100, damping: 10 }}
               >
-                Prêt à donner vie à votre projet ? Contactez-nous dès aujourd'hui pour une consultation gratuite et
+                Prêt à donner vie à votre projet ? Contactez-nous dès aujourd’hui pour une consultation gratuite et
                 découvrez comment nous pouvons transformer votre vision en réalité.
               </motion.p>
             </Parallax>
@@ -218,6 +216,7 @@ const InputField = React.memo(({ type, name, placeholder, required }) => (
     />
   </motion.div>
 ))
+InputField.displayName = "InputField"
 
 const TextareaField = React.memo(({ name, placeholder, required }) => (
   <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -236,6 +235,7 @@ const TextareaField = React.memo(({ name, placeholder, required }) => (
     />
   </motion.div>
 ))
+TextareaField.displayName = "TextareaField"
 
 const BackgroundAnimation = React.memo(() => (
   <motion.div
@@ -257,6 +257,7 @@ const BackgroundAnimation = React.memo(() => (
     }}
   />
 ))
+BackgroundAnimation.displayName = "BackgroundAnimation"
 
 export default ContactPage
 

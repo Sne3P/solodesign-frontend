@@ -234,7 +234,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                     whileHover={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <span className="text-white text-lg font-bold">Voir l'image</span>
+                    <span className="text-white text-lg font-bold">Voir l’image</span>
                   </motion.div>
                 </motion.div>
               ))}

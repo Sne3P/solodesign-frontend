@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useRef } from 'react';
+import React, { useRef, createRef } from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
 import { useRouter } from 'next/navigation';
@@ -20,7 +19,9 @@ const projets = [
 ];
 
 const ProjectsSection = () => {
-  const refsProjets = Array(6).fill().map(() => useRef(null));
+  const refsProjets = useRef(
+    Array.from({ length: 6 }, () => createRef<HTMLDivElement>())
+  );
   const router = useRouter();
 
   const handleProjectClick = (projectId) => {
@@ -47,7 +48,7 @@ const ProjectsSection = () => {
           {projets.map((projet, index) => (
             <motion.div
               key={projet.id}
-              ref={refsProjets[index]}
+              ref={refsProjets.current[index]}
               className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 md:gap-16"
               initial="masque"
               whileInView="visible"

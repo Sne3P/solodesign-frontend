@@ -22,7 +22,7 @@ const AboutSection = () => (
               avec un design fonctionnel pour créer des expériences digitales impactantes qui résonnent avec votre audience.
             </p>
             <p className="text-base sm:text-lg md:text-xl text-gray-300">
-              En mettant l'accent sur des lignes épurées, une typographie réfléchie et une utilisation stratégique de l'espace blanc, 
+              En mettant l’accent sur des lignes épurées, une typographie réfléchie et une utilisation stratégique de l’espace blanc,
               nous créons des designs qui sont non seulement beaux, mais qui communiquent efficacement le message de votre marque.
             </p>
           </motion.div>

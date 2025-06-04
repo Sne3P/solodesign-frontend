@@ -11,6 +11,7 @@ import Footer from "../../../components/sections/Footer"
 import ScrollArrow from "../../../components/layout/ScrollArrow"
 import Cursor from "../../../components/layout/Cursor"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 20, rotate: -1 },
@@ -64,6 +65,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
   const { scrollYProgress } = useScroll()
   const progressionDefilementFluide = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
   const router = useRouter()
+  const MotionImage = motion(Image)
   const [isLoaded, setIsLoaded] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
@@ -108,9 +110,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <LogoTitle className="text-black" />
-        <SocialLinks className="text-black" />
-        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} className="text-black" />
+        <LogoTitle />
+        <SocialLinks />
+        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
         <motion.div
           className="fixed top-24 left-8 z-50 bg-black text-white p-3 rounded-full cursor-pointer"
@@ -138,9 +140,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <img
+              <Image
                 src="/placeholder.svg?height=600&width=1200"
                 alt="Image du projet"
+                width={1200}
+                height={600}
                 className="w-full h-[600px] object-cover"
               />
             </motion.div>
@@ -218,9 +222,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                   transition={{ type: "spring", stiffness: 300, damping: 10 }}
                   onClick={() => setSelectedImage(`/placeholder.svg?height=600&width=800&text=Image ${item}`)}
                 >
-                  <img
+                  <MotionImage
                     src={`/placeholder.svg?height=300&width=400&text=Image ${item}`}
                     alt={`Image ${item} du projet`}
+                    width={400}
+                    height={300}
                     className="w-full h-[300px] object-cover"
                   />
                   <motion.div
@@ -259,8 +265,8 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
           </AnimatedSection>
         </main>
 
-        <Footer className="bg-gray-100 text-black" />
-        <ScrollArrow className="text-black" />
+        <Footer />
+        <ScrollArrow />
         <Cursor />
 
         <motion.div
@@ -277,9 +283,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
               className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50"
               onClick={() => setSelectedImage(null)}
             >
-              <motion.img
+              <MotionImage
                 src={selectedImage}
                 alt="Image agrandie"
+                width={800}
+                height={600}
                 className="max-w-full max-h-full object-contain"
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}

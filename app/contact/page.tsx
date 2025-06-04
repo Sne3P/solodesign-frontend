@@ -13,6 +13,7 @@ const ScrollArrow = lazy(() => import("../../components/layout/ScrollArrow"))
 const Cursor = lazy(() => import("../../components/layout/Cursor"))
 const LogoTitle = lazy(() => import("../../components/layout/LogoTitle"))
 const Footer = lazy(() => import("../../components/sections/Footer"))
+import { InputField, TextareaField, BackgroundAnimation } from "../../components/pages/contact"
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -95,14 +96,14 @@ const ContactPage = () => {
             transition={{ duration: 0.3 }}
           >
             <Link href="/" passHref>
-              <motion.span
+              <motion.a
                 className="bg-white text-black p-2 rounded-full inline-block cursor-pointer"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={(e) => handleExit(e, "/")}
               >
                 <ArrowLeft size={24} />
-              </motion.span>
+              </motion.a>
             </Link>
           </motion.div>
 
@@ -198,13 +199,16 @@ const ContactPage = () => {
   )
 }
 
-const InputField = React.memo(({ type, name, placeholder, required }) => (
-  <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-    <motion.input
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      required={required}
+type InputFieldProps = React.InputHTMLAttributes<HTMLInputElement>
+
+const InputField: React.FC<InputFieldProps> = React.memo(
+  ({ type, name, placeholder, required }) => (
+    <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <motion.input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        required={required}
       className="w-full px-6 py-4 bg-white bg-opacity-5 text-white placeholder-white placeholder-opacity-50 focus:outline-none transition-colors z-10 relative"
       whileFocus={{ scale: 1.02 }}
     />
@@ -215,15 +219,19 @@ const InputField = React.memo(({ type, name, placeholder, required }) => (
       transition={{ duration: 0.5 }}
     />
   </motion.div>
-))
+  )
+)
 InputField.displayName = "InputField"
 
-const TextareaField = React.memo(({ name, placeholder, required }) => (
-  <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-    <motion.textarea
-      name={name}
-      placeholder={placeholder}
-      required={required}
+type TextareaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
+
+const TextareaField: React.FC<TextareaFieldProps> = React.memo(
+  ({ name, placeholder, required }) => (
+    <motion.div className="relative overflow-hidden rounded-lg" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+      <motion.textarea
+        name={name}
+        placeholder={placeholder}
+        required={required}
       className="w-full px-6 py-4 bg-white bg-opacity-5 text-white placeholder-white placeholder-opacity-50 focus:outline-none transition-colors resize-none h-40 z-10 relative"
       whileFocus={{ scale: 1.02 }}
     />
@@ -234,7 +242,8 @@ const TextareaField = React.memo(({ name, placeholder, required }) => (
       transition={{ duration: 0.5 }}
     />
   </motion.div>
-))
+  )
+)
 TextareaField.displayName = "TextareaField"
 
 const BackgroundAnimation = React.memo(() => (
@@ -258,6 +267,7 @@ const BackgroundAnimation = React.memo(() => (
   />
 ))
 BackgroundAnimation.displayName = "BackgroundAnimation"
+
 
 export default ContactPage
 

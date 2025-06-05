@@ -1,17 +1,31 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useRef } from "react"
-import { motion, AnimatePresence, useSpring, useScroll, useInView } from "framer-motion"
-import { ParallaxProvider, useParallax } from "react-scroll-parallax"
-import { ArrowLeft, ArrowRight, Calendar, Users, Code, Globe, X } from "lucide-react"
-import LogoTitle from "../../../components/layout/LogoTitle"
-import SocialLinks from "../../../components/layout/SocialLinks"
-import MenuButton from "../../../components/layout/MenuButton"
-import Footer from "../../../components/sections/Footer"
-import ScrollArrow from "../../../components/layout/ScrollArrow"
-import Cursor from "../../../components/layout/Cursor"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { useEffect, useState, useRef } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useSpring,
+  useScroll,
+  useInView,
+} from "framer-motion";
+import { ParallaxProvider, useParallax } from "react-scroll-parallax";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Calendar,
+  Users,
+  Code,
+  Globe,
+  X,
+} from "lucide-react";
+import LogoTitle from "../../../components/layout/LogoTitle";
+import SocialLinks from "../../../components/layout/SocialLinks";
+import MenuButton from "../../../components/layout/MenuButton";
+import Footer from "../../../components/sections/Footer";
+import ScrollArrow from "../../../components/layout/ScrollArrow";
+import Cursor from "../../../components/layout/Cursor";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 20, rotate: -1 },
@@ -27,10 +41,10 @@ const fadeInVariants = {
       damping: 10,
     },
   },
-}
+};
 
 const ParallaxTitle = ({ children }: { children: React.ReactNode }) => {
-  const titleParallax = useParallax<HTMLHeadingElement>({ speed: -5 })
+  const titleParallax = useParallax<HTMLHeadingElement>({ speed: -5 });
   return (
     <motion.h1
       ref={titleParallax.ref}
@@ -41,12 +55,16 @@ const ParallaxTitle = ({ children }: { children: React.ReactNode }) => {
     >
       {children}
     </motion.h1>
-  )
-}
+  );
+};
 
 const AnimatedSection = ({ children }: { children: React.ReactNode }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: false, amount: 0.3, margin: "-100px" })
+  const ref = useRef(null);
+  const isInView = useInView(ref, {
+    once: false,
+    amount: 0.3,
+    margin: "-100px",
+  });
 
   return (
     <motion.div
@@ -57,49 +75,57 @@ const AnimatedSection = ({ children }: { children: React.ReactNode }) => {
     >
       {children}
     </motion.div>
-  )
-}
+  );
+};
 
 const ProjectDetail = ({ params }: { params: { id: string } }) => {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const progressionDefilementFluide = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
-  const router = useRouter()
-  const MotionImage = motion(Image)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progressionDefilementFluide = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+  const router = useRouter();
+  const MotionImage = motion(Image);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    document.body.classList.add("cursor-none")
-    window.scrollTo(0, 0)
-    setIsLoaded(true)
+    document.body.classList.add("cursor-none");
+    window.scrollTo(0, 0);
+    setIsLoaded(true);
     return () => {
-      document.body.classList.remove("cursor-none")
-    }
-  }, [])
+      document.body.classList.remove("cursor-none");
+    };
+  }, []);
 
   useEffect(() => {
     if (isLoaded) {
-      document.body.style.overflow = selectedImage ? "hidden" : "auto"
+      document.body.style.overflow = selectedImage ? "hidden" : "auto";
     }
-  }, [isLoaded, selectedImage])
+  }, [isLoaded, selectedImage]);
 
   const handleBackClick = () => {
-    document.body.classList.add("page-transition")
-    const mainContent = document.querySelector("main")
+    document.body.classList.add("page-transition");
+    const mainContent = document.querySelector("main");
     if (mainContent) {
-      mainContent.style.opacity = "0"
-      mainContent.style.transition = "opacity 0.5s ease"
+      mainContent.style.opacity = "0";
+      mainContent.style.transition = "opacity 0.5s ease";
     }
-    setTimeout(() => router.push("/"), 500)
-  }
+    setTimeout(() => router.push("/"), 500);
+  };
 
   const projectDetails = [
     { icon: Calendar, title: "Durée du Projet", value: "6 mois" },
     { icon: Users, title: "Taille de l'Équipe", value: "8 personnes" },
-    { icon: Code, title: "Technologies Utilisées", value: "React, Node.js, MongoDB" },
+    {
+      icon: Code,
+      title: "Technologies Utilisées",
+      value: "React, Node.js, MongoDB",
+    },
     { icon: Globe, title: "Portée du Projet", value: "Internationale" },
-  ]
+  ];
 
   return (
     <ParallaxProvider>
@@ -166,8 +192,10 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
               >
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu
-                sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam
+                in dui mauris. Vivamus hendrerit arcu sed erat molestie
+                vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh
+                porttitor.
               </motion.p>
               <motion.p
                 className="text-xl text-gray-700 leading-relaxed"
@@ -175,9 +203,10 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
-                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-                pariatur.
+                Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                dolor in reprehenderit in voluptate velit esse cillum dolore eu
+                fugiat nulla pariatur.
               </motion.p>
             </AnimatedSection>
             <AnimatedSection>
@@ -198,7 +227,10 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                     }}
                     transition={{ duration: 0.2 }}
                   >
-                    <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.3 }}>
+                    <motion.div
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.3 }}
+                    >
                       <item.icon size={24} className="text-gray-600" />
                     </motion.div>
                     <div>
@@ -212,7 +244,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
           </div>
 
           <AnimatedSection>
-            <h2 className="text-4xl font-semibold mb-8 text-center">Galerie du Projet</h2>
+            <h2 className="text-4xl font-semibold mb-8 text-center">
+              Galerie du Projet
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((item) => (
                 <motion.div
@@ -220,7 +254,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                   className="relative overflow-hidden rounded-lg shadow-xl cursor-pointer"
                   whileHover={{ scale: 1.05, rotate: 1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                  onClick={() => setSelectedImage(`/placeholder.svg?height=600&width=800&text=Image ${item}`)}
+                  onClick={() =>
+                    setSelectedImage(
+                      `/placeholder.svg?height=600&width=800&text=Image ${item}`
+                    )
+                  }
                 >
                   <MotionImage
                     src={`/placeholder.svg?height=300&width=400&text=Image ${item}`}
@@ -234,7 +272,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                     whileHover={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <span className="text-white text-lg font-bold">Voir l’image</span>
+                    <span className="text-white text-lg font-bold">
+                      Voir l’image
+                    </span>
                   </motion.div>
                 </motion.div>
               ))}
@@ -243,7 +283,9 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
 
           <AnimatedSection>
             <div className="text-center mt-24">
-              <h2 className="text-4xl font-semibold mb-6">Prêt à commencer votre projet ?</h2>
+              <h2 className="text-4xl font-semibold mb-6">
+                Prêt à commencer votre projet ?
+              </h2>
               <motion.button
                 className="bg-black text-white px-8 py-4 rounded-full text-xl font-bold inline-flex items-center space-x-2 overflow-hidden relative"
                 whileHover={{ scale: 1.05, rotate: 0.5 }}
@@ -257,7 +299,11 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
                 }}
               >
                 <span>Contactez-nous</span>
-                <motion.div initial={{ x: -10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
+                <motion.div
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
                   <ArrowRight size={24} />
                 </motion.div>
               </motion.button>
@@ -307,8 +353,7 @@ const ProjectDetail = ({ params }: { params: { id: string } }) => {
         </AnimatePresence>
       </motion.div>
     </ParallaxProvider>
-  )
-}
+  );
+};
 
-export default ProjectDetail
-
+export default ProjectDetail;

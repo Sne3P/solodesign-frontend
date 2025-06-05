@@ -1,65 +1,21 @@
 "use client";
 
-import React, { useRef, createRef } from "react";
+import React, { useRef } from "react";
 import { Parallax } from "react-scroll-parallax";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import SectionTitle from "../ui/SectionTitle";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { projects } from "@/lib/data/projects"; // <-- import des projets
 
 const MotionImage = motion<any>(Image);
-type Projet = {
-  id: number;
-  titre: string;
-  desc: string;
-  image: string;
-};
-const projets = [
-  {
-    id: 1,
-    titre: "Monochrome",
-    desc: "Une plateforme e-commerce élégante pour une marque de mode minimaliste",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-  {
-    id: 2,
-    titre: "Minimal",
-    desc: "Identité de marque pour une galerie d'art contemporain mettant en valeur des œuvres avant-gardistes",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-  {
-    id: 3,
-    titre: "Simplicité",
-    desc: "Design UI/UX pour une application de productivité axée sur la concentration et l'efficacité",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-  {
-    id: 4,
-    titre: "Essence",
-    desc: "Design d'emballage pour une ligne de soins de la peau de luxe mettant l'accent sur des ingrédients naturels",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-  {
-    id: 5,
-    titre: "Pureté",
-    desc: "Conception web pour un spa haut de gamme offrant des expériences de détente et de rajeunissement",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-  {
-    id: 6,
-    titre: "Clarté",
-    desc: "Campagne digitale pour une startup technologique révolutionnant le cloud computing",
-    image: "/placeholder.svg?height=600&width=800",
-  },
-];
 
 const ProjectsSection = () => {
   const refsProjets = useRef<Array<HTMLDivElement | null>>([]);
   const router = useRouter();
 
-  const handleProjectClick = (projectId: number) => {
-    // Animation de sortie
+  const handleProjectClick = (projectId: string) => {
     document.body.style.overflow = "hidden";
     const element = document.getElementById("projects-section");
     if (element) {
@@ -67,8 +23,6 @@ const ProjectsSection = () => {
       element.style.transform = "scale(0.95)";
       element.style.opacity = "0";
     }
-
-    // Redirection après un court délai
     setTimeout(() => {
       router.push(`/projet/${projectId}`);
     }, 500);
@@ -82,7 +36,7 @@ const ProjectsSection = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle>Projets Phares</SectionTitle>
         <div className="space-y-24 sm:space-y-32 md:space-y-40">
-          {projets.map((projet, index) => (
+          {projects.map((projet, index) => (
             <motion.div
               key={projet.id}
               ref={(el) => (refsProjets.current[index] = el)}
@@ -115,7 +69,7 @@ const ProjectsSection = () => {
                 >
                   <MotionImage
                     src={projet.image}
-                    alt={projet.titre}
+                    alt={projet.title}
                     width={800}
                     height={600}
                     className="w-full h-[300px] sm:h-[400px] md:h-[450px] object-cover rounded-lg shadow-lg"
@@ -150,11 +104,21 @@ const ProjectsSection = () => {
                 }}
               >
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">
-                  {projet.titre}
+                  {projet.title}
                 </h3>
                 <p className="text-base sm:text-lg md:text-xl text-gray-300">
-                  {projet.desc}
+                  {projet.description}
                 </p>
+                <div className="flex flex-wrap gap-2">
+                  {projet.tags?.map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-xs"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
                 <motion.button
                   className="bg-white text-black px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold flex items-center space-x-2 group"
                   whileHover={{ scale: 1.05, x: 10 }}

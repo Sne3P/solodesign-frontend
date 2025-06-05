@@ -1,114 +1,75 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { motion, AnimatePresence, useAnimation } from "framer-motion"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import LogoTitle from "../../components/layout/LogoTitle"
-import SocialLinks from "../../components/layout/SocialLinks"
-import MenuButton from "../../components/layout/MenuButton"
-import Cursor from "../../components/layout/Cursor"
-import ProgressBar from "../../components/layout/ProgressBar"
-import Footer from "../../components/sections/Footer"
-import ProjectCard from "../../components/ProjectCard"
-
-const projects = [
-  {
-    id: 1,
-    title: "Monochrome",
-    description:
-      "Une plateforme e-commerce élégante qui redéfinit l'expérience d'achat en ligne avec une esthétique minimaliste et une interface utilisateur intuitive.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 2,
-    title: "Minimal",
-    description:
-      "Identité de marque épurée pour une galerie d'art contemporain, mettant en valeur les œuvres tout en restant discrète et sophistiquée.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 3,
-    title: "Simplicité",
-    description:
-      "Application de productivité au design intuitif, permettant aux utilisateurs de se concentrer sur l'essentiel sans distractions superflues.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 4,
-    title: "Essence",
-    description:
-      "Design d'emballage innovant pour une ligne de soins de la peau, alliant luxe et durabilité dans une présentation minimaliste et élégante.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 5,
-    title: "Pureté",
-    description:
-      "Site web pour un spa haut de gamme, créant une expérience en ligne aussi relaxante et raffinée que les services offerts sur place.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 6,
-    title: "Clarté",
-    description:
-      "Campagne digitale percutante pour une startup tech, communiquant des concepts complexes de manière claire et visuellement attrayante.",
-    image: "/placeholder.svg",
-  },
-]
+import { useState, useEffect, useCallback, useRef } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import LogoTitle from "../../components/layout/LogoTitle";
+import SocialLinks from "../../components/layout/SocialLinks";
+import MenuButton from "../../components/layout/MenuButton";
+import Cursor from "../../components/layout/Cursor";
+import ProgressBar from "../../components/layout/ProgressBar";
+import Footer from "../../components/sections/Footer";
+import ProjectCard from "../../components/ProjectCard";
+import { projects } from "../../lib/data/projects"; // <-- Ajout de l'import
 
 export default function ProjectsPage() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [currentProject, setCurrentProject] = useState(0)
-  const [direction, setDirection] = useState(0)
-  const scrollRef = useRef(0)
-  const controls = useAnimation()
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [currentProject, setCurrentProject] = useState(0);
+  const [direction, setDirection] = useState(0);
+  const scrollRef = useRef(0);
+  const controls = useAnimation();
 
   const changeProject = useCallback((newDirection: number) => {
-    setDirection(newDirection)
-    setCurrentProject((prev) => (prev + newDirection + projects.length) % projects.length)
-  }, [])
+    setDirection(newDirection);
+    setCurrentProject(
+      (prev) => (prev + newDirection + projects.length) % projects.length
+    );
+  }, []);
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
-      e.preventDefault()
-      scrollRef.current += e.deltaY
+      e.preventDefault();
+      scrollRef.current += e.deltaY;
 
       if (Math.abs(scrollRef.current) > 100) {
-        const newDirection = scrollRef.current > 0 ? 1 : -1
-        changeProject(newDirection)
-        scrollRef.current = 0
+        const newDirection = scrollRef.current > 0 ? 1 : -1;
+        changeProject(newDirection);
+        scrollRef.current = 0;
 
         controls
           .start({
             y: newDirection * 20,
             transition: { duration: 0.3 },
           })
-          .then(() => controls.set({ y: 0 }))
+          .then(() => controls.set({ y: 0 }));
       }
     },
-    [changeProject, controls],
-  )
+    [changeProject, controls]
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
-        changeProject(1)
+        changeProject(1);
       } else if (e.key === "ArrowLeft") {
-        changeProject(-1)
+        changeProject(-1);
       }
-    }
+    };
 
-    window.addEventListener("keydown", handleKeyDown)
-    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
-  }, [changeProject])
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [changeProject]);
 
   return (
-    <div className="h-screen bg-black text-white overflow-hidden" onWheel={handleWheel}>
+    <div
+      className="h-screen bg-black text-white overflow-hidden"
+      onWheel={handleWheel}
+    >
       <div className="relative h-full">
         <LogoTitle />
         <SocialLinks />
@@ -116,10 +77,13 @@ export default function ProjectsPage() {
 
         <ProgressBar current={currentProject} total={projects.length} />
 
-        <motion.div className="absolute inset-0 flex items-center justify-center" animate={controls}>
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          animate={controls}
+        >
           <AnimatePresence custom={direction} mode="wait">
             <motion.div
-              key={currentProject}
+              key={projects[currentProject].id} // <-- Utilise l'id string
               custom={direction}
               className="w-full max-w-4xl px-4"
               initial={{
@@ -164,7 +128,8 @@ export default function ProjectsPage() {
         <motion.div
           className="fixed inset-0 pointer-events-none z-0"
           style={{
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
+            backgroundImage:
+              "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
             backgroundSize: "30px 30px",
           }}
           animate={{
@@ -183,6 +148,5 @@ export default function ProjectsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

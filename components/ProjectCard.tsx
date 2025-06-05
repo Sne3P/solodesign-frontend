@@ -1,16 +1,16 @@
-import { motion } from "framer-motion"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Project {
-  id: number
-  title: string
-  description: string
-  image: string
+  id: number;
+  title: string;
+  description: string;
+  image: string;
 }
 
 export default function ProjectCard({ project }: { project: Project }) {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <motion.div
@@ -66,6 +66,5 @@ export default function ProjectCard({ project }: { project: Project }) {
         </motion.div>
       </div>
     </motion.div>
-  )
+  );
 }
-

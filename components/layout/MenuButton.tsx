@@ -134,15 +134,15 @@ const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
                   transition={{ delay: 0.1 * index, type: "spring", stiffness: 200, damping: 15 }}
                 >
                   <motion.div variants={menuItemVariants} whileHover="hover" whileTap="tap">
-                    <Link href={item.path} passHref>
-                      <motion.a
+                    <Link href={item.path}>
+                      <motion.span
                         onClick={(e) => {
                           e.preventDefault()
                           if (!isRedirecting) {
                             handleNavigation(item.path)
                           }
                         }}
-                        className="inline-block relative"
+                        className="inline-block relative cursor-pointer"
                       >
                         {item.text}
                         <motion.div
@@ -151,7 +151,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
                           whileHover={{ width: "100%" }}
                           transition={{ duration: 0.2 }}
                         />
-                      </motion.a>
+                      </motion.span>
                     </Link>
                   </motion.div>
                 </motion.div>

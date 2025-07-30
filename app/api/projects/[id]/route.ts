@@ -8,7 +8,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const project = ProjectService.getProjectById(params.id)
+    const { id } = await params
+    const project = ProjectService.getProjectById(id)
     
     if (!project) {
       return NextResponse.json(
@@ -42,6 +43,7 @@ export async function PUT(
       )
     }
 
+    const { id } = await params
     const projectData = await request.json()
 
     // Traitement des technologies et tags
@@ -59,7 +61,7 @@ export async function PUT(
         .filter((tag: string) => tag.length > 0)
     }
 
-    const updatedProject = ProjectService.updateProject(params.id, projectData)
+    const updatedProject = ProjectService.updateProject(id, projectData)
     
     if (!updatedProject) {
       return NextResponse.json(
@@ -94,7 +96,8 @@ export async function DELETE(
       )
     }
 
-    const deleted = ProjectService.deleteProject(params.id)
+    const { id } = await params
+    const deleted = ProjectService.deleteProject(id)
     
     if (!deleted) {
       return NextResponse.json(

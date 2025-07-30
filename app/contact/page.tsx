@@ -94,7 +94,7 @@ const ContactPage = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <Link href="/" passHref>
+            <Link href="/">
               <motion.span
                 className="bg-white text-black p-2 rounded-full inline-block cursor-pointer"
                 whileHover={{ scale: 1.1 }}

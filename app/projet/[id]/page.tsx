@@ -4,8 +4,9 @@ interface PageProps {
   params: { id: string }
 }
 
-const ProjectPage = ({ params }: PageProps) => {
-  return <ProjectDetailClient id={params.id} />
+const ProjectPage = async ({ params }: PageProps) => {
+  const { id } = await params
+  return <ProjectDetailClient id={id} />
 }
 
 export default ProjectPage

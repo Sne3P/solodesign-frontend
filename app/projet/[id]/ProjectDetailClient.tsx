@@ -84,6 +84,10 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
         setProject(projectData)
       } else if (response.status === 404) {
         setError('Projet non trouvé')
+        // Rediriger vers la page 404 après 2 secondes
+        setTimeout(() => {
+          router.push('/projects')
+        }, 2000)
       } else {
         setError('Erreur lors du chargement du projet')
       }

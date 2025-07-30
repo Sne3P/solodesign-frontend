@@ -15,16 +15,18 @@ import {
   Globe,
   X,
   Save,
-  Upload
+  Upload,
+  Image as ImageIcon
 } from "lucide-react"
 import { Project, ProjectFormData } from "../../../lib/types"
-import LogoTitle from "../../../components/layout/LogoTitle"
 import { useToast } from "../../../hooks/use-toast"
+import MediaManager from "../../../components/admin/MediaManager"
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [activeTab, setActiveTab] = useState<'details' | 'media'>('details')
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
@@ -90,6 +92,66 @@ const AdminDashboard = () => {
     router.push('/admin')
   }
 
+  const handleMediaUpdate = () => {
+    // Recharger les projets pour avoir les médias à jour
+    fetchProjects()
+    
+    // Si on édite un projet, le rafraîchir aussi
+    if (editingProject) {
+      handleRefreshProject()
+    }
+  }
+
+  const handleRefreshProject = async () => {
+    if (!editingProject) return
+
+    try {
+      const response = await fetch(`/api/projects/${editingProject.id}`)
+      if (response.ok) {
+        const updatedProject = await response.json()
+        setEditingProject(updatedProject)
+      }
+    } catch (error) {
+      console.error('Erreur refresh projet:', error)
+    }
+  }
+
+  const handleCoverImageChange = async (imageUrl: string) => {
+    if (!editingProject) return
+
+    const token = localStorage.getItem('admin_token')
+    
+    try {
+      const response = await fetch(`/api/projects/${editingProject.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ coverImage: imageUrl })
+      })
+
+      if (response.ok) {
+        // Mettre à jour le projet en cours d'édition
+        setEditingProject(prev => prev ? { ...prev, coverImage: imageUrl } : null)
+        // Recharger tous les projets
+        fetchProjects()
+        toast({
+          title: "Succès",
+          description: "Image de couverture mise à jour"
+        })
+      } else {
+        throw new Error('Erreur lors de la mise à jour')
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour l'image de couverture",
+        variant: "destructive"
+      })
+    }
+  }
+
   const openModal = (project?: Project) => {
     if (project) {
       setEditingProject(project)
@@ -102,6 +164,7 @@ const AdminDashboard = () => {
         teamSize: project.teamSize,
         scope: project.scope
       })
+      setActiveTab('details') // Commencer par l'onglet détails pour les projets existants
     } else {
       setEditingProject(null)
       setFormData({
@@ -113,6 +176,7 @@ const AdminDashboard = () => {
         teamSize: "",
         scope: ""
       })
+      setActiveTab('details') // Toujours commencer par les détails pour un nouveau projet
     }
     setShowModal(true)
   }
@@ -138,13 +202,31 @@ const AdminDashboard = () => {
       })
 
       if (response.ok) {
+        const newProject = await response.json()
         toast({
           title: "Succès",
           description: editingProject 
             ? "Projet mis à jour avec succès" 
             : "Projet créé avec succès",
         })
-        setShowModal(false)
+        
+        // Si c'est une création, passer au mode édition avec onglet médias
+        if (!editingProject) {
+          setEditingProject(newProject)
+          setActiveTab('media')
+          setFormData({
+            title: newProject.title,
+            description: newProject.description,
+            technologies: newProject.technologies.join(', '),
+            tags: newProject.tags.join(', '),
+            duration: newProject.duration,
+            teamSize: newProject.teamSize,
+            scope: newProject.scope
+          })
+        } else {
+          setShowModal(false)
+        }
+        
         fetchProjects()
       } else {
         const data = await response.json()
@@ -210,8 +292,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <LogoTitle />
-      
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -377,7 +457,7 @@ const AdminDashboard = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
@@ -395,7 +475,36 @@ const AdminDashboard = () => {
                   </motion.button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Onglets - seulement si on édite un projet existant */}
+                {editingProject && (
+                  <div className="flex border-b border-gray-200 mb-6">
+                    <button
+                      onClick={() => setActiveTab('details')}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        activeTab === 'details'
+                          ? 'border-black text-black'
+                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      Détails du projet
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('media')}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center space-x-2 ${
+                        activeTab === 'media'
+                          ? 'border-black text-black'
+                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      <span>Médias</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Contenu des onglets */}
+                {activeTab === 'details' ? (
+                  <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Titre *
@@ -516,6 +625,20 @@ const AdminDashboard = () => {
                     </motion.button>
                   </div>
                 </form>
+                ) : (
+                  /* Onglet Médias */
+                  editingProject && (
+                    <MediaManager
+                      projectId={editingProject.id}
+                      images={editingProject.images || []}
+                      videos={editingProject.videos || []}
+                      coverImage={editingProject.coverImage}
+                      onMediaUpdate={handleMediaUpdate}
+                      onCoverImageChange={handleCoverImageChange}
+                      onRefreshProject={handleRefreshProject}
+                    />
+                  )
+                )}
               </div>
             </motion.div>
           </motion.div>

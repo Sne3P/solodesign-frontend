@@ -5,13 +5,34 @@ export interface Project {
   technologies: string[]
   tags: string[]
   coverImage: string
-  images: string[]
-  videos: string[]
+  images: ProjectImage[]
+  videos: ProjectVideo[]
   duration: string
   teamSize: string
   scope: string
   createdAt: string
   updatedAt: string
+}
+
+export interface ProjectImage {
+  id: string
+  filename: string
+  originalName: string
+  url: string
+  size: number
+  mimeType: string
+  uploadedAt: string
+}
+
+export interface ProjectVideo {
+  id: string
+  filename: string
+  originalName: string
+  url: string
+  size: number
+  mimeType: string
+  duration?: number
+  uploadedAt: string
 }
 
 export interface AdminAuth {

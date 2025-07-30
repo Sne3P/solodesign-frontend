@@ -9,6 +9,15 @@ export async function GET(
 ) {
   try {
     const { id } = await params
+    
+    // Valider que l'ID est valide
+    if (!ProjectService.validateProjectId(id)) {
+      return NextResponse.json(
+        { error: 'Projet non trouvé' },
+        { status: 404 }
+      )
+    }
+    
     const project = ProjectService.getProjectById(id)
     
     if (!project) {

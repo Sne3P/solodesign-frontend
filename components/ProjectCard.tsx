@@ -1,13 +1,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-
-interface Project {
-  id: number
-  title: string
-  description: string
-  image: string
-}
+import { Project } from "../lib/types"
 
 export default function ProjectCard({ project }: { project: Project }) {
   const router = useRouter()
@@ -26,7 +20,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         whileTap={{ scale: 0.95 }}
       >
         <Image
-          src={project.image || "/placeholder.svg"}
+          src={project.coverImage || "/placeholder.svg"}
           alt={project.title}
           width={800}
           height={600}
@@ -59,7 +53,7 @@ export default function ProjectCard({ project }: { project: Project }) {
             className="inline-block bg-white text-black px-6 py-3 md:px-8 md:py-4 rounded-full font-bold text-base md:text-lg transition-colors duration-300 hover:bg-gray-200"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push(`/project/${project.id}`)}
+            onClick={() => router.push(`/projet/${project.id}`)}
           >
             Voir le Projet
           </motion.button>

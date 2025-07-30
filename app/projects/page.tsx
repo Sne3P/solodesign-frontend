@@ -10,63 +10,40 @@ import Cursor from "../../components/layout/Cursor"
 import ProgressBar from "../../components/layout/ProgressBar"
 import Footer from "../../components/sections/Footer"
 import ProjectCard from "../../components/ProjectCard"
-
-const projects = [
-  {
-    id: 1,
-    title: "Monochrome",
-    description:
-      "Une plateforme e-commerce élégante qui redéfinit l'expérience d'achat en ligne avec une esthétique minimaliste et une interface utilisateur intuitive.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 2,
-    title: "Minimal",
-    description:
-      "Identité de marque épurée pour une galerie d'art contemporain, mettant en valeur les œuvres tout en restant discrète et sophistiquée.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 3,
-    title: "Simplicité",
-    description:
-      "Application de productivité au design intuitif, permettant aux utilisateurs de se concentrer sur l'essentiel sans distractions superflues.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 4,
-    title: "Essence",
-    description:
-      "Design d'emballage innovant pour une ligne de soins de la peau, alliant luxe et durabilité dans une présentation minimaliste et élégante.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 5,
-    title: "Pureté",
-    description:
-      "Site web pour un spa haut de gamme, créant une expérience en ligne aussi relaxante et raffinée que les services offerts sur place.",
-    image: "/placeholder.svg",
-  },
-  {
-    id: 6,
-    title: "Clarté",
-    description:
-      "Campagne digitale percutante pour une startup tech, communiquant des concepts complexes de manière claire et visuellement attrayante.",
-    image: "/placeholder.svg",
-  },
-]
+import { Project } from "../../lib/types"
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
   const [menuOpen, setMenuOpen] = useState(false)
   const [currentProject, setCurrentProject] = useState(0)
   const [direction, setDirection] = useState(0)
   const scrollRef = useRef(0)
   const controls = useAnimation()
 
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data)
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des projets:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const changeProject = useCallback((newDirection: number) => {
+    if (projects.length === 0) return
     setDirection(newDirection)
     setCurrentProject((prev) => (prev + newDirection + projects.length) % projects.length)
-  }, [])
+  }, [projects.length])
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -112,52 +89,67 @@ export default function ProjectsPage() {
       <div className="relative h-full">
         <LogoTitle />
         <SocialLinks />
-        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <MenuButton />
 
-        <ProgressBar current={currentProject} total={projects.length} />
+        {loading ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mb-4"></div>
+              <p className="text-xl">Chargement des projets...</p>
+            </div>
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-4">Aucun projet trouvé</h2>
+              <p className="text-xl text-gray-400">Les projets seront bientôt disponibles.</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <ProgressBar current={currentProject} total={projects.length} />
 
-        <motion.div className="absolute inset-0 flex items-center justify-center" animate={controls}>
-          <AnimatePresence custom={direction} mode="wait">
-            <motion.div
-              key={currentProject}
-              custom={direction}
-              className="w-full max-w-4xl px-4"
-              initial={(custom) => ({
-                x: custom > 0 ? "100%" : "-100%",
-                opacity: 0,
-              })}
-              animate={{ x: 0, opacity: 1 }}
-              exit={(custom) => ({
-                x: custom < 0 ? "100%" : "-100%",
-                opacity: 0,
-              })}
-              transition={{
-                x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-            >
-              <ProjectCard project={projects[currentProject]} />
+            <motion.div className="absolute inset-0 flex items-center justify-center" animate={controls}>
+              <AnimatePresence custom={direction} mode="wait">
+                <motion.div
+                  key={currentProject}
+                  custom={direction}
+                  className="w-full max-w-4xl px-4"
+                  initial={{ x: direction > 0 ? "100%" : "-100%", opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: direction < 0 ? "100%" : "-100%", opacity: 0 }}
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 },
+                  }}
+                >
+                  <ProjectCard project={projects[currentProject]} />
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
-          </AnimatePresence>
-        </motion.div>
 
-        <motion.button
-          className="absolute top-1/2 left-8 md:left-16 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 focus:outline-none z-10"
-          onClick={() => changeProject(-1)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ChevronLeft size={24} />
-        </motion.button>
+            {/* Navigation buttons */}
+            <motion.button
+              className="absolute top-1/2 left-8 md:left-16 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 focus:outline-none z-10"
+              onClick={() => changeProject(-1)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              disabled={projects.length <= 1}
+            >
+              <ChevronLeft size={24} />
+            </motion.button>
 
-        <motion.button
-          className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 focus:outline-none z-10"
-          onClick={() => changeProject(1)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <ChevronRight size={24} />
-        </motion.button>
+            <motion.button
+              className="absolute top-1/2 right-8 md:right-16 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white rounded-full p-2 focus:outline-none z-10"
+              onClick={() => changeProject(1)}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              disabled={projects.length <= 1}
+            >
+              <ChevronRight size={24} />
+            </motion.button>
+          </>
+        )}
 
         <Cursor />
 

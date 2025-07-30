@@ -53,14 +53,17 @@ export async function POST(request: NextRequest) {
         .filter((tag: string) => tag.length > 0)
     }
 
-    // Initialisation des champs manquants
+    // Initialisation des champs manquants avec des valeurs par défaut
     const newProject = {
       ...projectData,
       coverImage: projectData.coverImage || '/placeholder.svg',
       images: projectData.images || [],
       videos: projectData.videos || [],
       technologies: projectData.technologies || [],
-      tags: projectData.tags || []
+      tags: projectData.tags || [],
+      duration: projectData.duration || 'Non spécifié',
+      teamSize: projectData.teamSize || 'Non spécifié',
+      scope: projectData.scope || 'Non spécifié'
     }
 
     const project = ProjectService.createProject(newProject)

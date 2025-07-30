@@ -244,7 +244,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 <div>
                   {project.images.length > 0 && (
                     <Image
-                      src={project.images[0]}
+                      src={project.images[0].url}
                       alt="Détail du projet"
                       width={600}
                       height={320}
@@ -264,14 +264,14 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {project.images.map((image, index) => (
                     <motion.div
-                      key={index}
+                      key={image.id}
                       className="relative overflow-hidden rounded-lg cursor-pointer"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
-                      onClick={() => setSelectedImage(image)}
+                      onClick={() => setSelectedImage(image.url)}
                     >
                       <Image
-                        src={image}
+                        src={image.url}
                         alt={`Image ${index + 1} du projet ${project.title}`}
                         width={400}
                         height={256}
@@ -292,18 +292,18 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {project.videos.map((video, index) => (
                     <motion.div
-                      key={index}
+                      key={video.id}
                       className="relative overflow-hidden rounded-lg"
                       whileHover={{ scale: 1.02 }}
                       transition={{ duration: 0.3 }}
                     >
                       <video
-                        src={video}
+                        src={video.url}
                         controls
-                        className="w-full h-auto rounded-lg"
+                        className="w-full h-64 object-cover"
                         preload="metadata"
                       >
-                        Votre navigateur ne supporte pas la lecture vidéo.
+                        Votre navigateur ne supporte pas la lecture de vidéos.
                       </video>
                     </motion.div>
                   ))}

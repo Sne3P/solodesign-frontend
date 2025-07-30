@@ -113,12 +113,36 @@ export default function MediaManager({
     }
   }
 
-  const handleCoverImageSet = (imageUrl: string) => {
-    onCoverImageChange(imageUrl)
-    toast({
-      title: "Succès",
-      description: "Image de couverture mise à jour"
-    })
+  const handleCoverImageSet = async (imageUrl: string) => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}/cover-image`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+        body: JSON.stringify({ coverImage: imageUrl })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Erreur lors de la mise à jour')
+      }
+
+      onCoverImageChange(imageUrl)
+      onRefreshProject()
+      
+      toast({
+        title: "Succès",
+        description: "Image de couverture mise à jour"
+      })
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message || 'Erreur lors de la mise à jour de l\'image de couverture',
+        variant: "destructive"
+      })
+    }
   }
 
   const handleDragOver = (e: React.DragEvent) => {

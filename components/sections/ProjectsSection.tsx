@@ -1,28 +1,42 @@
 "use client"
 
-import React, { useRef, createRef } from 'react';
+import React, { useRef, createRef, useState, useEffect } from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
 import { useRouter } from 'next/navigation';
-
-const projets = [
-  { id: 1, titre: "Monochrome", desc: "Une plateforme e-commerce élégante pour une marque de mode minimaliste", image: "/placeholder.svg?height=600&width=800" },
-  { id: 2, titre: "Minimal", desc: "Identité de marque pour une galerie d'art contemporain mettant en valeur des œuvres avant-gardistes", image: "/placeholder.svg?height=600&width=800" },
-  { id: 3, titre: "Simplicité", desc: "Design UI/UX pour une application de productivité axée sur la concentration et l'efficacité", image: "/placeholder.svg?height=600&width=800" },
-  { id: 4, titre: "Essence", desc: "Design d'emballage pour une ligne de soins de la peau de luxe mettant l'accent sur des ingrédients naturels", image: "/placeholder.svg?height=600&width=800" },
-  { id: 5, titre: "Pureté", desc: "Conception web pour un spa haut de gamme offrant des expériences de détente et de rajeunissement", image: "/placeholder.svg?height=600&width=800" },
-  { id: 6, titre: "Clarté", desc: "Campagne digitale pour une startup technologique révolutionnant le cloud computing", image: "/placeholder.svg?height=600&width=800" }
-];
+import { Project } from '../../lib/types';
 
 const ProjectsSection = () => {
-  const refsProjets = useRef(
-    Array.from({ length: 6 }, () => createRef<HTMLDivElement>())
-  );
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const refsProjets = useRef<React.RefObject<HTMLDivElement>[]>([])
   const router = useRouter();
 
-  const handleProjectClick = (projectId) => {
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        // Limiter à 6 projets pour la section
+        const limitedProjects = data.slice(0, 6)
+        setProjects(limitedProjects)
+        // Créer les refs pour chaque projet
+        refsProjets.current = limitedProjects.map(() => createRef<HTMLDivElement>())
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des projets:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleProjectClick = (projectId: string) => {
     // Animation de sortie
     document.body.style.overflow = 'hidden';
     const element = document.getElementById('projects-section');
@@ -38,14 +52,44 @@ const ProjectsSection = () => {
     }, 500);
   };
 
+  if (loading) {
+    return (
+      <section id="projects-section" className="py-16 sm:py-24 md:py-32 mb-16 sm:mb-24 md:mb-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionTitle>Projets Phares</SectionTitle>
+          <div className="flex justify-center items-center py-20">
+            <motion.div 
+              className="w-12 h-12 border-2 border-white border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (projects.length === 0) {
+    return (
+      <section id="projects-section" className="py-16 sm:py-24 md:py-32 mb-16 sm:mb-24 md:mb-32">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <SectionTitle>Projets Phares</SectionTitle>
+          <div className="text-center py-20">
+            <p className="text-gray-400 text-lg">Aucun projet disponible pour le moment.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section id="projects-section" className="py-16 sm:py-24 md:py-32 mb-16 sm:mb-24 md:mb-32">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle>Projets Phares</SectionTitle>
         <div className="space-y-24 sm:space-y-32 md:space-y-40">
-          {projets.map((projet, index) => (
+          {projects.map((project, index) => (
             <motion.div
-              key={projet.id}
+              key={project.id}
               ref={refsProjets.current[index]}
               className="flex flex-col md:flex-row items-center gap-8 sm:gap-12 md:gap-16"
               initial="masque"
@@ -71,8 +115,8 @@ const ProjectsSection = () => {
                   }}
                 >
                   <motion.img
-                    src={projet.image}
-                    alt={projet.titre}
+                    src={project.coverImage || '/placeholder.svg'}
+                    alt={project.title}
                     className="w-full h-[300px] sm:h-[400px] md:h-[450px] object-cover rounded-lg shadow-lg"
                     whileHover={{ scale: 1.05, rotate: index % 2 === 0 ? -2 : 2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 10 }}
@@ -97,17 +141,40 @@ const ProjectsSection = () => {
                   }
                 }}
               >
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">{projet.titre}</h3>
-                <p className="text-base sm:text-lg md:text-xl text-gray-300">{projet.desc}</p>
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold">{project.title}</h3>
+                <p className="text-base sm:text-lg md:text-xl text-gray-300">{project.description}</p>
+                
+                {/* Technologies tags */}
+                {project.technologies && project.technologies.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.slice(0, 3).map((tech, techIndex) => (
+                      <span
+                        key={techIndex}
+                        className="px-2 py-1 text-xs bg-white/10 text-white rounded-full"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
                 <motion.button
-                  className="bg-white text-black px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold flex items-center space-x-2 group"
-                  whileHover={{ scale: 1.05, x: 10 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  onClick={() => handleProjectClick(projet.id)}
+                  className="bg-white text-black px-6 py-3 sm:px-8 sm:py-4 rounded-full font-bold flex items-center space-x-2 group transition-all duration-150 hover:bg-gray-100 transform-gpu"
+                  whileHover={{ 
+                    scale: 1.1, 
+                    x: 3 
+                  }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 700, 
+                    damping: 25,
+                    mass: 0.6
+                  }}
+                  onClick={() => handleProjectClick(project.id)}
                 >
                   <span>Voir le Projet</span>
-                  <ArrowRight size={20} className="transition-transform group-hover:translate-x-2" />
+                  <ArrowRight size={20} className="transition-transform duration-150 group-hover:translate-x-1" />
                 </motion.button>
               </motion.div>
             </motion.div>

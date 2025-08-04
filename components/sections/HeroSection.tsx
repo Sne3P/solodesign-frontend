@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
+import { Parallax } from 'react-scroll-parallax';
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -48,124 +49,116 @@ const HeroSection = () => {
       ))}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Premium Badge */}
+        <Parallax speed={-20}>
           <motion.div
-            className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            whileHover={{ 
-              scale: 1.05,
-              transition: { duration: 0.2 }
-            }}
-          >
-            <Sparkles className="w-5 h-5 text-white" />
-            <span className="text-white font-medium">Design Premium • Développement Expert</span>
-          </motion.div>
-
-          {/* Main Title avec animation SOLODESIGN */}
-          <motion.h1 
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight"
-            initial={{ opacity: 0, y: 20 }}
+            className="text-center"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
+            transition={{ duration: 0.6 }}
           >
-            {/* Animation des lettres SOLODESIGN */}
-            <div className="overflow-hidden">
-              {"SOLODESIGN".split("").map((letter, index) => (
-                <motion.span
-                  key={index}
-                  className="inline-block bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent"
-                  initial={{ y: 100, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: 0.1 + index * 0.05,
-                    type: "spring",
-                    stiffness: 120,
-                    damping: 20
-                  }}
-                  whileHover={{
-                    y: -5,
-                    scale: 1.1,
-                    transition: { duration: 0.2 }
-                  }}
-                  style={{
-                    backgroundSize: "200% 200%"
-                  }}
-                >
-                  {letter}
-                </motion.span>
-              ))}
-            </div>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p 
-            className="text-xl sm:text-2xl md:text-3xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.6 }}
-          >
-            Design moderne • Développement sur-mesure • Solutions innovantes
-          </motion.p>
-
-          {/* Description */}
-          <motion.p 
-            className="text-lg text-gray-400 mb-12 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.8 }}
-          >
-            Transformez vos idées en expériences digitales exceptionnelles avec notre expertise en design et développement web moderne.
-          </motion.p>
-
-          {/* CTA Button */}
-          <motion.div
-            className="flex flex-col sm:flex-row items-center justify-center gap-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 1.0 }}
-          >
-            <motion.button
-              className="relative overflow-hidden bg-white text-black px-8 py-4 rounded-full font-bold text-lg flex items-center space-x-3 group shadow-lg"
+            {/* Premium Badge */}
+            <motion.div
+              className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
               whileHover={{ 
                 scale: 1.05,
                 transition: { duration: 0.2 }
               }}
-              whileTap={{ scale: 0.95 }}
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-gray-800 to-black"
-                initial={{ x: "100%" }}
-                whileHover={{ x: "0%" }}
-                transition={{ duration: 0.3 }}
-              />
-              <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                Découvrir nos projets
-              </span>
-              <ArrowRight className="w-5 h-5 relative z-10 group-hover:text-white transition-colors duration-300" />
-            </motion.button>
+              <Sparkles className="w-5 h-5 text-white" />
+              <span className="text-white font-medium">Design Premium • Développement Expert</span>
+            </motion.div>
 
-            {/* Response Time Badge */}
-            <motion.div
-              className="flex items-center space-x-2 text-gray-400"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 1.2 }}
-              whileHover={{ scale: 1.05 }}
+            {/* Main Title avec animation SOLODESIGN */}
+            <motion.h1 
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 leading-tight tracking-tight"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <Timer className="w-4 h-4" />
-              <span className="text-sm font-medium">Réponse sous 24h</span>
+              <span className="block bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+                {"SOLODESIGN".split("").map((letter, index) => (
+                  <motion.span
+                    key={index}
+                    className="inline-block"
+                    initial={{ y: 100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{
+                      duration: 0.4,
+                      delay: 0.1 + index * 0.04,
+                      type: "spring",
+                      stiffness: 140,
+                      damping: 18
+                    }}
+                    whileHover={{
+                      y: -8,
+                      scale: 1.12,
+                      transition: { duration: 0.18 }
+                    }}
+                  >
+                    {letter}
+                  </motion.span>
+                ))}
+              </span>
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p 
+              className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 }}
+            >
+              Design moderne • Développement sur-mesure
+            </motion.p>
+
+            {/* Description */}
+            <motion.p 
+              className="text-base text-gray-400 mb-8 max-w-xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.8 }}
+            >
+              Transformez vos idées en expériences digitales exceptionnelles avec notre expertise.
+            </motion.p>
+
+            {/* CTA Button */}
+            <motion.div
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 1.0 }}
+            >
+              <motion.button
+                className="relative overflow-hidden bg-white text-black px-6 py-3 rounded-full font-bold text-base flex items-center space-x-2 group shadow-lg"
+                whileHover={{ 
+                  scale: 1.04,
+                  transition: { duration: 0.18 }
+                }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <span className="relative z-10 group-hover:text-white transition-colors duration-200">
+                  Découvrir
+                </span>
+                <ArrowRight className="w-5 h-5 relative z-10 group-hover:text-white transition-colors duration-200" />
+              </motion.button>
+
+              {/* Response Time Badge */}
+              <motion.div
+                className="flex items-center space-x-2 text-gray-400"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 1.2 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <Timer className="w-4 h-4" />
+                <span className="text-xs font-medium">Réponse sous 24h</span>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </motion.div>
+        </Parallax>
       </div>
 
       {/* Scroll indicator */}

@@ -19,18 +19,18 @@ const Cursor = () => {
 
     const handleHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      const clickable = target?.closest?.('a, button, .social-icon, .menu-item, .service-card, input, textarea');
+      const clickable = target?.closest?.('a, button, .social-icon, .menu-item, .service-card, input, textarea, .clickable');
       setHover(!!clickable);
     };
 
     window.addEventListener('mousemove', updatePosition, { passive: true });
     document.addEventListener('mouseover', handleHover, { passive: true });
-    document.addEventListener('mouseout', () => setHover(false), { passive: true });
+    document.addEventListener('mouseout', handleHover, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', updatePosition);
       document.removeEventListener('mouseover', handleHover);
-      document.removeEventListener('mouseout', () => setHover(false));
+      document.removeEventListener('mouseout', handleHover);
     };
   }, []);
 
@@ -40,27 +40,38 @@ const Cursor = () => {
       style={{
         x: position.x - 12,
         y: position.y - 12,
-        backgroundColor: hover ? 'white' : 'transparent',
-        border: '2px solid white',
         willChange: 'transform'
       }}
       animate={{ 
         scale: hover ? 1.8 : 1,
-        opacity: hover ? 0.9 : 1
+        opacity: 1
       }}
       transition={{ 
         type: "spring", 
-        stiffness: 400, 
-        damping: 20,
-        mass: 0.5
+        stiffness: 600, 
+        damping: 25,
+        mass: 0.3
       }}
     >
-      {/* Point central plus visible */}
+      {/* Cercle principal */}
+      <motion.div 
+        className="absolute inset-0 rounded-full border-2 border-white"
+        animate={{
+          backgroundColor: hover ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0)',
+        }}
+        transition={{ 
+          duration: 0.2,
+          ease: "easeOut"
+        }}
+      />
+      
+      {/* Point central */}
       <motion.div 
         className="absolute top-1/2 left-1/2 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2" 
         animate={{
-          width: hover ? 6 : 3,
-          height: hover ? 6 : 3,
+          width: hover ? 4 : 3,
+          height: hover ? 4 : 3,
+          opacity: hover ? 0 : 1,
         }}
         transition={{ 
           type: "spring", 
@@ -69,19 +80,22 @@ const Cursor = () => {
         }}
       />
       
-      {/* Effet de pulse subtil sur hover */}
-      {hover && (
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-white"
-          initial={{ scale: 1, opacity: 0.8 }}
-          animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ 
-            duration: 1, 
-            repeat: Infinity,
-            ease: "easeOut"
-          }}
-        />
-      )}
+      {/* Effet de pulse uniquement sur hover - sans clignotement */}
+      <motion.div
+        className="absolute inset-0 rounded-full border border-white/50"
+        animate={hover ? {
+          scale: [1, 1.8, 1],
+          opacity: [0.6, 0, 0.6],
+        } : {
+          scale: 1,
+          opacity: 0
+        }}
+        transition={{ 
+          duration: 2, 
+          repeat: hover ? Infinity : 0,
+          ease: "easeInOut"
+        }}
+      />
     </motion.div>
   );
 };

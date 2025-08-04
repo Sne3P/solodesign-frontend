@@ -2,7 +2,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface MenuButtonProps {
   initialMenuOpen?: boolean
@@ -13,6 +13,7 @@ const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
   const [isRedirecting, setIsRedirecting] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const updateButtonPosition = () => {
@@ -40,25 +41,40 @@ const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
   ]
 
   const handleNavigation = (path: string) => {
+    if (isRedirecting) return // Empêcher les clicks multiples
+    
     setIsRedirecting(true)
+    
+    // Fermer le menu avec une animation fluide
     setMenuOpen(false)
-
-    if (path.startsWith("/#")) {
-      const sectionId = path.substring(2)
-      const section = document.getElementById(sectionId)
-      if (section) {
-        section.scrollIntoView({ behavior: "smooth" })
-        setIsRedirecting(false)
+    
+    // Délai pour laisser l'animation de fermeture se jouer
+    setTimeout(() => {
+      if (path.startsWith("/#")) {
+        // Pour les liens d'ancrage internes
+        const sectionId = path.substring(2)
+        const section = document.getElementById(sectionId)
+        if (section) {
+          section.scrollIntoView({ behavior: "smooth" })
+        } else {
+          router.push("/")
+          setTimeout(() => {
+            const sectionElement = document.getElementById(sectionId)
+            if (sectionElement) {
+              sectionElement.scrollIntoView({ behavior: "smooth" })
+            }
+          }, 100)
+        }
       } else {
-        setTimeout(() => {
-          window.location.href = path
-        }, 300)
+        // Navigation SPA avec Next.js router
+        router.push(path)
       }
-    } else {
+      
+      // Reset du state après un petit délai
       setTimeout(() => {
-        window.location.href = path
-      }, 300)
-    }
+        setIsRedirecting(false)
+      }, 100)
+    }, 300) // Temps de l'animation de fermeture
   }
 
   const menuItemVariants = {
@@ -134,25 +150,22 @@ const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
                   transition={{ delay: 0.1 * index, type: "spring", stiffness: 200, damping: 15 }}
                 >
                   <motion.div variants={menuItemVariants} whileHover="hover" whileTap="tap">
-                    <Link href={item.path}>
-                      <motion.span
-                        onClick={(e) => {
-                          e.preventDefault()
-                          if (!isRedirecting) {
-                            handleNavigation(item.path)
-                          }
-                        }}
-                        className="inline-block relative cursor-pointer"
-                      >
-                        {item.text}
-                        <motion.div
-                          className="absolute -bottom-1 left-0 h-0.5 bg-black"
-                          initial={{ width: "0%" }}
-                          whileHover={{ width: "100%" }}
-                          transition={{ duration: 0.2 }}
-                        />
-                      </motion.span>
-                    </Link>
+                    <motion.span
+                      onClick={() => {
+                        if (!isRedirecting) {
+                          handleNavigation(item.path)
+                        }
+                      }}
+                      className="inline-block relative cursor-pointer"
+                    >
+                      {item.text}
+                      <motion.div
+                        className="absolute -bottom-1 left-0 h-0.5 bg-black"
+                        initial={{ width: "0%" }}
+                        whileHover={{ width: "100%" }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </motion.span>
                   </motion.div>
                 </motion.div>
               ))}

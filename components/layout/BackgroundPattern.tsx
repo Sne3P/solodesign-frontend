@@ -80,8 +80,8 @@ const BackgroundPattern = ({
     const render = () => {
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       
-      // Points magnétiques - seulement dans un rayon de 100px du curseur
-      const radius = 100;
+      // Points magnétiques - rayon plus grand pour plus de fluidité
+      const radius = 120;
       const gridSize = spacing;
       
       // Calculer la grille locale autour du curseur
@@ -90,28 +90,46 @@ const BackgroundPattern = ({
       const startY = Math.floor((mousePos.y - radius) / gridSize) * gridSize;
       const endY = Math.ceil((mousePos.y + radius) / gridSize) * gridSize;
 
-      ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(dotOpacity * 1.5, 0.8)})`;
+      // Créer un gradient radial pour l'effet magnétique
+      const gradient = ctx.createRadialGradient(
+        mousePos.x, mousePos.y, 0,
+        mousePos.x, mousePos.y, radius
+      );
+      gradient.addColorStop(0, `rgba(255, 255, 255, ${dotOpacity * 2})`);
+      gradient.addColorStop(0.5, `rgba(255, 255, 255, ${dotOpacity * 1.2})`);
+      gradient.addColorStop(1, `rgba(255, 255, 255, ${dotOpacity * 0.3})`);
 
-      // Réduire encore plus le nombre de points
+      // Points magnétiques avec effet fluide
       for (let x = startX; x <= endX; x += gridSize) {
         for (let y = startY; y <= endY; y += gridSize) {
           const distance = Math.hypot(mousePos.x - x, mousePos.y - y);
           
           if (distance < radius) {
-            // Effet magnétique plus accentué
-            const force = Math.pow(1 - distance / radius, 1.8);
+            // Effet magnétique plus fluide et design
+            const force = Math.pow(1 - distance / radius, 1.5);
             const angle = Math.atan2(y - mousePos.y, x - mousePos.x);
-            const offset = force * 12; // Augmenter l'offset pour un effet plus visible
+            const offset = force * 15; // Offset plus important pour plus de visibilité
             
             const finalX = x + Math.cos(angle) * offset;
             const finalY = y + Math.sin(angle) * offset;
             
-            // Taille du point basée sur la proximité - plus visible
-            const size = 1 + force * 2.2;
+            // Taille et opacité basées sur la proximité
+            const size = 1.2 + force * 2.5;
+            const pointOpacity = 0.3 + force * 0.7;
             
+            // Dessiner le point principal
+            ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity})`;
             ctx.beginPath();
             ctx.arc(finalX, finalY, size, 0, Math.PI * 2);
             ctx.fill();
+            
+            // Ajouter un effet de halo pour les points proches
+            if (force > 0.6) {
+              ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity * 0.3})`;
+              ctx.beginPath();
+              ctx.arc(finalX, finalY, size * 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
           }
         }
       }

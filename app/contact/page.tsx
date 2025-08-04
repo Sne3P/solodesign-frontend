@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, lazy, Suspense } from "react"
 import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion"
-import { Send, ArrowLeft, Mail, Phone, MapPin, Clock, Zap, Smartphone, Globe, Shield, Database, Palette, Code, Rocket, CheckCircle, Star } from "lucide-react"
+import { Send, ArrowLeft, Mail, Phone, MapPin, Clock, Zap, Smartphone, Globe, Shield, Database, Palette, Code, Rocket, CheckCircle, Star, ArrowRight, ArrowLeft as ArrowLeftIcon } from "lucide-react"
 import { ParallaxProvider, Parallax } from "react-scroll-parallax"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import jsPDF from 'jspdf'
 
 const SocialLinks = lazy(() => import("../../components/layout/SocialLinks"))
 const MenuButton = lazy(() => import("../../components/layout/MenuButton"))
@@ -41,6 +42,12 @@ const ContactPage = () => {
   const [showQuiz, setShowQuiz] = useState(false)
   const [activeTab, setActiveTab] = useState("contact")
   const [selectedServices, setSelectedServices] = useState<string[]>([])
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+  const [clientInfo, setClientInfo] = useState({
+    name: "",
+    email: "",
+    phone: ""
+  })
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -316,31 +323,169 @@ const ContactPage = () => {
     setIsSubmitting(false)
   }
 
-  const handleQuizSubmit = async () => {
+  const handleQuizAnswer = (stepId: string, answer: string | string[]) => {
+    setQuizAnswers(prev => ({ ...prev, [stepId]: answer }))
+    
+    // Only auto-advance for single-select questions
+    const currentStep = quizSteps[currentQuizStep]
+    if (!currentStep.multiSelect && currentQuizStep < quizSteps.length - 1) {
+      setTimeout(() => setCurrentQuizStep(prev => prev + 1), 300)
+    }
+  }
+
+  const handleMultiSelectToggle = (stepId: string, option: string) => {
+    setQuizAnswers(prev => {
+      const currentAnswers = Array.isArray(prev[stepId]) ? prev[stepId] as string[] : []
+      const isSelected = currentAnswers.includes(option)
+      
+      if (isSelected) {
+        return { ...prev, [stepId]: currentAnswers.filter(a => a !== option) }
+      } else {
+        return { ...prev, [stepId]: [...currentAnswers, option] }
+      }
+    })
+  }
+
+  const nextQuizStep = () => {
+    if (currentQuizStep < quizSteps.length - 1) {
+      setCurrentQuizStep(prev => prev + 1)
+    }
+  }
+
+  const prevQuizStep = () => {
+    if (currentQuizStep > 0) {
+      setCurrentQuizStep(prev => prev - 1)
+    }
+  }
+
+  const generateQuotePdf = async () => {
+    setIsGeneratingPdf(true)
+    
+    try {
+      // Create PDF content
+      const pdf = new jsPDF()
+      
+      // Add header
+      pdf.setFontSize(20)
+      pdf.text('Devis SoloDesign', 20, 30)
+      
+      // Add client info
+      if (clientInfo.name || clientInfo.email || clientInfo.phone) {
+        pdf.setFontSize(14)
+        pdf.text('Informations client:', 20, 50)
+        let yPos = 60
+        
+        if (clientInfo.name) {
+          pdf.setFontSize(12)
+          pdf.text(`Nom: ${clientInfo.name}`, 20, yPos)
+          yPos += 10
+        }
+        if (clientInfo.email) {
+          pdf.text(`Email: ${clientInfo.email}`, 20, yPos)
+          yPos += 10
+        }
+        if (clientInfo.phone) {
+          pdf.text(`Téléphone: ${clientInfo.phone}`, 20, yPos)
+          yPos += 15
+        }
+      }
+      
+      // Add quiz answers
+      pdf.setFontSize(14)
+      let currentY = clientInfo.name || clientInfo.email || clientInfo.phone ? 95 : 50
+      pdf.text('Détails du projet:', 20, currentY)
+      currentY += 15
+      
+      Object.entries(quizAnswers).forEach(([stepId, answer]) => {
+        const step = quizSteps.find(s => s.id === stepId)
+        if (step) {
+          pdf.setFontSize(12)
+          pdf.text(`${step.question}:`, 20, currentY)
+          currentY += 8
+          
+          if (Array.isArray(answer)) {
+            answer.forEach(ans => {
+              pdf.text(`• ${ans}`, 25, currentY)
+              currentY += 8
+            })
+          } else {
+            pdf.text(`• ${answer}`, 25, currentY)
+            currentY += 8
+          }
+          currentY += 5
+        }
+      })
+      
+      // Add footer
+      pdf.setFontSize(10)
+      pdf.text('Ce devis est généré automatiquement et sera affiné lors de notre entretien.', 20, 270)
+      pdf.text('SoloDesign - contact@solodesign.fr', 20, 280)
+      
+      // Generate blob for email attachment
+      const pdfBlob = pdf.output('blob')
+      return pdfBlob
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error)
+      throw error
+    } finally {
+      setIsGeneratingPdf(false)
+    }
+  }
+
+  const submitQuoteWithPdf = async () => {
     setIsSubmitting(true)
     
     try {
+      // Generate PDF
+      const pdfBlob = await generateQuotePdf()
+      
+      // Create FormData for email with PDF attachment
+      const formData = new FormData()
+      formData.append('pdf', pdfBlob, 'devis-solodesign.pdf')
+      formData.append('quizAnswers', JSON.stringify(quizAnswers))
+      formData.append('clientInfo', JSON.stringify(clientInfo))
+      
+      // Prepare email data
+      const emailData = {
+        name: clientInfo.name || "Demande de devis automatique",
+        email: clientInfo.email || "devis@solodesign.fr",
+        message: `Nouvelle demande de devis générée automatiquement:
+
+Informations client:
+${clientInfo.name ? `Nom: ${clientInfo.name}` : ''}
+${clientInfo.email ? `Email: ${clientInfo.email}` : ''}
+${clientInfo.phone ? `Téléphone: ${clientInfo.phone}` : ''}
+
+Détails du projet:
+${Object.entries(quizAnswers).map(([key, value]) => {
+  const step = quizSteps.find(s => s.id === key)
+  const questionText = step ? step.question : key
+  const answerText = Array.isArray(value) ? value.join(", ") : value
+  return `${questionText}: ${answerText}`
+}).join("\n")}
+
+Un PDF détaillé est joint à cette demande.`,
+        hasAttachment: true
+      }
+
+      // Send email with PDF attachment
       const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: "Demande de devis automatique",
-          email: "devis@solodesign.fr",
-          message: `Nouvelle demande de devis générée automatiquement:\n\n${Object.entries(quizAnswers).map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`).join("\n")}`,
-          type: "quote",
-          quizData: quizAnswers
-        }),
+        body: JSON.stringify(emailData),
       })
 
       if (response.ok) {
         alert("Demande de devis envoyée avec succès! Nous vous recontacterons rapidement avec une estimation personnalisée.")
-        setShowQuiz(false)
-        setCurrentQuizStep(0)
         setQuizAnswers({})
+        setCurrentQuizStep(0)
+        setShowQuiz(false)
+        setClientInfo({ name: "", email: "", phone: "" })
       } else {
-        alert("Erreur lors de l'envoi. Veuillez réessayer.")
+        throw new Error("Failed to send email")
       }
     } catch (error) {
       console.error("Error:", error)
@@ -348,14 +493,6 @@ const ContactPage = () => {
     }
 
     setIsSubmitting(false)
-  }
-
-  const handleQuizAnswer = (stepId: string, answer: string | string[]) => {
-    setQuizAnswers(prev => ({ ...prev, [stepId]: answer }))
-    
-    if (currentQuizStep < quizSteps.length - 1) {
-      setTimeout(() => setCurrentQuizStep(prev => prev + 1), 300)
-    }
   }
 
   const handleExit = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -461,11 +598,17 @@ const ContactPage = () => {
                   currentStep={currentQuizStep}
                   answers={quizAnswers}
                   onAnswer={handleQuizAnswer}
-                  onSubmit={handleQuizSubmit}
+                  onSubmit={submitQuoteWithPdf}
                   isSubmitting={isSubmitting}
                   showQuiz={showQuiz}
                   setShowQuiz={setShowQuiz}
                   setCurrentStep={setCurrentQuizStep}
+                  handleMultiSelectToggle={handleMultiSelectToggle}
+                  nextQuizStep={nextQuizStep}
+                  prevQuizStep={prevQuizStep}
+                  clientInfo={clientInfo}
+                  setClientInfo={setClientInfo}
+                  isGeneratingPdf={isGeneratingPdf}
                 />
               )}
             </AnimatePresence>
@@ -544,6 +687,12 @@ interface QuoteSectionProps {
   showQuiz: boolean
   setShowQuiz: (show: boolean) => void
   setCurrentStep: (step: number) => void
+  handleMultiSelectToggle: (stepId: string, option: string) => void
+  nextQuizStep: () => void
+  prevQuizStep: () => void
+  clientInfo: { name: string; email: string; phone: string }
+  setClientInfo: React.Dispatch<React.SetStateAction<{ name: string; email: string; phone: string }>>
+  isGeneratingPdf: boolean
 }
 
 // Section Contact améliorée
@@ -814,7 +963,13 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
   isSubmitting,
   showQuiz,
   setShowQuiz,
-  setCurrentStep
+  setCurrentStep,
+  handleMultiSelectToggle,
+  nextQuizStep,
+  prevQuizStep,
+  clientInfo,
+  setClientInfo,
+  isGeneratingPdf
 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -917,31 +1072,83 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quizSteps[currentStep].options.map((option) => (
-                  <motion.button
-                    key={option.id}
-                    className="p-6 rounded-lg border border-white/20 hover:border-white/50 bg-white/5 hover:bg-white/10 transition-all text-left group"
-                    onClick={() => onAnswer(quizSteps[currentStep].id, option.value)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 }}
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="bg-white/10 p-3 rounded-full group-hover:bg-white/20 transition-all">
-                        {option.icon && <option.icon className="w-6 h-6" />}
+                {quizSteps[currentStep].options.map((option) => {
+                  const isMultiSelect = quizSteps[currentStep].multiSelect
+                  const currentAnswers = answers[quizSteps[currentStep].id]
+                  const isSelected = isMultiSelect 
+                    ? Array.isArray(currentAnswers) && currentAnswers.includes(option.value)
+                    : currentAnswers === option.value
+
+                  return (
+                    <motion.button
+                      key={option.id}
+                      className={`p-6 rounded-lg border transition-all text-left group ${
+                        isSelected 
+                          ? 'border-white bg-white/15' 
+                          : 'border-white/20 hover:border-white/50 bg-white/5 hover:bg-white/10'
+                      }`}
+                      onClick={() => {
+                        if (isMultiSelect) {
+                          handleMultiSelectToggle(quizSteps[currentStep].id, option.value)
+                        } else {
+                          onAnswer(quizSteps[currentStep].id, option.value)
+                        }
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.1 }}
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className={`p-3 rounded-full transition-all ${
+                          isSelected ? 'bg-white/30' : 'bg-white/10 group-hover:bg-white/20'
+                        }`}>
+                          {option.icon && <option.icon className="w-6 h-6" />}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-lg mb-2">{option.label}</h3>
+                            {isSelected && (
+                              <CheckCircle className="w-5 h-5 text-white" />
+                            )}
+                          </div>
+                          {option.description && (
+                            <p className="text-gray-300 text-sm">{option.description}</p>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">{option.label}</h3>
-                        {option.description && (
-                          <p className="text-gray-300 text-sm">{option.description}</p>
-                        )}
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  )
+                })}
               </div>
+              
+              {/* Navigation buttons for multi-select questions */}
+              {quizSteps[currentStep].multiSelect && (
+                <div className="flex gap-4 justify-center mt-8">
+                  {currentStep > 0 && (
+                    <motion.button
+                      className="bg-gray-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2"
+                      onClick={prevQuizStep}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <ArrowLeftIcon className="w-4 h-4" />
+                      Précédent
+                    </motion.button>
+                  )}
+                  
+                  <motion.button
+                    className="bg-gradient-to-r from-white to-gray-200 text-black px-6 py-3 rounded-full font-bold flex items-center gap-2"
+                    onClick={nextQuizStep}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Suivant
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.button>
+                </div>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -949,12 +1156,57 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               className="text-center"
             >
-              <h2 className="text-3xl font-bold mb-8">Récapitulatif de votre projet</h2>
+              <h2 className="text-3xl font-bold mb-8">Vos informations de contact</h2>
+              
+              {/* Formulaire d'informations client */}
+              <motion.div 
+                className="bg-white/5 rounded-lg p-8 mb-8 text-left max-w-md mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Nom complet</label>
+                    <input
+                      type="text"
+                      value={clientInfo.name}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-4 py-3 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:bg-white/15 transition-all rounded-lg border border-white/20 focus:border-white/40"
+                      placeholder="Votre nom et prénom"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={clientInfo.email}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-4 py-3 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:bg-white/15 transition-all rounded-lg border border-white/20 focus:border-white/40"
+                      placeholder="votre@email.com"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Téléphone (optionnel)</label>
+                    <input
+                      type="tel"
+                      value={clientInfo.phone}
+                      onChange={(e) => setClientInfo(prev => ({ ...prev, phone: e.target.value }))}
+                      className="w-full px-4 py-3 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:bg-white/15 transition-all rounded-lg border border-white/20 focus:border-white/40"
+                      placeholder="Votre numéro de téléphone"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              <h3 className="text-2xl font-bold mb-6">Récapitulatif de votre projet</h3>
               <div className="bg-white/5 rounded-lg p-8 mb-8 text-left">
                 {Object.entries(answers).map(([key, value]) => {
                   const step = quizSteps.find(s => s.id === key)
                   return (
-                    <div key={key} className="mb-4 flex justify-between items-center">
+                    <div key={key} className="mb-4 flex justify-between items-start gap-4">
                       <span className="font-semibold">{step?.question.replace(" ?", "")} :</span>
                       <span className="text-gray-300 text-right max-w-xs">
                         {Array.isArray(value) ? value.join(", ") : value}
@@ -965,7 +1217,8 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
               </div>
               
               <p className="text-gray-300 mb-8">
-                Nous analyserons vos réponses et vous enverrons une estimation détaillée dans les plus brefs délais.
+                Un devis détaillé au format PDF sera généré et envoyé avec votre demande. 
+                Nous analyserons vos réponses et vous recontacterons rapidement.
               </p>
               
               <div className="flex gap-4 justify-center">
@@ -974,6 +1227,7 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
                   onClick={() => {
                     setShowQuiz(false)
                     setCurrentStep(0)
+                    setClientInfo({ name: "", email: "", phone: "" })
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -982,13 +1236,22 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
                 </motion.button>
                 
                 <motion.button
-                  className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-3 rounded-full font-bold"
+                  className="bg-gradient-to-r from-white to-gray-200 text-black px-12 py-3 rounded-full font-bold flex items-center gap-2"
                   onClick={onSubmit}
-                  disabled={isSubmitting}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  disabled={isSubmitting || isGeneratingPdf || !clientInfo.email}
+                  whileHover={{ scale: !isSubmitting && !isGeneratingPdf && clientInfo.email ? 1.05 : 1 }}
+                  whileTap={{ scale: !isSubmitting && !isGeneratingPdf && clientInfo.email ? 0.95 : 1 }}
                 >
-                  {isSubmitting ? "Envoi en cours..." : "Recevoir mon devis"}
+                  {isGeneratingPdf ? (
+                    <>Génération PDF...</>
+                  ) : isSubmitting ? (
+                    <>Envoi en cours...</>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Recevoir mon devis PDF
+                    </>
+                  )}
                 </motion.button>
               </div>
             </motion.div>

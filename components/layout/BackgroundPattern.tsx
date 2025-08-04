@@ -6,32 +6,25 @@ interface BackgroundPatternProps {
   opacity?: number;
   spacing?: number;
   duration?: number;
-  dotOpacity?: number;
   zIndex?: number;
-  magneticEffect?: boolean; // Nouvelle prop pour activer/désactiver l'effet magnétique
+  magneticEffect?: boolean;
 }
 
 const BackgroundPattern = ({ 
-  opacity = 0.2, 
-  spacing = 30, 
-  duration = 10,
-  dotOpacity = 0.3,
+  opacity = 0.25, 
+  spacing = 35, 
+  duration = 12,
   zIndex = 10,
   magneticEffect = true
 }: BackgroundPatternProps) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
-  const lastMouseUpdate = useRef<number>(0);
+  const dotsRef = useRef<Array<{x: number, y: number, originalX: number, originalY: number}>>([]);
 
-  // Optimisation: réduire drastiquement la fréquence de mise à jour
+  // Suivi de la souris optimisé
   const updateMousePosition = useCallback((e: MouseEvent) => {
     if (!magneticEffect) return;
-    
-    const now = Date.now();
-    if (now - lastMouseUpdate.current < 32) return; // 30fps pour l'effet magnétique
-    
-    lastMouseUpdate.current = now;
     setMousePos({ x: e.clientX, y: e.clientY });
   }, [magneticEffect]);
 
@@ -50,7 +43,7 @@ const BackgroundPattern = ({
     };
   }, [updateMousePosition, magneticEffect]);
 
-  // Effet canvas ultra-optimisé - seulement si l'effet magnétique est activé
+  // Initialisation et animation de la trame magnétique
   useEffect(() => {
     if (!magneticEffect) return;
     
@@ -60,79 +53,81 @@ const BackgroundPattern = ({
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    // Configurer le canvas pour de meilleures performances
     const updateCanvasSize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Limiter le DPR pour les perfs
       const width = window.innerWidth;
       const height = window.innerHeight;
       
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
+      canvas.width = width;
+      canvas.height = height;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      ctx.scale(dpr, dpr);
+
+      // Générer la grille de points une seule fois
+      const dots: Array<{x: number, y: number, originalX: number, originalY: number}> = [];
+      for (let x = 0; x <= width + spacing; x += spacing) {
+        for (let y = 0; y <= height + spacing; y += spacing) {
+          dots.push({ x, y, originalX: x, originalY: y });
+        }
+      }
+      dotsRef.current = dots;
     };
 
     updateCanvasSize();
     window.addEventListener('resize', updateCanvasSize);
 
-    // Animation ultra-légère avec seulement quelques points près du curseur
+    // Animation fluide et légère
     const render = () => {
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Points magnétiques - rayon plus grand pour plus de fluidité
-      const radius = 120;
-      const gridSize = spacing;
+      const magneticRadius = 120;
+      const magneticStrength = 15;
       
-      // Calculer la grille locale autour du curseur
-      const startX = Math.floor((mousePos.x - radius) / gridSize) * gridSize;
-      const endX = Math.ceil((mousePos.x + radius) / gridSize) * gridSize;
-      const startY = Math.floor((mousePos.y - radius) / gridSize) * gridSize;
-      const endY = Math.ceil((mousePos.y + radius) / gridSize) * gridSize;
-
-      // Créer un gradient radial pour l'effet magnétique
-      const gradient = ctx.createRadialGradient(
-        mousePos.x, mousePos.y, 0,
-        mousePos.x, mousePos.y, radius
-      );
-      gradient.addColorStop(0, `rgba(255, 255, 255, ${dotOpacity * 2})`);
-      gradient.addColorStop(0.5, `rgba(255, 255, 255, ${dotOpacity * 1.2})`);
-      gradient.addColorStop(1, `rgba(255, 255, 255, ${dotOpacity * 0.3})`);
-
-      // Points magnétiques avec effet fluide
-      for (let x = startX; x <= endX; x += gridSize) {
-        for (let y = startY; y <= endY; y += gridSize) {
-          const distance = Math.hypot(mousePos.x - x, mousePos.y - y);
+      dotsRef.current.forEach(dot => {
+        const distance = Math.hypot(mousePos.x - dot.originalX, mousePos.y - dot.originalY);
+        
+        if (distance < magneticRadius) {
+          // Effet magnétique accentué et fluide
+          const force = Math.pow(1 - distance / magneticRadius, 1.8);
+          const angle = Math.atan2(mousePos.y - dot.originalY, mousePos.x - dot.originalX);
           
-          if (distance < radius) {
-            // Effet magnétique plus fluide et design
-            const force = Math.pow(1 - distance / radius, 1.5);
-            const angle = Math.atan2(y - mousePos.y, x - mousePos.x);
-            const offset = force * 15; // Offset plus important pour plus de visibilité
-            
-            const finalX = x + Math.cos(angle) * offset;
-            const finalY = y + Math.sin(angle) * offset;
-            
-            // Taille et opacité basées sur la proximité
-            const size = 1.2 + force * 2.5;
-            const pointOpacity = 0.3 + force * 0.7;
-            
-            // Dessiner le point principal
-            ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity})`;
+          // Déplacement vers la souris avec interpolation fluide
+          const targetX = dot.originalX + Math.cos(angle) * force * magneticStrength;
+          const targetY = dot.originalY + Math.sin(angle) * force * magneticStrength;
+          
+          // Interpolation plus rapide pour l'attraction, plus lente pour éviter les bugs visuels
+          const attractionSpeed = 0.25;
+          dot.x += (targetX - dot.x) * attractionSpeed;
+          dot.y += (targetY - dot.y) * attractionSpeed;
+          
+          // Opacité et taille augmentées pour les points magnétiques
+          const pointOpacity = Math.min(opacity * (1 + force * 2.5), 0.8);
+          const pointSize = 1.4 + force * 1.2;
+          
+          ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity})`;
+          ctx.beginPath();
+          ctx.arc(dot.x, dot.y, pointSize, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Effet de glow subtil pour les points très proches
+          if (force > 0.7) {
+            ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity * 0.2})`;
             ctx.beginPath();
-            ctx.arc(finalX, finalY, size, 0, Math.PI * 2);
+            ctx.arc(dot.x, dot.y, pointSize * 2.5, 0, Math.PI * 2);
             ctx.fill();
-            
-            // Ajouter un effet de halo pour les points proches
-            if (force > 0.6) {
-              ctx.fillStyle = `rgba(255, 255, 255, ${pointOpacity * 0.3})`;
-              ctx.beginPath();
-              ctx.arc(finalX, finalY, size * 2, 0, Math.PI * 2);
-              ctx.fill();
-            }
           }
+        } else {
+          // Retour progressif à la position originale avec interpolation douce
+          const returnSpeed = 0.12;
+          dot.x += (dot.originalX - dot.x) * returnSpeed;
+          dot.y += (dot.originalY - dot.y) * returnSpeed;
+          
+          // Point normal plus visible
+          ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+          ctx.beginPath();
+          ctx.arc(dot.x, dot.y, 1.2, 0, Math.PI * 2);
+          ctx.fill();
         }
-      }
+      });
 
       animationFrameRef.current = requestAnimationFrame(render);
     };
@@ -145,7 +140,7 @@ const BackgroundPattern = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [mousePos, spacing, dotOpacity, magneticEffect]);
+  }, [mousePos, spacing, opacity, magneticEffect]);
 
   return (
     <motion.div
@@ -153,27 +148,26 @@ const BackgroundPattern = ({
       style={{ zIndex }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
+      transition={{ duration: 1.2 }}
     >
-      {/* Trame de base avec CSS pur - ultra performant */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(255,255,255,${opacity}) 1px, transparent 1px)`,
-          backgroundSize: `${spacing}px ${spacing}px`,
-          backgroundPosition: '0px 0px',
-          animation: `backgroundMove-${spacing} ${duration}s linear infinite`
-        }}
-      />
-      
-      {/* Canvas pour l'effet magnétique optimisé - seulement si activé */}
-      {magneticEffect && (
+      {/* Canvas pour la trame magnétique */}
+      {magneticEffect ? (
         <canvas
           ref={canvasRef}
           className="absolute inset-0"
           style={{ 
-            mixBlendMode: 'screen',
-            filter: 'blur(0.3px)'
+            filter: 'blur(0.1px)'
+          }}
+        />
+      ) : (
+        /* Trame statique en fallback */
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,${opacity}) 1px, transparent 1px)`,
+            backgroundSize: `${spacing}px ${spacing}px`,
+            backgroundPosition: '0px 0px',
+            animation: `backgroundMove-${spacing} ${duration}s linear infinite`
           }}
         />
       )}

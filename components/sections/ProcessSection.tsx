@@ -63,96 +63,156 @@ const ProcessSection = () => {
         {/* Timeline des étapes */}
         <div className="relative">
           {/* Ligne centrale pour desktop */}
-          <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
+          <div className="hidden lg:block absolute left-1/2 transform -translate-x-0.5 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
           
           {/* Ligne latérale pour mobile */}
           <div className="lg:hidden absolute left-8 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
 
-          <div className="space-y-16 sm:space-y-20 md:space-y-24">
+          <div className="space-y-20">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                className={`relative flex flex-col lg:flex-row items-start lg:items-center ${
-                  index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-                } gap-8 lg:gap-16`}
+                className="relative"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ 
-                  duration: 0.8, 
-                  delay: index * 0.2,
-                  ease: "easeOut"
+                  duration: 0.6, 
+                  delay: index * 0.1,
+                  type: "spring",
+                  stiffness: 120,
+                  damping: 20
                 }}
               >
-                {/* Numéro d'étape (mobile) */}
-                <div className="lg:hidden absolute left-0 top-0 w-16 h-16 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-xl font-bold text-white backdrop-blur-sm">
-                  {index + 1}
+                {/* Layout desktop */}
+                <div className={`hidden lg:flex items-center ${
+                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
+                } gap-8`}>
+                  
+                  {/* Contenu */}
+                  <motion.div
+                    className="w-5/12"
+                    whileHover={{ scale: 1.02, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                      
+                      {/* Icône et durée */}
+                      <div className={`flex items-center gap-4 mb-6 ${
+                        index % 2 === 0 ? 'justify-start' : 'justify-end'
+                      }`}>
+                        <motion.div
+                          className="flex items-center justify-center w-14 h-14 bg-white/10 rounded-xl text-white"
+                          whileHover={{ 
+                            rotate: 360,
+                            scale: 1.1 
+                          }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          {step.icon}
+                        </motion.div>
+                        <span className="text-sm font-medium text-gray-400 bg-white/5 px-3 py-1 rounded-full">
+                          {step.duration}
+                        </span>
+                      </div>
+
+                      {/* Titre */}
+                      <h3 className={`text-2xl font-bold text-white mb-4 ${
+                        index % 2 === 0 ? 'text-left' : 'text-right'
+                      }`}>
+                        {step.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className={`text-gray-300 leading-relaxed ${
+                        index % 2 === 0 ? 'text-left' : 'text-right'
+                      }`}>
+                        {step.description}
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Numéro central */}
+                  <motion.div
+                    className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg z-10"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: index * 0.1 + 0.2,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15
+                    }}
+                    whileHover={{ 
+                      scale: 1.2,
+                      rotate: 5
+                    }}
+                  >
+                    {index + 1}
+                  </motion.div>
+
+                  {/* Espace pour équilibrer */}
+                  <div className="w-5/12" />
                 </div>
 
-                {/* Contenu */}
-                <motion.div
-                  className={`lg:w-1/2 ml-20 lg:ml-0 ${
-                    index % 2 === 0 ? 'lg:text-right lg:pr-8' : 'lg:text-left lg:pl-8'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                >
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-                    
-                    {/* Icône et durée */}
-                    <div className={`flex items-center gap-4 mb-6 ${
-                      index % 2 === 0 ? 'lg:justify-end' : 'lg:justify-start'
-                    } justify-start`}>
-                      <motion.div
-                        className="flex items-center justify-center w-14 h-14 bg-white/10 rounded-full text-white"
-                        whileHover={{ 
-                          rotate: 360,
-                          scale: 1.1 
-                        }}
-                        transition={{ duration: 0.6 }}
-                      >
-                        {step.icon}
-                      </motion.div>
-                      <span className="text-sm font-medium text-gray-400 bg-white/5 px-3 py-1 rounded-full">
-                        {step.duration}
-                      </span>
+                {/* Layout mobile */}
+                <div className="lg:hidden flex items-start gap-6">
+                  {/* Numéro mobile */}
+                  <motion.div
+                    className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg flex-shrink-0"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: index * 0.1 + 0.2,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15
+                    }}
+                  >
+                    {index + 1}
+                  </motion.div>
+
+                  {/* Contenu mobile */}
+                  <motion.div
+                    className="flex-1"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                      
+                      {/* Icône et durée */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <motion.div
+                          className="flex items-center justify-center w-12 h-12 bg-white/10 rounded-xl text-white"
+                          whileHover={{ 
+                            rotate: 360,
+                            scale: 1.1 
+                          }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          {step.icon}
+                        </motion.div>
+                        <span className="text-sm font-medium text-gray-400 bg-white/5 px-3 py-1 rounded-full">
+                          {step.duration}
+                        </span>
+                      </div>
+
+                      {/* Titre */}
+                      <h3 className="text-xl font-bold text-white mb-3">
+                        {step.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="text-gray-300 leading-relaxed text-sm">
+                        {step.description}
+                      </p>
                     </div>
-
-                    {/* Titre */}
-                    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                      {step.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="text-base sm:text-lg text-gray-300 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                </motion.div>
-
-                {/* Numéro d'étape central (desktop) */}
-                <motion.div
-                  className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2 w-16 h-16 bg-white/10 border border-white/20 rounded-full items-center justify-center text-xl font-bold text-white backdrop-blur-sm"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ 
-                    duration: 0.6, 
-                    delay: index * 0.2 + 0.3,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 15
-                  }}
-                  whileHover={{ 
-                    scale: 1.2,
-                    backgroundColor: "rgba(255, 255, 255, 0.2)"
-                  }}
-                >
-                  {index + 1}
-                </motion.div>
-
-                {/* Espace pour équilibrer (desktop) */}
-                <div className="hidden lg:block lg:w-1/2" />
+                  </motion.div>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -160,25 +220,25 @@ const ProcessSection = () => {
 
         {/* Call to action */}
         <motion.div
-          className="text-center mt-16 sm:mt-20 md:mt-24"
+          className="text-center mt-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <p className="text-lg sm:text-xl text-gray-300 mb-8">
-            Prêt à démarrer votre projet ?
+          <p className="text-lg text-gray-300 mb-8">
+            Prêt à démarrer votre projet ? • Devis gratuit • Prototype offert
           </p>
           <motion.button
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-100 transition-colors duration-200"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full font-bold text-lg transition-all duration-200"
             whileHover={{ 
               scale: 1.05,
               y: -3
             }}
-            whileTap={{ scale: 0.98 }}
+            whileTap={{ scale: 0.95 }}
             transition={{ 
               type: "spring", 
-              stiffness: 300, 
+              stiffness: 400, 
               damping: 20 
             }}
           >

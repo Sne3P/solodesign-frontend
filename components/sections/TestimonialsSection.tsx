@@ -65,13 +65,13 @@ const TestimonialsSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <motion.div
             className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8"
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             <Star className="w-5 h-5 text-yellow-400" />
             <span className="text-white font-medium">Témoignages Clients</span>
@@ -96,14 +96,14 @@ const TestimonialsSection = () => {
               initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -50, scale: 0.95 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               {/* Quote icon */}
               <motion.div
                 className="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-full mb-8"
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: 0.3 }}
               >
                 <Quote className="w-8 h-8 text-white" />
               </motion.div>
@@ -113,7 +113,7 @@ const TestimonialsSection = () => {
                 className="text-xl sm:text-2xl md:text-3xl text-white leading-relaxed mb-8 italic"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
+                transition={{ duration: 0.4 }}
               >
                 &ldquo;{testimonials[currentTestimonial].text}&rdquo;
               </motion.blockquote>
@@ -123,14 +123,14 @@ const TestimonialsSection = () => {
                 className="flex justify-center space-x-1 mb-6"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                transition={{ duration: 0.3 }}
               >
                 {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.5 + i * 0.1 }}
+                    transition={{ duration: 0.2 }}
                   >
                     <Star className="w-6 h-6 text-yellow-400 fill-current" />
                   </motion.div>
@@ -142,7 +142,7 @@ const TestimonialsSection = () => {
                 className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                transition={{ duration: 0.3 }}
               >
                 <div className="flex items-center space-x-4">
                   <Image
@@ -219,7 +219,7 @@ const TestimonialsSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.4 }}
         >
           <div className="text-center">
             <div className="text-3xl sm:text-4xl font-bold text-white mb-2">4.9/5</div>

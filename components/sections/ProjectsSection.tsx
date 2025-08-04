@@ -139,7 +139,7 @@ const ProjectsSection = () => {
                         stiffness: 80,
                         damping: 20,
                         mass: 1,
-                        duration: 1.5
+                        duration: 0.8
                       }
                     }
                   }}
@@ -179,7 +179,7 @@ const ProjectsSection = () => {
                       <motion.div
                         className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm 
                                    rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"
-                        transition={{ duration: 0.2, delay: 0.05 }}
+                        transition={{ duration: 0.15 }}
                       >
                         <ArrowRight className="w-6 h-6 text-white" />
                       </motion.div>
@@ -208,9 +208,8 @@ const ProjectsSection = () => {
                         type: "spring",
                         stiffness: 80,
                         damping: 20,
-                        delay: 0.2,
                         mass: 1,
-                        duration: 1.5
+                        duration: 0.8
                       }
                     }
                   }}
@@ -227,8 +226,7 @@ const ProjectsSection = () => {
                         transition: {
                           type: "spring",
                           stiffness: 100,
-                          damping: 15,
-                          delay: 0.4
+                          damping: 15
                         }
                       }
                     }}
@@ -259,8 +257,7 @@ const ProjectsSection = () => {
                         transition: {
                           type: "spring",
                           stiffness: 100,
-                          damping: 20,
-                          delay: 0.6
+                          damping: 20
                         }
                       }
                     }}
@@ -277,8 +274,7 @@ const ProjectsSection = () => {
                         visible: {
                           opacity: 1,
                           transition: {
-                            delay: 0.8,
-                            staggerChildren: 0.03
+                            staggerChildren: 0.02
                           }
                         }
                       }}
@@ -338,8 +334,7 @@ const ProjectsSection = () => {
                         transition: {
                           type: "spring",
                           stiffness: 120,
-                          damping: 15,
-                          delay: 1.0
+                          damping: 15
                         }
                       }
                     }}

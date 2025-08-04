@@ -20,7 +20,7 @@ const AboutSection = () => (
         className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
+        transition={{ duration: 0.6 }}
       />
       
       {/* Floating Elements */}
@@ -43,20 +43,19 @@ const AboutSection = () => (
           opacity: [0.4, 0.8, 0.4]
         }}
         transition={{ 
-          duration: 2.5,
+          duration: 1.2,
           repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1
+          ease: "easeInOut"
         }}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <Parallax y={[-20, 20]}>
+        <Parallax translateY={[-20, 20]}>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             className="text-center mb-16"
           >
             <SectionTitle className="text-white">À Propos de Nous</SectionTitle>
@@ -65,7 +64,7 @@ const AboutSection = () => (
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
           {/* Left Content */}
-          <Parallax y={[-30, 30]}>
+          <Parallax translateY={[-30, 30]}>
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -77,9 +76,9 @@ const AboutSection = () => (
                   x: 0,
                   transition: {
                     type: "spring",
-                    stiffness: 100,
+                    stiffness: 200,
                     damping: 20,
-                    staggerChildren: 0.1
+                    staggerChildren: 0.05
                   }
                 }
               }}
@@ -102,7 +101,7 @@ const AboutSection = () => (
                   visible: { opacity: 1, y: 0 }
                 }}
               >
-                Nous sommes une équipe passionnée de designers et développeurs qui transforment les idées en expériences digitales exceptionnelles. Notre mission est de créer des solutions qui marquent les esprits et génèrent des résultats.
+                Nous transformons vos idées en expériences digitales exceptionnelles avec les technologies les plus modernes. React, Next.js, design systems avancés - nous maîtrisons l&apos;écosystème complet du développement moderne.
               </motion.p>
               
               <motion.p 
@@ -112,7 +111,7 @@ const AboutSection = () => (
                   visible: { opacity: 1, y: 0 }
                 }}
               >
-                Avec une approche centrée sur l&apos;utilisateur et une expertise technique de pointe, nous donnons vie aux projets les plus ambitieux de nos clients.
+                Service ultra-rapide • Développement accéléré • Prototypes gratuits • Devis sans engagement • Support 24h/7j
               </motion.p>
 
               <motion.div
@@ -148,7 +147,7 @@ const AboutSection = () => (
           </Parallax>
 
           {/* Right Image */}
-          <Parallax y={[30, -30]}>
+          <Parallax translateY={[30, -30]}>
             <motion.div
               className="relative"
               initial={{ opacity: 0, x: 60, rotateY: -15 }}
@@ -156,14 +155,13 @@ const AboutSection = () => (
               viewport={{ once: true, amount: 0.3 }}
               transition={{ 
                 type: "spring",
-                stiffness: 80,
-                damping: 20,
-                delay: 0.2
+                stiffness: 120,
+                damping: 20
               }}
               whileHover={{ 
                 scale: 1.02,
                 rotateY: 2,
-                transition: { duration: 0.3 }
+                transition: { duration: 0.2 }
               }}
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
@@ -200,7 +198,7 @@ const AboutSection = () => (
         </div>
 
         {/* Values Grid */}
-        <Parallax y={[-15, 15]}>
+        <Parallax translateY={[-15, 15]}>
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8"
             initial="hidden"

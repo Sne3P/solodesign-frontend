@@ -68,13 +68,13 @@ const ExpertiseSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <motion.div
             className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8"
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.3 }}
           >
             <Zap className="w-5 h-5 text-yellow-400" />
             <span className="text-white font-medium">Notre Expertise</span>
@@ -100,8 +100,7 @@ const ExpertiseSection = () => {
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ 
-                duration: 0.7, 
-                delay: index * 0.1,
+                duration: 0.4, 
                 ease: "easeOut"
               }}
             >
@@ -134,7 +133,7 @@ const ExpertiseSection = () => {
                     rotate: 360,
                     scale: 1.1 
                   }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.3 }}
                 >
                   {service.icon}
                 </motion.div>
@@ -158,8 +157,7 @@ const ExpertiseSection = () => {
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       transition={{ 
-                        delay: index * 0.1 + featureIndex * 0.05 + 0.3,
-                        duration: 0.5
+                        duration: 0.3
                       }}
                     >
                       <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${service.color}`} />
@@ -196,7 +194,7 @@ const ExpertiseSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: 0.4 }}
         >
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 max-w-4xl mx-auto">
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">

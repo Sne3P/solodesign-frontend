@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
 import { Project } from "../lib/types"
 
 export default function ProjectCard({ project }: { project: Project }) {
@@ -16,8 +17,14 @@ export default function ProjectCard({ project }: { project: Project }) {
     >
       <motion.div
         className="w-full lg:w-1/2 order-2 lg:order-1"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.99 }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 400, 
+          damping: 25,
+          mass: 0.5
+        }}
       >
         <div className="relative group overflow-hidden rounded-xl shadow-2xl">
           <Image
@@ -25,10 +32,10 @@ export default function ProjectCard({ project }: { project: Project }) {
             alt={project.title}
             width={800}
             height={600}
-            className="w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[450px] object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[450px] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250" />
         </div>
       </motion.div>
       
@@ -87,26 +94,76 @@ export default function ProjectCard({ project }: { project: Project }) {
                        bg-white text-black 
                        rounded-full font-bold 
                        text-sm sm:text-base md:text-lg
-                       transition-all duration-150 ease-out
+                       transition-all duration-200 ease-out
                        hover:bg-gray-100
                        focus:outline-none focus:ring-2 focus:ring-white/50
                        group relative overflow-hidden
-                       transform-gpu"
+                       transform-gpu shadow-lg"
             whileHover={{ 
-              scale: 1.1
+              scale: 1.08,
+              y: -6,
+              boxShadow: "0 25px 50px rgba(255, 255, 255, 0.25)"
             }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ 
+              scale: 0.95,
+              y: 0
+            }}
             transition={{ 
               type: "spring", 
-              stiffness: 600, 
-              damping: 20,
-              mass: 0.8
+              stiffness: 250, 
+              damping: 8,
+              mass: 0.9
+            }}
+            animate={{
+              scale: 1,
+              y: 0
             }}
             onClick={() => router.push(`/projet/${project.id}`)}
           >
-            <span className="relative z-10 transition-transform duration-150 group-hover:translate-x-1">
+            {/* Effet de background animé au hover */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-full"
+              initial={{ scale: 0, opacity: 0 }}
+              whileHover={{ 
+                scale: 1.1,
+                opacity: 1
+              }}
+              transition={{ 
+                type: "spring",
+                stiffness: 350,
+                damping: 15,
+                mass: 0.6
+              }}
+            />
+            
+            <motion.span 
+              className="relative z-10 transition-colors duration-200 group-hover:text-gray-800"
+              whileHover={{ x: 3 }}
+              transition={{
+                type: "spring",
+                stiffness: 350,
+                damping: 15
+              }}
+            >
               Voir le Projet
-            </span>
+            </motion.span>
+            
+            <motion.div
+              className="relative z-10 ml-2"
+              whileHover={{ 
+                x: 6,
+                rotate: 15
+              }}
+              transition={{ 
+                type: "spring", 
+                stiffness: 350, 
+                damping: 12,
+                mass: 0.4
+              }}
+            >
+              <ArrowRight size={16} className="sm:w-5 sm:h-5 md:w-6 md:h-6 
+                                               transition-colors duration-200 group-hover:text-gray-800" />
+            </motion.div>
           </motion.button>
         </motion.div>
       </div>

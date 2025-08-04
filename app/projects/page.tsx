@@ -102,14 +102,25 @@ export default function ProjectsPage() {
   }, [changeProject, isTransitioning])
 
   return (
-    <div className="h-screen bg-black text-white overflow-hidden pb-16 sm:pb-20 md:pb-24" onWheel={handleWheel}>{/* Padding bottom pour éviter le footer */}
-      <div className="relative h-full">
+    <div className="min-h-screen bg-black text-white flex flex-col" onWheel={handleWheel}>
+      {/* Header fixe */}
+      <div className="relative z-40">
         <LogoTitle />
         <SocialLinks />
         <MenuButton />
+      </div>
 
+      {/* ProgressBar en haut à droite sous le menu */}
+      {!loading && projects.length > 0 && (
+        <div className="absolute top-16 sm:top-20 md:top-24 right-4 sm:right-6 md:right-8 lg:right-12 z-30">
+          <ProgressBar current={currentProject} total={projects.length} />
+        </div>
+      )}
+
+      {/* Contenu principal avec flex-grow pour prendre l'espace disponible */}
+      <div className="flex-grow flex flex-col justify-center items-center relative px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-8">
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <motion.div 
               className="text-center"
               initial={{ opacity: 0, scale: 0.8 }}
@@ -131,9 +142,9 @@ export default function ProjectsPage() {
             </motion.div>
           </div>
         ) : projects.length === 0 ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex items-center justify-center">
             <motion.div 
-              className="text-center px-4"
+              className="text-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -144,22 +155,16 @@ export default function ProjectsPage() {
           </div>
         ) : (
           <>
-            <ProgressBar current={currentProject} total={projects.length} />
-
+            {/* Contenu des projets centré */}
             <motion.div 
-              className="absolute inset-0 flex items-center justify-center px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16" 
+              className="w-full max-w-6xl mx-auto flex items-center justify-center min-h-0" 
               animate={controls}
-              style={{ 
-                transformOrigin: "center center",
-                paddingTop: "1rem",
-                paddingBottom: "12rem" // Plus d'espace pour éviter le chevauchement
-              }}
             >
               <AnimatePresence custom={direction} mode="wait">
                 <motion.div
                   key={currentProject}
                   custom={direction}
-                  className="w-full max-w-6xl mx-auto"
+                  className="w-full"
                   initial={{ 
                     x: direction > 0 ? "50%" : "-50%", 
                     opacity: 0,
@@ -181,25 +186,21 @@ export default function ProjectsPage() {
                     damping: 25,
                     duration: 0.8
                   }}
-                  style={{ 
-                    transformOrigin: "center center"
-                  }}
                 >
                   <ProjectCard project={projects[currentProject]} />
                 </motion.div>
               </AnimatePresence>
             </motion.div>
 
-            {/* Navigation buttons - Petits, responsives et sans décalage au hover */}
+            {/* Navigation buttons - positionnés sous le menu navbar */}
             <motion.button
               className="absolute top-1/2 left-3 sm:left-6 md:left-8 lg:left-12 -translate-y-1/2 
-                         group z-30"
+                         group z-20"
               onClick={() => changeProject(-1)}
               disabled={projects.length <= 1 || isTransitioning}
             >
               <div className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 
                               flex items-center justify-center">
-                {/* Cercle de background avec effet de scale au hover - SANS décalage */}
                 <motion.div
                   className="absolute inset-0 bg-black/15 backdrop-blur-sm rounded-full 
                              border border-white/25"
@@ -217,7 +218,6 @@ export default function ProjectsPage() {
                   }}
                 />
                 
-                {/* Icône flèche - taille petite et responsive */}
                 <motion.div
                   className="relative z-10"
                   whileHover={{ x: -1 }}
@@ -230,13 +230,12 @@ export default function ProjectsPage() {
 
             <motion.button
               className="absolute top-1/2 right-3 sm:right-6 md:right-8 lg:right-12 -translate-y-1/2 
-                         group z-30"
+                         group z-20"
               onClick={() => changeProject(1)}
               disabled={projects.length <= 1 || isTransitioning}
             >
               <div className="relative w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 
                               flex items-center justify-center">
-                {/* Cercle de background avec effet de scale au hover - SANS décalage */}
                 <motion.div
                   className="absolute inset-0 bg-black/15 backdrop-blur-sm rounded-full 
                              border border-white/25"
@@ -254,7 +253,6 @@ export default function ProjectsPage() {
                   }}
                 />
                 
-                {/* Icône flèche - taille petite et responsive */}
                 <motion.div
                   className="relative z-10"
                   whileHover={{ x: 1 }}
@@ -265,8 +263,8 @@ export default function ProjectsPage() {
               </div>
             </motion.button>
 
-            {/* Project indicators - Remontés pour éviter le footer */}
-            <div className="absolute bottom-20 sm:bottom-24 md:bottom-28 lg:bottom-32 left-1/2 transform -translate-x-1/2 
+            {/* Project indicators - en bas du contenu principal */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 
                             flex items-center space-x-2 z-30">
               {projects.map((_, index) => (
                 <motion.button
@@ -294,7 +292,6 @@ export default function ProjectsPage() {
                   }}
                   disabled={isTransitioning}
                 >
-                  {/* Animation clean pour l'indicateur actif */}
                   {index === currentProject && (
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-full"
@@ -315,29 +312,31 @@ export default function ProjectsPage() {
           </>
         )}
 
-        <BackgroundPattern 
-          opacity={0.03} 
-          spacing={40} 
-          duration={20} 
-          dotOpacity={0.08}
-          zIndex={0}
-          magneticEffect={false}
-        />
-
-        {/* Footer avec z-index approprié */}
-        <div className="absolute bottom-0 left-0 right-0 z-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-          >
-            <Footer />
-          </motion.div>
+        {/* Background pattern */}
+        <div className="absolute inset-0 -z-10">
+          <BackgroundPattern 
+            opacity={0.03} 
+            spacing={40} 
+            duration={20} 
+            zIndex={0}
+            magneticEffect={false}
+          />
         </div>
-
-        {/* Cursor au-dessus de tout */}
-        <Cursor />
       </div>
+
+      {/* Footer collé en bas */}
+      <div className="relative z-20 mt-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+        >
+          <Footer />
+        </motion.div>
+      </div>
+
+      {/* Cursor au-dessus de tout */}
+      <Cursor />
     </div>
   )
 }

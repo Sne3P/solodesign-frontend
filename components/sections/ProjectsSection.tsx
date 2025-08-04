@@ -148,15 +148,15 @@ const ProjectsSection = () => {
                     <motion.div
                       className="project-image relative group cursor-pointer"
                       whileHover={{ 
-                        scale: 1.05, 
-                        rotate: isEven ? -2 : 2,
-                        y: -12
+                        scale: 1.03, 
+                        rotate: isEven ? -1 : 1,
+                        y: -8
                       }}
                       transition={{ 
                         type: "spring", 
-                        stiffness: 300, 
-                        damping: 20,
-                        mass: 0.8
+                        stiffness: 400, 
+                        damping: 25,
+                        mass: 0.5
                       }}
                       onClick={() => handleProjectClick(project.id)}
                     >
@@ -170,16 +170,16 @@ const ProjectsSection = () => {
                       
                       {/* Overlay d'interaction */}
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent 
+                        className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent 
                                    rounded-3xl opacity-0 group-hover:opacity-100"
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        transition={{ duration: 0.25, ease: "easeOut" }}
                       />
                       
                       {/* Indicateur de clic */}
                       <motion.div
                         className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm 
                                    rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"
-                        transition={{ duration: 0.3, delay: 0.1 }}
+                        transition={{ duration: 0.2, delay: 0.05 }}
                       >
                         <ArrowRight className="w-6 h-6 text-white" />
                       </motion.div>
@@ -278,7 +278,7 @@ const ProjectsSection = () => {
                           opacity: 1,
                           transition: {
                             delay: 0.8,
-                            staggerChildren: 0.05
+                            staggerChildren: 0.03
                           }
                         }
                       }}
@@ -290,25 +290,25 @@ const ProjectsSection = () => {
                                      bg-white/10 backdrop-blur-sm text-white rounded-full 
                                      border border-white/20 font-medium cursor-pointer"
                           variants={{
-                            hidden: { opacity: 0, scale: 0.8, y: 20 },
+                            hidden: { opacity: 0, scale: 0.8, y: 15 },
                             visible: { 
                               opacity: 1, 
                               scale: 1, 
                               y: 0,
                               transition: {
                                 type: "spring",
-                                stiffness: 800,
-                                damping: 15,
-                                mass: 0.3
+                                stiffness: 500,
+                                damping: 20,
+                                mass: 0.4
                               }
                             }
                           }}
                           whileHover={{ 
-                            scale: 1.15,
-                            y: -4,
-                            backgroundColor: "rgba(255, 255, 255, 0.25)",
-                            borderColor: "rgba(255, 255, 255, 0.6)",
-                            boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)"
+                            scale: 1.08,
+                            y: -2,
+                            backgroundColor: "rgba(255, 255, 255, 0.2)",
+                            borderColor: "rgba(255, 255, 255, 0.5)",
+                            boxShadow: "0 4px 20px rgba(255, 255, 255, 0.1)"
                           }}
                           whileTap={{ 
                             scale: 0.95,
@@ -317,8 +317,8 @@ const ProjectsSection = () => {
                           transition={{ 
                             type: "spring", 
                             stiffness: 600, 
-                            damping: 12,
-                            mass: 0.2
+                            damping: 20,
+                            mass: 0.3
                           }}
                         >
                           {tech}
@@ -345,52 +345,71 @@ const ProjectsSection = () => {
                     }}
                   >
                     <motion.button
-                      className="project-button relative overflow-hidden bg-white text-black 
+                      className="relative overflow-hidden bg-white text-black 
                                  px-8 py-4 sm:px-10 sm:py-5 md:px-12 md:py-6
                                  rounded-full font-bold text-base sm:text-lg md:text-xl
                                  flex items-center justify-center space-x-3 sm:space-x-4 
-                                 mx-auto lg:mx-0 group shadow-lg"
+                                 mx-auto lg:mx-0 group shadow-lg transform-gpu"
                       onClick={() => handleProjectClick(project.id)}
                       whileHover={{ 
-                        scale: 1.08,
-                        y: -6,
-                        boxShadow: "0 25px 50px rgba(255, 255, 255, 0.2)"
+                        scale: 1.06,
+                        y: -4
                       }}
                       whileTap={{ 
-                        scale: 0.96,
-                        y: -2
+                        scale: 0.97,
+                        y: 0
                       }}
                       transition={{ 
                         type: "spring", 
-                        stiffness: 700, 
-                        damping: 15,
-                        mass: 0.3
+                        stiffness: 350, 
+                        damping: 18,
+                        mass: 0.7,
+                        delay: 0
+                      }}
+                      animate={{
+                        scale: 1,
+                        y: 0
                       }}
                     >
-                      {/* Effet de background animé au hover - plus réactif */}
+                      {/* Effet de background animé au hover */}
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-full"
                         initial={{ scale: 0, opacity: 0 }}
-                        whileHover={{ scale: 1, opacity: 1 }}
+                        whileHover={{ 
+                          scale: 1.1,
+                          opacity: 1
+                        }}
                         transition={{ 
                           type: "spring",
-                          stiffness: 500,
-                          damping: 20,
-                          mass: 0.2
+                          stiffness: 350,
+                          damping: 15,
+                          mass: 0.6
                         }}
                       />
                       
-                      <span className="relative z-10 transition-colors duration-200 group-hover:text-gray-800">
+                      <motion.span 
+                        className="relative z-10 transition-colors duration-200 group-hover:text-gray-800"
+                        whileHover={{ x: 3 }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 350,
+                          damping: 15
+                        }}
+                      >
                         Voir le Projet
-                      </span>
+                      </motion.span>
+                      
                       <motion.div
                         className="relative z-10"
-                        whileHover={{ x: 8, rotate: 20 }}
+                        whileHover={{ 
+                          x: 6,
+                          rotate: 15
+                        }}
                         transition={{ 
                           type: "spring", 
-                          stiffness: 800, 
+                          stiffness: 350, 
                           damping: 12,
-                          mass: 0.1
+                          mass: 0.4
                         }}
                       >
                         <ArrowRight size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7 

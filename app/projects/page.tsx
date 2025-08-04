@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import LogoTitle from "../../components/layout/LogoTitle"
 import SocialLinks from "../../components/layout/SocialLinks"
 import MenuButton from "../../components/layout/MenuButton"
+import BackgroundPattern from "../../components/layout/BackgroundPattern"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import ProgressBar from "../../components/layout/ProgressBar"
@@ -16,7 +17,6 @@ import { Project } from "../../lib/types"
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [menuOpen, setMenuOpen] = useState(false)
   const [currentProject, setCurrentProject] = useState(0)
   const [direction, setDirection] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -315,21 +315,13 @@ export default function ProjectsPage() {
           </>
         )}
 
-        <motion.div
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-          animate={{
-            backgroundPosition: ["0px 0px", "0px -40px"],
-          }}
-          transition={{
-            repeat: Number.POSITIVE_INFINITY,
-            repeatType: "loop",
-            duration: 20,
-            ease: "linear",
-          }}
+        <BackgroundPattern 
+          opacity={0.03} 
+          spacing={40} 
+          duration={20} 
+          dotOpacity={0.08}
+          zIndex={0}
+          magneticEffect={false}
         />
 
         {/* Footer avec z-index approprié */}

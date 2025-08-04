@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { ParallaxProvider } from 'react-scroll-parallax'
 import { useScroll, useSpring, motion } from 'framer-motion'
 import SocialLinks from '../components/layout/SocialLinks'
 import MenuButton from '../components/layout/MenuButton'
 import ScrollArrow from '../components/layout/ScrollArrow'
+import BackgroundPattern from '../components/layout/BackgroundPattern'
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../components/layout/Cursor'), { ssr: false });
 import HeroSection from '../components/sections/HeroSection'
@@ -17,7 +18,6 @@ import Footer from '../components/sections/Footer'
 import LogoTitle from '../components/layout/LogoTitle'  // Ajout du LogoTitle
 
 const Portfolio = () => {
-  const [menuOpen, setMenuOpen] = useState(false)
   const { scrollYProgress } = useScroll()
   const progressionDefilementFluide = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
 
@@ -38,7 +38,7 @@ const Portfolio = () => {
         <SocialLinks />
 
         {/* Bouton de menu */}
-        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <MenuButton />
 
         {/* Sections */}
         <HeroSection />
@@ -62,25 +62,8 @@ const Portfolio = () => {
           style={{ scaleX: progressionDefilementFluide }}
         />
 
-        {/* Animation de fond */}
-        <motion.div
-          className="fixed inset-0 pointer-events-none z-10"
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)',
-            backgroundSize: '30px 30px'
-          }}
-          animate={{
-            backgroundPosition: ['0px 0px', '0px -30px']
-          }}
-          transition={{
-            backgroundPosition: {
-              repeat: Infinity,
-              repeatType: "loop",
-              duration: 10,
-              ease: "linear"
-            }
-          }}
-        />
+        {/* Animation de fond avec effet magnétique optimisé */}
+        <BackgroundPattern magneticEffect={true} dotOpacity={0.4} />
       </div>
     </ParallaxProvider>
   )

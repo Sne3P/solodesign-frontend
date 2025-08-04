@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation"
 const SocialLinks = lazy(() => import("../../components/layout/SocialLinks"))
 const MenuButton = lazy(() => import("../../components/layout/MenuButton"))
 const ScrollArrow = lazy(() => import("../../components/layout/ScrollArrow"))
+const BackgroundPattern = lazy(() => import("../../components/layout/BackgroundPattern"))
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 const LogoTitle = lazy(() => import("../../components/layout/LogoTitle"))
@@ -17,7 +18,6 @@ const Footer = lazy(() => import("../../components/sections/Footer"))
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -85,7 +85,7 @@ const ContactPage = () => {
           <Suspense fallback={<div className="bg-black">Chargement...</div>}>
             <LogoTitle />
             <SocialLinks />
-            <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+            <MenuButton />
           </Suspense>
 
           <motion.div
@@ -188,7 +188,9 @@ const ContactPage = () => {
             style={{ scaleX }}
           />
 
-          <BackgroundAnimation />
+          <Suspense fallback={<div className="bg-black">Chargement...</div>}>
+            <BackgroundPattern magneticEffect={false} opacity={0.15} />
+          </Suspense>
 
           <Suspense fallback={<div className="bg-black">Chargement...</div>}>
             <Footer />
@@ -237,28 +239,6 @@ const TextareaField = React.memo(({ name, placeholder, required }) => (
   </motion.div>
 ))
 TextareaField.displayName = "TextareaField"
-
-const BackgroundAnimation = React.memo(() => (
-  <motion.div
-    className="fixed inset-0 pointer-events-none z-10"
-    style={{
-      backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)",
-      backgroundSize: "30px 30px",
-    }}
-    animate={{
-      backgroundPosition: ["0px 0px", "0px -30px"],
-    }}
-    transition={{
-      backgroundPosition: {
-        repeat: Number.POSITIVE_INFINITY,
-        repeatType: "loop",
-        duration: 10,
-        ease: "linear",
-      },
-    }}
-  />
-))
-BackgroundAnimation.displayName = "BackgroundAnimation"
 
 export default ContactPage
 

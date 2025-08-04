@@ -138,4 +138,19 @@ body {
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* Animations optimisées pour BackgroundPattern */
+  @keyframes backgroundMove-30 {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 0px -30px; }
+  }
+
+  @keyframes backgroundMove-40 {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 0px -40px; }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
 }

@@ -10,7 +10,11 @@ import BackgroundPattern from '../components/layout/BackgroundPattern'
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../components/layout/Cursor'), { ssr: false });
 import HeroSection from '../components/sections/HeroSection'
+import StatsSection from '../components/sections/StatsSection'
+import ExpertiseSection from '../components/sections/ExpertiseSection'
 import ProjectsSection from '../components/sections/ProjectsSection'
+import ProcessSection from '../components/sections/ProcessSection'
+import TestimonialsSection from '../components/sections/TestimonialsSection'
 import ServicesSection from '../components/sections/ServicesSection'
 import AboutSection from '../components/sections/AboutSection'
 import ContactSection from '../components/sections/ContactSection'
@@ -42,7 +46,11 @@ const Portfolio = () => {
 
         {/* Sections */}
         <HeroSection />
+        <StatsSection />
+        <ExpertiseSection />
         <ProjectsSection />
+        <ProcessSection />
+        <TestimonialsSection />
         <ServicesSection />
         <AboutSection />
         <ContactSection />
@@ -63,7 +71,7 @@ const Portfolio = () => {
         />
 
         {/* Animation de fond avec effet magnétique optimisé */}
-        <BackgroundPattern magneticEffect={true} dotOpacity={0.4} />
+        <BackgroundPattern magneticEffect={true} opacity={0.2} />
       </div>
     </ParallaxProvider>
   )

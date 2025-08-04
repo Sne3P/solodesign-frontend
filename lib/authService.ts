@@ -9,7 +9,10 @@ export class AuthService {
   }
 
   static generateToken(): string {
-    return btoa(`admin_${Date.now()}_${Math.random()}`)
+    if (typeof window !== 'undefined') {
+        return btoa(`admin_${Date.now()}_${Math.random()}`);
+    }
+    return btoa('admin_ssr_placeholder');
   }
 
   static verifyToken(token: string): boolean {

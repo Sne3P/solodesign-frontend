@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -6,9 +7,10 @@ const Cursor = () => {
   const [hover, setHover] = useState(false);
 
   useEffect(() => {
-    const updatePosition = (e) => setPosition({ x: e.clientX, y: e.clientY });
-    const handleHover = (e) => {
-      const clickable = e.target.closest('a, button, .social-icon, .menu-item, .service-card');
+    const updatePosition = (e: MouseEvent) => setPosition({ x: e.clientX, y: e.clientY });
+    const handleHover = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const clickable = target?.closest?.('a, button, .social-icon, .menu-item, .service-card');
       setHover(!!clickable);
     };
 

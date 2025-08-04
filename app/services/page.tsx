@@ -27,7 +27,8 @@ import { useRouter } from "next/navigation"
 import SocialLinks from "../../components/layout/SocialLinks"
 import MenuButton from "../../components/layout/MenuButton"
 import LogoTitle from "../../components/layout/LogoTitle"
-import Cursor from "../../components/layout/Cursor"
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import Footer from "../../components/sections/Footer"
 import React from "react"
 
@@ -80,7 +81,11 @@ const services = [
 
 // -------------------- Components --------------------
 
-const ServiceCard = ({ service, index }) => {
+interface ServiceCardProps {
+  service: any;
+  index: number;
+}
+const ServiceCard = ({ service, index }: ServiceCardProps) => {
   const cardRef = useRef(null)
   const isInView = useInView(cardRef, { once: false, amount: 0.2, margin: "-100px" })
   const controls = useAnimation()
@@ -110,7 +115,7 @@ const ServiceCard = ({ service, index }) => {
 
   const toolVariants = {
     hidden: { opacity: 0, x: -10 },
-    visible: (i) => ({
+    visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
@@ -141,7 +146,7 @@ const ServiceCard = ({ service, index }) => {
       <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
       <p className="text-gray-600 mb-4">{service.description}</p>
       <div className="flex flex-wrap gap-2">
-        {service.tools.map((tool, toolIndex) => (
+        {service.tools.map((tool: string, toolIndex: number) => (
           <motion.span
             key={toolIndex}
             className="bg-gray-200 text-gray-800 px-2 py-1 rounded text-sm transition-colors duration-200"
@@ -156,7 +161,12 @@ const ServiceCard = ({ service, index }) => {
   )
 }
 
-const ProcessStep = ({ step, index, totalSteps }) => {
+interface ProcessStepProps {
+  step: any;
+  index: number;
+  totalSteps: number;
+}
+const ProcessStep = ({ step, index, totalSteps }: ProcessStepProps) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: false, amount: 0.5, margin: "-100px" })
   const controls = useAnimation()
@@ -224,11 +234,14 @@ const ProcessStep = ({ step, index, totalSteps }) => {
 /*
   GlowingCards : Conteneur captant le mouvement de la souris, même hors des cases.
 */
-const GlowingCards = ({ children }) => {
+interface GlowingCardsProps {
+  children: React.ReactNode;
+}
+const GlowingCards = ({ children }: GlowingCardsProps) => {
   const containerRef = useRef(null)
   const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current.getBoundingClientRect()
     setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
   }
@@ -255,7 +268,13 @@ const GlowingCards = ({ children }) => {
   GlowingCard : Case avec effet lumineux dynamique (légèrement atténué)
   Rendu cliquable pour activer le custom cursor (aucun effet de navigation).
 */
-const GlowingCard = ({ children, index, globalPos, containerRef }) => {
+interface GlowingCardProps {
+  children: React.ReactNode;
+  index: number;
+  globalPos: any;
+  containerRef: React.RefObject<HTMLDivElement>;
+}
+const GlowingCard = ({ children, index, globalPos, containerRef }: GlowingCardProps) => {
   const cardRef = useRef(null)
   const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
   const localX = useMotionValue(0)
@@ -263,7 +282,7 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
 
   useEffect(() => {
     if (globalPos && cardRef.current && containerRef?.current) {
-      const cardRect = cardRef.current.getBoundingClientRect()
+      const cardRect = cardRef.current?.getBoundingClientRect()
       const containerRect = containerRef.current.getBoundingClientRect()
       const relativeX = globalPos.x - (cardRect.left - containerRect.left)
       const relativeY = globalPos.y - (cardRect.top - containerRect.top)
@@ -280,14 +299,14 @@ const GlowingCard = ({ children, index, globalPos, containerRef }) => {
     const { offsetWidth: width, offsetHeight: height } = cardRef.current
     const centerX = width / 2
     const centerY = height / 2
-    const distance = Math.hypot(x - centerX, y - centerY)
+    const distance = Math.hypot(Number(x) - centerX, Number(y) - centerY)
     return Math.max(0, 1 - distance / (width / 1.5))
   })
 
   const background = useTransform(
     [localX, localY, glowOpacity, hoverState],
     ([x, y, opacity, h]) =>
-      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${opacity * 0.2 * h}), transparent)`
+      `radial-gradient(circle 150px at ${x}px ${y}px, rgba(255,255,255,${Number(opacity) * 0.2 * Number(h)}), transparent)`
   )
 
   return (

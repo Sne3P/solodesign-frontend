@@ -14,10 +14,14 @@ const TitleAnimation = ({ texte }: TitleAnimationProps) => {
   }, []);
 
   // Générer les rotations une seule fois côté client
-  const rotations = useMemo(() => 
-    isClient ? texte.split('').map(() => Math.random() * 30 - 15) : texte.split('').map(() => 0), 
-    [texte, isClient]
-  );
+  const [rotations, setRotations] = useState<number[]>([]);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRotations(texte.split('').map(() => Math.random() * 30 - 15));
+    } else {
+      setRotations(texte.split('').map(() => 0));
+    }
+  }, [texte]);
 
   // Pendant l'hydratation, afficher une version statique
   if (!isClient) {

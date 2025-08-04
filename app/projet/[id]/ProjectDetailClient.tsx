@@ -10,7 +10,8 @@ import SocialLinks from "../../../components/layout/SocialLinks"
 import MenuButton from "../../../components/layout/MenuButton"
 import Footer from "../../../components/sections/Footer"
 import ScrollArrow from "../../../components/layout/ScrollArrow"
-import Cursor from "../../../components/layout/Cursor"
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../../../components/layout/Cursor'), { ssr: false });
 import { Project } from "../../../lib/types"
 
 const fadeInVariants = {

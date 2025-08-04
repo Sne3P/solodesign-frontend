@@ -55,7 +55,13 @@ class MediaService {
 
   // Générer un ID unique pour les médias
   private generateMediaId(): string {
-    return `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    // Utilise un identifiant stable ou passé en paramètre pour éviter les mismatches SSR/CSR
+    // Par exemple, utiliser un uuid ou un timestamp généré côté client uniquement
+    if (typeof window !== 'undefined') {
+        return `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    // Valeur fallback côté serveur (jamais utilisée pour l'hydratation)
+    return 'media_ssr_placeholder';
   }
 
   // Obtenir une extension sécurisée

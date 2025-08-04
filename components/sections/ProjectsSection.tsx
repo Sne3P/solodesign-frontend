@@ -37,31 +37,32 @@ const ProjectsSection = () => {
   }
 
   const handleProjectClick = (projectId: string) => {
-    // Animation de sortie
+    // Animation de sortie ultra fluide
     document.body.style.overflow = 'hidden';
     const element = document.getElementById('projects-section');
     if (element) {
-      element.style.transition = 'all 0.5s ease-in-out';
-      element.style.transform = 'scale(0.95)';
+      element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      element.style.transform = 'scale(0.96) translateY(20px)';
       element.style.opacity = '0';
+      element.style.filter = 'blur(4px)';
     }
 
-    // Redirection après un court délai
+    // Redirection avec un délai optimisé
     setTimeout(() => {
       router.push(`/projet/${projectId}`);
-    }, 500);
+    }, 400);
   };
 
   if (loading) {
     return (
-      <section id="projects-section" className="py-16 sm:py-20 md:py-24 lg:py-32 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+      <section id="projects-section" className="py-20 sm:py-24 md:py-28 lg:py-32 xl:py-36 mb-20 sm:mb-24 md:mb-28 lg:mb-32 xl:mb-36">
+        <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-28 xl:mb-32">
             <SectionTitle>Projets Phares</SectionTitle>
           </div>
-          <div className="flex justify-center items-center py-20">
+          <div className="flex justify-center items-center py-24">
             <motion.div 
-              className="w-12 h-12 sm:w-16 sm:h-16 border-2 border-white border-t-transparent rounded-full"
+              className="w-16 h-16 sm:w-20 sm:h-20 border-2 border-white border-t-transparent rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
@@ -73,17 +74,17 @@ const ProjectsSection = () => {
 
   if (projects.length === 0) {
     return (
-      <section id="projects-section" className="py-16 sm:py-20 md:py-24 lg:py-32 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+      <section id="projects-section" className="py-20 sm:py-24 md:py-28 lg:py-32 xl:py-36 mb-20 sm:mb-24 md:mb-28 lg:mb-32 xl:mb-36">
+        <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-28 xl:mb-32">
             <SectionTitle>Projets Phares</SectionTitle>
           </div>
-          <div className="text-center py-20">
+          <div className="text-center py-24">
             <motion.p 
-              className="text-gray-400 text-lg sm:text-xl"
+              className="text-gray-400 text-xl sm:text-2xl max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 1, type: "spring", stiffness: 100, damping: 20 }}
             >
               Aucun projet disponible pour le moment.
             </motion.p>
@@ -94,35 +95,38 @@ const ProjectsSection = () => {
   }
 
   return (
-    <section id="projects-section" className="py-16 sm:py-20 md:py-24 lg:py-32 mb-16 sm:mb-20 md:mb-24 lg:mb-32">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-        <div className="text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24">
+    <section id="projects-section" className="project-section py-20 sm:py-24 md:py-28 lg:py-32 xl:py-36 mb-20 sm:mb-24 md:mb-28 lg:mb-32 xl:mb-36">
+      <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+        <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-28 xl:mb-32">
           <SectionTitle>Projets Phares</SectionTitle>
         </div>
         
-        <div className="space-y-20 sm:space-y-24 md:space-y-28 lg:space-y-32">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              ref={refsProjets.current[index]}
-              className={`flex flex-col ${
-                index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
-              } items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-16 xl:gap-20`}
-              initial="masque"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.2 }}
-            >
-              {/* Image du projet - responsive et centrée */}
-              <Parallax speed={index % 2 === 0 ? 15 : -15}>
+        <div className="space-y-24 sm:space-y-28 md:space-y-32 lg:space-y-36 xl:space-y-40">
+          {projects.map((project, index) => {
+            const isEven = index % 2 === 0;
+            
+            return (
+              <motion.div
+                key={project.id}
+                ref={refsProjets.current[index]}
+                className={`project-card flex flex-col ${
+                  isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'
+                } items-center justify-center gap-12 sm:gap-16 md:gap-20 lg:gap-24 xl:gap-28`}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.1, margin: "-100px" }}
+              >
+                {/* Image du projet avec parallax optimisé */}
                 <motion.div
-                  className="w-full max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto lg:mx-0 lg:flex-1"
+                  className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 
+                             mx-auto lg:mx-0 lg:flex-1"
                   variants={{
-                    masque: { 
+                    hidden: { 
                       opacity: 0, 
-                      x: index % 2 === 0 ? -80 : 80, 
-                      y: 30,
-                      rotate: index % 2 === 0 ? -8 : 8,
-                      scale: 0.9
+                      x: isEven ? -100 : 100, 
+                      y: 50,
+                      rotate: isEven ? -6 : 6,
+                      scale: 0.8
                     },
                     visible: { 
                       opacity: 1, 
@@ -132,171 +136,254 @@ const ProjectsSection = () => {
                       scale: 1,
                       transition: {
                         type: "spring",
-                        stiffness: 120,
+                        stiffness: 80,
                         damping: 20,
-                        mass: 0.8,
-                        duration: 1.2
+                        mass: 1,
+                        duration: 1.5
                       }
                     }
                   }}
                 >
-                  <motion.img
-                    src={project.coverImage || '/placeholder.svg'}
-                    alt={project.title}
-                    className="w-full h-64 sm:h-80 md:h-96 lg:h-[400px] xl:h-[450px] 
-                               object-cover rounded-2xl shadow-2xl"
-                    whileHover={{ 
-                      scale: 1.03, 
-                      rotate: index % 2 === 0 ? -1 : 1,
-                      y: -8
-                    }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 400, 
-                      damping: 25,
-                      mass: 0.5
-                    }}
-                  />
-                </motion.div>
-              </Parallax>
-
-              {/* Contenu du projet - responsive et centré */}
-              <motion.div
-                className="w-full max-w-lg lg:max-w-md xl:max-w-lg mx-auto lg:mx-0 lg:flex-1 
-                           text-center lg:text-left space-y-4 sm:space-y-5 md:space-y-6"
-                variants={{
-                  masque: { 
-                    opacity: 0, 
-                    x: index % 2 === 0 ? 80 : -80, 
-                    y: 30,
-                    scale: 0.95
-                  },
-                  visible: { 
-                    opacity: 1, 
-                    x: 0,
-                    y: 0,
-                    scale: 1,
-                    transition: {
-                      type: "spring",
-                      stiffness: 120,
-                      damping: 20,
-                      delay: 0.15,
-                      mass: 0.8,
-                      duration: 1.2
-                    }
-                  }
-                }}
-              >
-                <motion.h3 
-                  className="text-2xl sm:text-3xl md:text-4xl lg:text-3xl xl:text-4xl font-bold 
-                             leading-tight text-white"
-                  whileInView={{ 
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  style={{
-                    background: "linear-gradient(90deg, #ffffff, #f0f0f0, #ffffff)",
-                    backgroundSize: "200% 100%",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text"
-                  }}
-                >
-                  {project.title}
-                </motion.h3>
-                
-                <motion.p 
-                  className="text-base sm:text-lg md:text-xl lg:text-lg xl:text-xl 
-                             text-gray-300 leading-relaxed"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                >
-                  {project.description}
-                </motion.p>
-                
-                {/* Technologies tags - responsive */}
-                {project.technologies && project.technologies.length > 0 && (
-                  <motion.div 
-                    className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.6 }}
-                  >
-                    {project.technologies.slice(0, 3).map((tech, techIndex) => (
-                      <motion.span
-                        key={techIndex}
-                        className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm 
-                                   bg-white/10 backdrop-blur-sm text-white rounded-full 
-                                   border border-white/20 font-medium"
-                        whileHover={{ 
-                          scale: 1.05,
-                          backgroundColor: "rgba(255, 255, 255, 0.15)",
-                          borderColor: "rgba(255, 255, 255, 0.4)"
-                        }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      >
-                        {tech}
-                      </motion.span>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Bouton avec animation de rebounce fluide et dynamique */}
-                <motion.div
-                  className="pt-2 sm:pt-4"
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                  <motion.button
-                    className="relative overflow-hidden bg-white text-black 
-                               px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5
-                               rounded-full font-bold text-sm sm:text-base md:text-lg
-                               flex items-center justify-center space-x-2 sm:space-x-3 
-                               mx-auto lg:mx-0 group"
-                    onClick={() => handleProjectClick(project.id)}
-                    whileHover={{ 
-                      scale: 1.08,
-                      y: -2,
-                      boxShadow: "0 20px 40px rgba(255, 255, 255, 0.2)"
-                    }}
-                    whileTap={{ 
-                      scale: 0.95,
-                      y: 0
-                    }}
-                    transition={{ 
-                      type: "spring", 
-                      stiffness: 500, 
-                      damping: 15,
-                      mass: 0.4
-                    }}
-                  >
-                    {/* Effet de background animé au hover */}
+                  <Parallax speed={isEven ? 8 : -8} className="project-parallax will-change-transform">
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200 rounded-full"
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileHover={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    
-                    <span className="relative z-10">Voir le Projet</span>
-                    <motion.div
-                      className="relative z-10"
-                      whileHover={{ x: 4, rotate: 10 }}
+                      className="project-image relative group cursor-pointer"
+                      whileHover={{ 
+                        scale: 1.05, 
+                        rotate: isEven ? -2 : 2,
+                        y: -12
+                      }}
                       transition={{ 
                         type: "spring", 
-                        stiffness: 600, 
-                        damping: 20 
+                        stiffness: 300, 
+                        damping: 20,
+                        mass: 0.8
+                      }}
+                      onClick={() => handleProjectClick(project.id)}
+                    >
+                      <motion.img
+                        src={project.coverImage || '/placeholder.svg'}
+                        alt={project.title}
+                        className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[480px] 
+                                   object-cover rounded-3xl shadow-2xl"
+                        loading="lazy"
+                      />
+                      
+                      {/* Overlay d'interaction */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent 
+                                   rounded-3xl opacity-0 group-hover:opacity-100"
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                      />
+                      
+                      {/* Indicateur de clic */}
+                      <motion.div
+                        className="absolute bottom-4 right-4 w-12 h-12 bg-white/20 backdrop-blur-sm 
+                                   rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"
+                        transition={{ duration: 0.3, delay: 0.1 }}
+                      >
+                        <ArrowRight className="w-6 h-6 text-white" />
+                      </motion.div>
+                    </motion.div>
+                  </Parallax>
+                </motion.div>
+
+                {/* Contenu du projet avec animations fluides */}
+                <motion.div
+                  className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl 
+                             mx-auto lg:mx-0 lg:flex-1 text-center lg:text-left 
+                             space-y-6 sm:space-y-7 md:space-y-8 lg:space-y-9"
+                  variants={{
+                    hidden: { 
+                      opacity: 0, 
+                      x: isEven ? 100 : -100, 
+                      y: 50,
+                      scale: 0.9
+                    },
+                    visible: { 
+                      opacity: 1, 
+                      x: 0,
+                      y: 0,
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 80,
+                        damping: 20,
+                        delay: 0.2,
+                        mass: 1,
+                        duration: 1.5
+                      }
+                    }
+                  }}
+                >
+                  {/* Titre avec animation de gradient fluide */}
+                  <motion.h3 
+                    className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 
+                               font-bold leading-tight"
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: { 
+                        opacity: 1, 
+                        y: 0,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 15,
+                          delay: 0.4
+                        }
+                      }
+                    }}
+                    style={{
+                      background: "linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%)",
+                      backgroundSize: "200% 200%",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text"
+                    }}
+                    whileInView={{
+                      backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  >
+                    {project.title}
+                  </motion.h3>
+                  
+                  {/* Description avec fade-in fluide */}
+                  <motion.p 
+                    className="text-base sm:text-lg md:text-xl lg:text-xl xl:text-2xl 
+                               text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { 
+                        opacity: 1, 
+                        y: 0,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 0.6
+                        }
+                      }
+                    }}
+                  >
+                    {project.description}
+                  </motion.p>
+                  
+                  {/* Technologies avec animation en cascade */}
+                  {project.technologies && project.technologies.length > 0 && (
+                    <motion.div 
+                      className="flex flex-wrap gap-3 sm:gap-4 justify-center lg:justify-start"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: {
+                          opacity: 1,
+                          transition: {
+                            delay: 0.8,
+                            staggerChildren: 0.1
+                          }
+                        }
                       }}
                     >
-                      <ArrowRight size={18} className="sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                      {project.technologies.slice(0, 4).map((tech, techIndex) => (
+                        <motion.span
+                          key={techIndex}
+                          className="px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base 
+                                     bg-white/10 backdrop-blur-sm text-white rounded-full 
+                                     border border-white/20 font-medium transition-all duration-300
+                                     hover:bg-white/20 hover:border-white/40 hover:scale-105"
+                          variants={{
+                            hidden: { opacity: 0, scale: 0.8, y: 20 },
+                            visible: { 
+                              opacity: 1, 
+                              scale: 1, 
+                              y: 0,
+                              transition: {
+                                type: "spring",
+                                stiffness: 150,
+                                damping: 15
+                              }
+                            }
+                          }}
+                          whileHover={{ 
+                            scale: 1.1,
+                            y: -2,
+                            transition: { duration: 0.2 }
+                          }}
+                        >
+                          {tech}
+                        </motion.span>
+                      ))}
                     </motion.div>
-                  </motion.button>
+                  )}
+
+                  {/* Bouton avec animation ultra fluide */}
+                  <motion.div
+                    className="pt-4 sm:pt-6"
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: { 
+                        opacity: 1, 
+                        y: 0,
+                        transition: {
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 20,
+                          delay: 1.0
+                        }
+                      }
+                    }}
+                  >
+                    <motion.button
+                      className="project-button relative overflow-hidden bg-white text-black 
+                                 px-8 py-4 sm:px-10 sm:py-5 md:px-12 md:py-6
+                                 rounded-full font-bold text-base sm:text-lg md:text-xl
+                                 flex items-center justify-center space-x-3 sm:space-x-4 
+                                 mx-auto lg:mx-0 group shadow-lg"
+                      onClick={() => handleProjectClick(project.id)}
+                      whileHover={{ 
+                        scale: 1.05,
+                        y: -4,
+                        boxShadow: "0 25px 50px rgba(255, 255, 255, 0.15)"
+                      }}
+                      whileTap={{ 
+                        scale: 0.95,
+                        y: 0
+                      }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 20,
+                        mass: 0.5
+                      }}
+                    >
+                      {/* Effet de background animé au hover */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-full"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileHover={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                      />
+                      
+                      <span className="relative z-10 transition-colors duration-300 group-hover:text-gray-800">
+                        Voir le Projet
+                      </span>
+                      <motion.div
+                        className="relative z-10"
+                        whileHover={{ x: 6, rotate: 15 }}
+                        transition={{ 
+                          type: "spring", 
+                          stiffness: 500, 
+                          damping: 15
+                        }}
+                      >
+                        <ArrowRight size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7 
+                                                         transition-colors duration-300 group-hover:text-gray-800" />
+                      </motion.div>
+                    </motion.button>
+                  </motion.div>
                 </motion.div>
               </motion.div>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

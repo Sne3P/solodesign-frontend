@@ -19,13 +19,18 @@ export const metadata: Metadata = {
   description: "Portfolio de projets créatifs et modernes",
 };
 
+// IMPORTANT :
+// Ne jamais modifier la classe du <html> côté client (pas de document.documentElement.classList.add/remove)
+// Si besoin d'une classe dynamique (ex: dark mode), la gérer ici côté serveur (SSR) uniquement.
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Si besoin d'ajouter une classe dynamique, le faire ici (ex: lire un cookie ou header SSR)
+  const htmlClass = `${geistSans.variable} ${geistMono.variable} antialiased`;
   return (
-    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="fr" className={htmlClass}>
       <body>
         {children}
         <Toaster />

@@ -6,7 +6,8 @@ import { useScroll, useSpring, motion } from 'framer-motion'
 import SocialLinks from '../components/layout/SocialLinks'
 import MenuButton from '../components/layout/MenuButton'
 import ScrollArrow from '../components/layout/ScrollArrow'
-import Cursor from '../components/layout/Cursor'
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../components/layout/Cursor'), { ssr: false });
 import HeroSection from '../components/sections/HeroSection'
 import ProjectsSection from '../components/sections/ProjectsSection'
 import ServicesSection from '../components/sections/ServicesSection'

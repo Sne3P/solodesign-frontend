@@ -6,7 +6,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import LogoTitle from "../../components/layout/LogoTitle"
 import SocialLinks from "../../components/layout/SocialLinks"
 import MenuButton from "../../components/layout/MenuButton"
-import Cursor from "../../components/layout/Cursor"
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import ProgressBar from "../../components/layout/ProgressBar"
 import Footer from "../../components/sections/Footer"
 import ProjectCard from "../../components/ProjectCard"

@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation"
 const SocialLinks = lazy(() => import("../../components/layout/SocialLinks"))
 const MenuButton = lazy(() => import("../../components/layout/MenuButton"))
 const ScrollArrow = lazy(() => import("../../components/layout/ScrollArrow"))
-const Cursor = lazy(() => import("../../components/layout/Cursor"))
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 const LogoTitle = lazy(() => import("../../components/layout/LogoTitle"))
 const Footer = lazy(() => import("../../components/sections/Footer"))
 

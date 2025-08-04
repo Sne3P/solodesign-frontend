@@ -268,7 +268,7 @@ const ProjectsSection = () => {
                     {project.description}
                   </motion.p>
                   
-                  {/* Technologies avec animation en cascade */}
+                  {/* Technologies avec animation en cascade ultra-réactive */}
                   {project.technologies && project.technologies.length > 0 && (
                     <motion.div 
                       className="flex flex-wrap gap-3 sm:gap-4 justify-center lg:justify-start"
@@ -278,7 +278,7 @@ const ProjectsSection = () => {
                           opacity: 1,
                           transition: {
                             delay: 0.8,
-                            staggerChildren: 0.1
+                            staggerChildren: 0.05
                           }
                         }
                       }}
@@ -288,8 +288,7 @@ const ProjectsSection = () => {
                           key={techIndex}
                           className="px-4 py-2 sm:px-5 sm:py-2.5 text-sm sm:text-base 
                                      bg-white/10 backdrop-blur-sm text-white rounded-full 
-                                     border border-white/20 font-medium transition-all duration-300
-                                     hover:bg-white/20 hover:border-white/40 hover:scale-105"
+                                     border border-white/20 font-medium cursor-pointer"
                           variants={{
                             hidden: { opacity: 0, scale: 0.8, y: 20 },
                             visible: { 
@@ -298,15 +297,28 @@ const ProjectsSection = () => {
                               y: 0,
                               transition: {
                                 type: "spring",
-                                stiffness: 150,
-                                damping: 15
+                                stiffness: 800,
+                                damping: 15,
+                                mass: 0.3
                               }
                             }
                           }}
                           whileHover={{ 
-                            scale: 1.1,
-                            y: -2,
-                            transition: { duration: 0.2 }
+                            scale: 1.15,
+                            y: -4,
+                            backgroundColor: "rgba(255, 255, 255, 0.25)",
+                            borderColor: "rgba(255, 255, 255, 0.6)",
+                            boxShadow: "0 8px 25px rgba(255, 255, 255, 0.1)"
+                          }}
+                          whileTap={{ 
+                            scale: 0.95,
+                            y: 0
+                          }}
+                          transition={{ 
+                            type: "spring", 
+                            stiffness: 600, 
+                            damping: 12,
+                            mass: 0.2
                           }}
                         >
                           {tech}
@@ -315,7 +327,7 @@ const ProjectsSection = () => {
                     </motion.div>
                   )}
 
-                  {/* Bouton avec animation ultra fluide */}
+                  {/* Bouton avec animation ultra-fluide et réactive */}
                   <motion.div
                     className="pt-4 sm:pt-6"
                     variants={{
@@ -325,8 +337,8 @@ const ProjectsSection = () => {
                         y: 0,
                         transition: {
                           type: "spring",
-                          stiffness: 100,
-                          damping: 20,
+                          stiffness: 120,
+                          damping: 15,
                           delay: 1.0
                         }
                       }
@@ -340,43 +352,49 @@ const ProjectsSection = () => {
                                  mx-auto lg:mx-0 group shadow-lg"
                       onClick={() => handleProjectClick(project.id)}
                       whileHover={{ 
-                        scale: 1.05,
-                        y: -4,
-                        boxShadow: "0 25px 50px rgba(255, 255, 255, 0.15)"
+                        scale: 1.08,
+                        y: -6,
+                        boxShadow: "0 25px 50px rgba(255, 255, 255, 0.2)"
                       }}
                       whileTap={{ 
-                        scale: 0.95,
-                        y: 0
+                        scale: 0.96,
+                        y: -2
                       }}
                       transition={{ 
                         type: "spring", 
-                        stiffness: 400, 
-                        damping: 20,
-                        mass: 0.5
+                        stiffness: 700, 
+                        damping: 15,
+                        mass: 0.3
                       }}
                     >
-                      {/* Effet de background animé au hover */}
+                      {/* Effet de background animé au hover - plus réactif */}
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-full"
                         initial={{ scale: 0, opacity: 0 }}
                         whileHover={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                        transition={{ 
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 20,
+                          mass: 0.2
+                        }}
                       />
                       
-                      <span className="relative z-10 transition-colors duration-300 group-hover:text-gray-800">
+                      <span className="relative z-10 transition-colors duration-200 group-hover:text-gray-800">
                         Voir le Projet
                       </span>
                       <motion.div
                         className="relative z-10"
-                        whileHover={{ x: 6, rotate: 15 }}
+                        whileHover={{ x: 8, rotate: 20 }}
                         transition={{ 
                           type: "spring", 
-                          stiffness: 500, 
-                          damping: 15
+                          stiffness: 800, 
+                          damping: 12,
+                          mass: 0.1
                         }}
                       >
                         <ArrowRight size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7 
-                                                         transition-colors duration-300 group-hover:text-gray-800" />
+                                                         transition-colors duration-200 group-hover:text-gray-800" />
                       </motion.div>
                     </motion.button>
                   </motion.div>

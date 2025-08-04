@@ -98,16 +98,16 @@ const BackgroundPattern = ({
           const distance = Math.hypot(mousePos.x - x, mousePos.y - y);
           
           if (distance < radius) {
-            // Effet magnétique plus subtil
-            const force = Math.pow(1 - distance / radius, 2);
+            // Effet magnétique plus accentué
+            const force = Math.pow(1 - distance / radius, 1.8);
             const angle = Math.atan2(y - mousePos.y, x - mousePos.x);
-            const offset = force * 8; // Réduire l'offset
+            const offset = force * 12; // Augmenter l'offset pour un effet plus visible
             
             const finalX = x + Math.cos(angle) * offset;
             const finalY = y + Math.sin(angle) * offset;
             
-            // Taille du point basée sur la proximité
-            const size = 0.8 + force * 1.5;
+            // Taille du point basée sur la proximité - plus visible
+            const size = 1 + force * 2.2;
             
             ctx.beginPath();
             ctx.arc(finalX, finalY, size, 0, Math.PI * 2);

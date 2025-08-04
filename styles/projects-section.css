@@ -72,14 +72,15 @@
   }
 }
 
-/* Micro-interactions pour les boutons */
+/* Micro-interactions pour les boutons - ultra-réactif */
 .project-button {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
-.project-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+.project-button:active {
+  transform: translateY(0);
 }
 
 /* Optimisations pour les grandes résolutions */

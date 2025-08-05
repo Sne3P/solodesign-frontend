@@ -9,17 +9,17 @@ const FooterMinimal = () => {
         </p>
         <ul className="flex space-x-4 text-sm">
           <li>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a href="/terms" className="text-gray-400 hover:text-white transition-colors">
               Conditions d&apos;utilisation
             </a>
           </li>
           <li>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
               Politique de confidentialité
             </a>
           </li>
           <li>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">
+            <a href="/legal" className="text-gray-400 hover:text-white transition-colors">
               Mentions légales
             </a>
           </li>

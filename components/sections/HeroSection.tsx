@@ -78,11 +78,11 @@ const HeroSection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 }}
             >
-              <span className="block bg-gradient-to-r from-white via-gray-100 to-white bg-clip-text text-transparent">
+              <span className="block text-white">
                 {"SOLODESIGN".split("").map((letter, index) => (
                   <motion.span
                     key={index}
-                    className="inline-block"
+                    className="inline-block text-white"
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{

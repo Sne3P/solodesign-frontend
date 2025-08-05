@@ -21,7 +21,6 @@ import ContactSection from '../components/sections/ContactSection'
 import Footer from '../components/sections/Footer'
 import LogoTitle from '../components/layout/LogoTitle'
 import SEO from '../components/seo/SEO'
-import { createScrollProgress } from '../lib/animations'
 
 const Portfolio = () => {
   const { scrollYProgress } = useScroll()
@@ -158,7 +157,7 @@ const Portfolio = () => {
         {/* Progression de défilement */}
         <motion.div
           className="fixed top-0 left-0 right-0 h-1 bg-white mix-blend-difference origin-left"
-          style={createScrollProgress(progressionDefilementFluide)}
+          style={{ scaleX: progressionDefilementFluide }}
         />
 
         {/* Animation de fond avec effet magnétique optimisé */}

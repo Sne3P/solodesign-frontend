@@ -5,8 +5,7 @@ import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
-import { useRouter } from 'next/navigation'
-import { pageExitTransition } from '@/lib/animations'
+import { useRouter } from 'next/navigation';
 import { Project } from '../../lib/types';
 import ActionButton from '../ui/ActionButton';
 
@@ -43,7 +42,10 @@ const ProjectsSection = () => {
     document.body.style.overflow = 'hidden';
     const element = document.getElementById('projects-section');
     if (element) {
-      Object.assign(element.style, pageExitTransition.style);
+      element.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+      element.style.transform = 'scale(0.96) translateY(20px)';
+      element.style.opacity = '0';
+      element.style.filter = 'blur(4px)';
     }
 
     // Redirection avec un délai optimisé

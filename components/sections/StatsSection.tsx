@@ -3,7 +3,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Users, Trophy, Clock, Star } from 'lucide-react'
-import { floatingDots } from '@/lib/animations'
 
 const StatsSection = () => {
   const stats = [
@@ -65,14 +64,9 @@ const StatsSection = () => {
               >
                 {/* Icon */}
                 <motion.div
-                  className="mx-auto mb-4 w-16 h-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/10 transition-colors duration-300"
-                  whileHover={{ 
-                    scale: 1.1,
-                    rotate: 5,
-                    transition: { duration: 0.2 }
-                  }}
+                  className="mx-auto mb-4 w-16 h-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl flex items-center justify-center transition-colors duration-300"
                 >
-                  <Icon className="w-8 h-8 text-white group-hover:text-white transition-colors duration-300" />
+                  <Icon className="w-8 h-8 text-white transition-colors duration-300" />
                 </motion.div>
 
                 {/* Number */}
@@ -120,15 +114,7 @@ const StatsSection = () => {
                 </motion.p>
 
                 {/* Hover line effect */}
-                <motion.div
-                  className="h-0.5 bg-gradient-to-r from-transparent via-white to-transparent mt-4 mx-auto"
-                  initial={{ width: 0, opacity: 0 }}
-                  whileHover={{ 
-                    width: "100%", 
-                    opacity: 0.3,
-                    transition: { duration: 0.3 }
-                  }}
-                />
+                <div className="h-0.5 bg-gradient-to-r from-transparent via-white to-transparent mt-4 mx-auto opacity-0" />
               </motion.div>
             )
           })}
@@ -144,7 +130,11 @@ const StatsSection = () => {
             left: `${15 + i * 20}%`,
             top: `${20 + i * 15}%`
           }}
-          {...floatingDots}
+          animate={{
+            y: [0, -15, 0],
+            opacity: [0.1, 0.3, 0.1],
+            scale: [1, 1.3, 1]
+          }}
           transition={{
             duration: 4 + i * 0.5,
             repeat: Infinity,

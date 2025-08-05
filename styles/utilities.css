@@ -22,8 +22,6 @@
   --transition-fast: 150ms;
   --transition-normal: 300ms;
   --transition-slow: 500ms;
-  --floating-animation-duration: 3s;
-  --page-exit-transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Classes utilitaires pour Glassmorphism */
@@ -46,32 +44,6 @@
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Classes pour les éléments flottants centralisées */
-.floating-element {
-  animation: float var(--floating-animation-duration) ease-in-out infinite;
-}
-
-.floating-element-slow {
-  animation: float 4s ease-in-out infinite;
-}
-
-.floating-element-fast {
-  animation: float 2s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); opacity: 0.6; }
-  50% { transform: translateY(-10px); opacity: 1; }
-}
-
-/* Animation de sortie de page */
-.page-exit {
-  transition: var(--page-exit-transition);
-  transform: scale(0.96) translateY(20px);
-  opacity: 0;
-  filter: blur(4px);
 }
 
 /* Classes pour les backgrounds animés */

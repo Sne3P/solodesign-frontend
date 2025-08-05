@@ -300,6 +300,73 @@ export const pulseVariants = {
   }
 };
 
+// Dynamic hover animations for professional interactions
+export const dynamicHoverVariants = {
+  card: {
+    initial: { scale: 1, y: 0, rotateX: 0 },
+    hover: { 
+      scale: 1.05, 
+      y: -8, 
+      rotateX: 5,
+      transition: transitions.fast
+    },
+    tap: { 
+      scale: 0.95,
+      transition: transitions.ultraFast
+    }
+  },
+  icon: {
+    initial: { scale: 1, rotate: 0 },
+    hover: { 
+      scale: 1.15, 
+      rotate: 8,
+      transition: transitions.fast
+    }
+  },
+  badge: {
+    initial: { scale: 1, y: 0 },
+    hover: { 
+      scale: 1.05, 
+      y: -2,
+      transition: transitions.fast
+    }
+  },
+  button: {
+    initial: { scale: 1, y: 0 },
+    hover: { 
+      scale: 1.05, 
+      y: -3,
+      transition: transitions.fast
+    },
+    tap: { 
+      scale: 0.95,
+      transition: transitions.ultraFast
+    }
+  }
+};
+
+// Professional text reveal animations
+export const textRevealVariants = {
+  container: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.02,
+        delayChildren: 0.1
+      }
+    }
+  },
+  child: {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: transitions.easeOut
+    }
+  }
+};
+
 // Scroll indicator animation
 export const scrollIndicatorVariants = {
   container: {
@@ -481,6 +548,8 @@ export const animations = {
   title: titleVariants,
   titleGlow: titleGlowVariants,
   letter: letterVariants,
+  dynamicHover: dynamicHoverVariants,
+  textReveal: textRevealVariants,
   scrollIndicator: scrollIndicatorVariants,
   errorIcon: errorIconVariants,
   card: cardVariants,

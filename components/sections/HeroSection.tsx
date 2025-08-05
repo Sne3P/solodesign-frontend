@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
 import { Parallax } from 'react-scroll-parallax';
-import ActionButton from '../ui/ActionButton';
+import { fadeInUp, titleVariants, transitions, scaleAnimations } from '@/lib/animations';
+import { ActionButton, Badge } from '@/components/ui';
 import SecondaryButton from '../ui/SecondaryButton';
 
 const HeroSection = () => {
@@ -59,19 +60,14 @@ const HeroSection = () => {
             transition={{ duration: 0.6 }}
           >
             {/* Premium Badge */}
-            <motion.div
-              className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full px-6 py-3 mb-8"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              whileHover={{ 
-                scale: 1.08,
-                transition: { duration: 0.12 }
-              }}
+            <Badge
+              variant="premium"
+              size="lg"
+              icon={Sparkles}
+              className="mb-8"
             >
-              <Sparkles className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">Design Premium • Développement Expert</span>
-            </motion.div>
+              Design Premium • Développement Expert
+            </Badge>
 
             {/* Main Title avec animation SOLODESIGN */}
             <motion.h1 

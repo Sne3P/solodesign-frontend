@@ -32,6 +32,7 @@ const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: fa
 import Footer from "../../components/sections/Footer"
 import ActionButton from "../../components/ui/ActionButton"
 import React from "react"
+import { ParallaxProvider } from "react-scroll-parallax"
 
 // -------------------- Data --------------------
 
@@ -394,198 +395,200 @@ const ServicesPage = () => {
   const MotionLink = motion(Link)
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-white origin-left z-50" style={{ scaleX }} />
+    <ParallaxProvider>
+      <div className="min-h-screen bg-black text-white overflow-hidden">
+        <motion.div className="fixed top-0 left-0 right-0 h-1 bg-white origin-left z-50" style={{ scaleX }} />
 
-      <LogoTitle />
-      <SocialLinks />
-      <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <Cursor />
+        <LogoTitle />
+        <SocialLinks />
+        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <Cursor />
 
-      {/* Bouton Retour */}
-      <motion.div
-        className="fixed top-24 left-8 z-50"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3, delay: 0.2 }}
-      >
-        <MotionLink
-          href="/"
-          className="bg-white text-black p-3 rounded-full flex items-center justify-center"
-          whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
-          whileTap={{ scale: 0.9 }}
+        {/* Bouton Retour */}
+        <motion.div
+          className="fixed top-24 left-8 z-50"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <ArrowLeft size={28} />
-        </MotionLink>
-      </motion.div>
+          <MotionLink
+            href="/"
+            className="bg-white text-black p-3 rounded-full flex items-center justify-center"
+            whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <ArrowLeft size={28} />
+          </MotionLink>
+        </motion.div>
 
-      {/* Hero Section */}
-      <motion.div
-        className="h-screen flex flex-col justify-center items-center relative px-4"
-        initial={{ opacity: 0, y: -50, rotate: -5 }}
-        animate={{ opacity: 1, y: 0, rotate: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
-      >
-        <motion.h1
-          className="text-5xl md:text-7xl font-bold mb-10 text-center"
-          whileHover={{ rotate: 2 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15 }}
-        >
-          Nos Services
-        </motion.h1>
-        <motion.p
-          className="text-xl md:text-2xl mb-10 text-center"
-          whileHover={{ scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15 }}
-        >
-          Des solutions innovantes pour propulser votre succès digital
-        </motion.p>
-      </motion.div>
-
-      {/* Services Section */}
-      <motion.div
-        className="max-w-6xl mx-auto px-4 py-20"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.h2
-          className="text-3xl md:text-5xl font-bold mb-10 text-center"
-          initial={{ opacity: 0, y: -20, rotate: -5 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-          exit={{ opacity: 0, y: -20, rotate: 5 }}
-          viewport={{ once: true, amount: 0.3 }}
+        {/* Hero Section */}
+        <motion.div
+          className="h-screen flex flex-col justify-center items-center relative px-4"
+          initial={{ opacity: 0, y: -50, rotate: -5 }}
+          animate={{ opacity: 1, y: 0, rotate: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
         >
-          Nos Expertises
-        </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {services.map((service, index) => (
-            <ServiceCard key={index} service={service} index={index} />
-          ))}
-        </div>
-      </motion.div>
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold mb-10 text-center"
+            whileHover={{ rotate: 2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            Nos Services
+          </motion.h1>
+          <motion.p
+            className="text-xl md:text-2xl mb-10 text-center"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            Des solutions innovantes pour propulser votre succès digital
+          </motion.p>
+        </motion.div>
 
-      {/* Process Section */}
-      <motion.div
-        className="max-w-4xl mx-auto px-4 py-20"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.h2
-          className="text-3xl md:text-5xl font-bold mb-10 text-center"
-          initial={{ opacity: 0, y: -20, rotate: -5 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-          exit={{ opacity: 0, y: -20, rotate: 5 }}
+        {/* Services Section */}
+        <motion.div
+          className="max-w-6xl mx-auto px-4 py-20"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
         >
-          Notre Processus
-        </motion.h2>
-        <div className="relative">
-          {processSteps.map((step, index) => (
-            <ProcessStep key={index} step={step} index={index} totalSteps={processSteps.length} />
-          ))}
-        </div>
-      </motion.div>
+          <motion.h2
+            className="text-3xl md:text-5xl font-bold mb-10 text-center"
+            initial={{ opacity: 0, y: -20, rotate: -5 }}
+            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, y: -20, rotate: 5 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+          >
+            Nos Expertises
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <ServiceCard key={index} service={service} index={index} />
+            ))}
+          </div>
+        </motion.div>
 
-      {/* Glowing Cards Section */}
-      <motion.div
-        className="max-w-6xl mx-auto px-4 py-20"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.h2
-          className="text-3xl md:text-5xl font-bold mb-10 text-center"
-          initial={{ opacity: 0, y: -20, rotate: -5 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-          exit={{ opacity: 0, y: -20, rotate: 5 }}
+        {/* Process Section */}
+        <motion.div
+          className="max-w-4xl mx-auto px-4 py-20"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
         >
-          Pourquoi Nous Choisir
-        </motion.h2>
-        <GlowingCards>
-          {[
-            {
-              icon: <Users size={48} />,
-              title: "Expertise",
-              description:
-                "Une équipe de professionnels passionnés et expérimentés dans tous les aspects du développement web.",
-            },
-            {
-              icon: <Lightbulb size={48} />,
-              title: "Innovation",
-              description: "Toujours à la pointe de la technologie pour offrir des solutions modernes et efficaces.",
-            },
-            {
-              icon: <TrendingUp size={48} />,
-              title: "Résultats",
-              description: "Un engagement envers l'excellence et des résultats mesurables pour votre entreprise.",
-            },
-          ].map((item, index) => (
-            <GlowingCard key={index} index={index}>
-              <motion.div
-                className="mx-auto mb-4 text-white"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 + index * 0.2 }}
-              >
-                {item.icon}
-              </motion.div>
-              <h3 className="text-xl font-bold mb-2 text-center">{item.title}</h3>
-              <p className="text-center">{item.description}</p>
-            </GlowingCard>
-          ))}
-        </GlowingCards>
-      </motion.div>
+          <motion.h2
+            className="text-3xl md:text-5xl font-bold mb-10 text-center"
+            initial={{ opacity: 0, y: -20, rotate: -5 }}
+            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, y: -20, rotate: 5 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+          >
+            Notre Processus
+          </motion.h2>
+          <div className="relative">
+            {processSteps.map((step, index) => (
+              <ProcessStep key={index} step={step} index={index} totalSteps={processSteps.length} />
+            ))}
+          </div>
+        </motion.div>
 
-      {/* Call-to-Action Section */}
-      <motion.div
-        className="text-center mt-16 py-20"
-        initial={{ opacity: 0, y: 50, rotate: -5 }}
-        whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-        exit={{ opacity: 0, y: 50, rotate: 5 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ type: "spring", stiffness: 300, damping: 15 }}
-      >
-        <motion.h2
-          className="text-3xl md:text-5xl font-bold mb-6"
-          whileHover={{ rotate: 2 }}
+        {/* Glowing Cards Section */}
+        <motion.div
+          className="max-w-6xl mx-auto px-4 py-20"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.h2
+            className="text-3xl md:text-5xl font-bold mb-10 text-center"
+            initial={{ opacity: 0, y: -20, rotate: -5 }}
+            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+            exit={{ opacity: 0, y: -20, rotate: 5 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.2 }}
+          >
+            Pourquoi Nous Choisir
+          </motion.h2>
+          <GlowingCards>
+            {[
+              {
+                icon: <Users size={48} />,
+                title: "Expertise",
+                description:
+                  "Une équipe de professionnels passionnés et expérimentés dans tous les aspects du développement web.",
+              },
+              {
+                icon: <Lightbulb size={48} />,
+                title: "Innovation",
+                description: "Toujours à la pointe de la technologie pour offrir des solutions modernes et efficaces.",
+              },
+              {
+                icon: <TrendingUp size={48} />,
+                title: "Résultats",
+                description: "Un engagement envers l'excellence et des résultats mesurables pour votre entreprise.",
+              },
+            ].map((item, index) => (
+              <GlowingCard key={index} index={index}>
+                <motion.div
+                  className="mx-auto mb-4 text-white"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 + index * 0.2 }}
+                >
+                  {item.icon}
+                </motion.div>
+                <h3 className="text-xl font-bold mb-2 text-center">{item.title}</h3>
+                <p className="text-center">{item.description}</p>
+              </GlowingCard>
+            ))}
+          </GlowingCards>
+        </motion.div>
+
+        {/* Call-to-Action Section */}
+        <motion.div
+          className="text-center mt-16 py-20"
+          initial={{ opacity: 0, y: 50, rotate: -5 }}
+          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+          exit={{ opacity: 0, y: 50, rotate: 5 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ type: "spring", stiffness: 300, damping: 15 }}
         >
-          Prêt à Innover ?
-        </motion.h2>
-        <ActionButton
-          variant="primary"
-          size="lg"
-          onClick={() => router.push("/contact")}
-        >
-          Contactez-nous
-        </ActionButton>
-      </motion.div>
+          <motion.h2
+            className="text-3xl md:text-5xl font-bold mb-6"
+            whileHover={{ rotate: 2 }}
+            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          >
+            Prêt à Innover ?
+          </motion.h2>
+          <ActionButton
+            variant="primary"
+            size="lg"
+            onClick={() => router.push("/contact")}
+          >
+            Contactez-nous
+          </ActionButton>
+        </motion.div>
 
-      <Footer />
+        <Footer />
 
-      <motion.div
-        className="fixed inset-0 pointer-events-none z-10"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
-          backgroundSize: "30px 30px",
-        }}
-        animate={{ backgroundPosition: ["0px 0px", "0px -30px"] }}
-        transition={{ repeat: Infinity, repeatType: "loop", duration: 10, ease: "linear" }}
-      />
-    </div>
+        <motion.div
+          className="fixed inset-0 pointer-events-none z-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
+            backgroundSize: "30px 30px",
+          }}
+          animate={{ backgroundPosition: ["0px 0px", "0px -30px"] }}
+          transition={{ repeat: Infinity, repeatType: "loop", duration: 10, ease: "linear" }}
+        />
+      </div>
+    </ParallaxProvider>
   )
 }
 

@@ -2,14 +2,13 @@
 
 import ProjectDetailClient from "./ProjectDetailClient";
 import { ParallaxProvider } from "react-scroll-parallax";
-import { use } from "react";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
 
 const ProjectPage = ({ params }: PageProps) => {
-  const { id } = use(params);
+  const { id } = params;
   return (
     <ParallaxProvider>
       <ProjectDetailClient id={id} />

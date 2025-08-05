@@ -128,7 +128,14 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
         >
           <motion.div
             className="h-full bg-gradient-to-r from-transparent via-red-400 to-transparent"
-            animate={animations.slideBar.animate}
+            animate={{
+              x: [-100, 100],
+              transition: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear"
+              }
+            }}
             style={{ width: "50px" }}
           />
         </motion.div>

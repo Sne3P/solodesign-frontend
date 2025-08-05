@@ -203,6 +203,40 @@ export const staggeredContainerVariants: Variants = {
   }
 };
 
+// Common stagger variants with different timing
+export const fastStaggerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.02,
+      delayChildren: 0.1
+    }
+  }
+};
+
+export const mediumStaggerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.15
+    }
+  }
+};
+
+export const slowStaggerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
 export const slideUpStaggerVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { 
@@ -223,6 +257,26 @@ export const floatingVariants = {
     }
   }
 };
+
+export const floatingParticles = {
+  animate: {
+    y: [0, -10, 0],
+    opacity: [0.2, 0.5, 0.2],
+    scale: [1, 1.2, 1],
+  }
+};
+
+export const floatingDots = {
+  animate: {
+    y: [0, -15, 0],
+    opacity: [0.1, 0.3, 0.1],
+    scale: [1, 1.3, 1]
+  }
+};
+
+export const mouseTrackingGradient = (mouseX: number, mouseY: number) => ({
+  background: `radial-gradient(circle at ${mouseX}px ${mouseY}px, rgba(255,255,255,0.03) 0%, transparent 50%)`
+});
 
 export const rotateVariants = {
   animate: {
@@ -246,6 +300,24 @@ export const pulseVariants = {
   }
 };
 
+// Scroll indicator animation
+export const scrollIndicatorVariants = {
+  container: {
+    animate: { y: [0, 12, 0] },
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  },
+  border: {
+    hover: { 
+      borderColor: 'rgba(255,255,255,0.8)',
+      transition: { duration: 0.12 }
+    }
+  }
+};
+
 // Text animation variants
 export const titleVariants: Variants = {
   hidden: { opacity: 0, y: 20, rotate: -1 },
@@ -254,6 +326,16 @@ export const titleVariants: Variants = {
     y: 0,
     rotate: 0,
     transition: transitions.smooth
+  }
+};
+
+export const letterVariants = {
+  initial: { y: 100, opacity: 0 },
+  animate: { y: 0, opacity: 1 },
+  hover: {
+    y: -8,
+    scale: 1.12,
+    transition: transitions.ultraFast
   }
 };
 
@@ -268,7 +350,7 @@ export const titleGlowVariants = {
   }
 };
 
-// Page transition variants
+// Page transition animations
 export const pageTransition: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { 
@@ -280,6 +362,15 @@ export const pageTransition: Variants = {
     opacity: 0, 
     y: -20,
     transition: transitions.fast
+  }
+};
+
+export const pageExitTransition = {
+  style: {
+    transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+    transform: 'scale(0.96) translateY(20px)',
+    opacity: '0',
+    filter: 'blur(4px)'
   }
 };
 
@@ -355,6 +446,12 @@ export const createHoverScale = (scale = 1.05, y = -2) => ({
   transition: transitions.fast
 });
 
+export const createScrollProgress = (scrollYProgress: import('framer-motion').MotionValue<number>) => {
+  return {
+    scaleX: scrollYProgress
+  };
+};
+
 // Export d'un objet contenant tous les variants pour faciliter l'import
 export const animations = {
   fadeIn: fadeInVariants,
@@ -366,7 +463,12 @@ export const animations = {
   scaleIn: scaleInVariants,
   container: containerVariants,
   staggeredContainer: staggeredContainerVariants,
+  fastStagger: fastStaggerVariants,
+  mediumStagger: mediumStaggerVariants,
+  slowStagger: slowStaggerVariants,
   floating: floatingVariants,
+  floatingParticles: floatingParticles,
+  floatingDots: floatingDots,
   pulse: pulseVariants,
   rotate: rotateVariants,
   slideUpStagger: slideUpStaggerVariants,
@@ -378,9 +480,12 @@ export const animations = {
   icon: iconVariants,
   title: titleVariants,
   titleGlow: titleGlowVariants,
+  letter: letterVariants,
+  scrollIndicator: scrollIndicatorVariants,
   errorIcon: errorIconVariants,
   card: cardVariants,
-  pageTransition: pageTransition
+  pageTransition: pageTransition,
+  pageExit: pageExitTransition
 };
 
 export default animations;

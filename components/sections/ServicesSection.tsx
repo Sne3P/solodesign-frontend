@@ -2,6 +2,7 @@ import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { Paintbrush, Code, Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
+import { slowStaggerVariants, slideUpStaggerVariants, slideInFromLeftVariants, backgroundPatternVariants } from '@/lib/animations';
 import SectionTitle from '../ui/SectionTitle';
 import SecondaryButton from '../ui/SecondaryButton';
 import ActionButton from '../ui/ActionButton';
@@ -36,14 +37,7 @@ const ServicesSection = () => (
         backgroundImage: `radial-gradient(circle at 25% 25%, #000 1px, transparent 1px)`,
         backgroundSize: '50px 50px'
       }}
-      animate={{
-        backgroundPosition: ['0% 0%', '100% 100%']
-      }}
-      transition={{
-        duration: 20,
-        repeat: Infinity,
-        ease: "linear"
-      }}
+      {...backgroundPatternVariants}
     />
 
     {/* Floating Elements */}
@@ -113,24 +107,7 @@ const ServicesSection = () => (
                   duration: 0.12
                 }
               }}
-              variants={{
-                hidden: { 
-                  opacity: 0, 
-                  y: 50, 
-                  rotate: -2
-                },
-                visible: { 
-                  opacity: 1, 
-                  y: 0, 
-                  rotate: 0,
-                  transition: {
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 15,
-                    delay: index * 0.2
-                  }
-                }
-              }}
+              variants={slideUpStaggerVariants}
             >
               {/* Background Gradient on Hover */}
               <motion.div

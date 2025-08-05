@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowUp, Heart, Github, Linkedin, Twitter } from 'lucide-react';
+import { backgroundPatternVariants, floatingVariants } from '@/lib/animations';
 
 const socialLinks = [
   { icon: Github, href: "https://github.com", label: "Github" },
@@ -45,23 +46,13 @@ const Footer = () => {
             backgroundImage: `radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px), radial-gradient(circle at 80% 50%, #fff 1px, transparent 1px)`,
             backgroundSize: '100px 100px'
           }}
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%']
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "linear"
-          }}
+          {...backgroundPatternVariants}
         />
 
         {/* Floating Elements */}
         <motion.div
           className="absolute top-8 right-12 w-2 h-2 bg-gray-600 rounded-full opacity-40"
-          animate={{ 
-            y: [0, -15, 0],
-            opacity: [0.4, 0.7, 0.4]
-          }}
+          {...floatingVariants}
           transition={{ 
             duration: 4,
             repeat: Infinity,

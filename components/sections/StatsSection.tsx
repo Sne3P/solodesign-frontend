@@ -3,6 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Users, Trophy, Clock, Star } from 'lucide-react'
+import { floatingDots } from '@/lib/animations'
 
 const StatsSection = () => {
   const stats = [
@@ -143,11 +144,7 @@ const StatsSection = () => {
             left: `${15 + i * 20}%`,
             top: `${20 + i * 15}%`
           }}
-          animate={{
-            y: [0, -15, 0],
-            opacity: [0.1, 0.3, 0.1],
-            scale: [1, 1.3, 1]
-          }}
+          {...floatingDots}
           transition={{
             duration: 4 + i * 0.5,
             repeat: Infinity,

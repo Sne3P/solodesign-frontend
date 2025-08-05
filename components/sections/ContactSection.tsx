@@ -1,7 +1,8 @@
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-import { Send, Mail, Phone, MapPin, Clock, Star } from 'lucide-react';
+import { Send, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { slowStaggerVariants, backgroundPatternVariants, floatingVariants } from '@/lib/animations';
 import SectionTitle from '../ui/SectionTitle';
 import ActionButton from '../ui/ActionButton';
 
@@ -20,24 +21,13 @@ const ContactSection = () => (
         backgroundImage: `linear-gradient(45deg, #000 1px, transparent 1px), linear-gradient(-45deg, #000 1px, transparent 1px)`,
         backgroundSize: '60px 60px'
       }}
-      animate={{
-        backgroundPosition: ['0% 0%', '100% 100%']
-      }}
-      transition={{
-        duration: 25,
-        repeat: Infinity,
-        ease: "linear"
-      }}
+      {...backgroundPatternVariants}
     />
 
     {/* Floating Elements */}
     <motion.div
       className="absolute top-24 left-12 w-3 h-3 bg-black rounded-full opacity-20"
-      animate={{ 
-        y: [0, -25, 0],
-        opacity: [0.2, 0.5, 0.2],
-        scale: [1, 1.2, 1]
-      }}
+      {...floatingVariants}
       transition={{ 
         duration: 3.5,
         repeat: Infinity,
@@ -46,10 +36,7 @@ const ContactSection = () => (
     />
     <motion.div
       className="absolute bottom-32 right-20 w-2 h-2 bg-gray-600 rounded-full opacity-30"
-      animate={{ 
-        y: [0, 20, 0],
-        opacity: [0.3, 0.6, 0.3]
-      }}
+      {...floatingVariants}
       transition={{ 
         duration: 2.8,
         repeat: Infinity,

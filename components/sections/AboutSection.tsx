@@ -2,6 +2,7 @@ import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { Award, Users, Zap, Target } from 'lucide-react';
+import { slowStaggerVariants, mediumStaggerVariants, floatingVariants } from '@/lib/animations';
 import SectionTitle from '../ui/SectionTitle';
 import Image from 'next/image';
 
@@ -26,22 +27,11 @@ const AboutSection = () => (
       {/* Floating Elements */}
       <motion.div
         className="absolute top-20 left-10 w-2 h-2 bg-white rounded-full opacity-60"
-        animate={{ 
-          y: [0, -20, 0],
-          opacity: [0.6, 1, 0.6]
-        }}
-        transition={{ 
-          duration: 3,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
+        {...floatingVariants}
       />
       <motion.div
         className="absolute bottom-32 right-16 w-1 h-1 bg-gray-400 rounded-full opacity-40"
-        animate={{ 
-          y: [0, 15, 0],
-          opacity: [0.4, 0.8, 0.4]
-        }}
+        {...floatingVariants}
         transition={{ 
           duration: 1.2,
           repeat: Infinity,

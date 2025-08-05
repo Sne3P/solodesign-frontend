@@ -4,9 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
 import { Parallax } from 'react-scroll-parallax';
-import { fadeInUp, titleVariants, transitions, scaleAnimations } from '@/lib/animations';
-import { ActionButton, Badge } from '@/components/ui';
-import SecondaryButton from '../ui/SecondaryButton';
+import { letterVariants, floatingParticles, mouseTrackingGradient, scrollIndicatorVariants } from '@/lib/animations'
+import { ActionButton, Badge } from '@/components/ui'
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -24,9 +23,7 @@ const HeroSection = () => {
       {/* Geometric background elements */}
       <motion.div
         className="absolute inset-0 z-0"
-        style={{
-          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.03) 0%, transparent 50%)`
-        }}
+        style={mouseTrackingGradient(mousePosition.x, mousePosition.y)}
       />
 
       {/* Floating particles */}
@@ -38,11 +35,7 @@ const HeroSection = () => {
             left: `${20 + i * 15}%`,
             top: `${30 + i * 8}%`
           }}
-          animate={{
-            y: [0, -10, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1]
-          }}
+          {...floatingParticles}
           transition={{
             duration: 3 + i * 0.5,
             repeat: Infinity,
@@ -81,8 +74,8 @@ const HeroSection = () => {
                   <motion.span
                     key={index}
                     className="inline-block text-white"
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
+                    initial={letterVariants.initial}
+                    animate={letterVariants.animate}
                     transition={{
                       duration: 0.4,
                       delay: 0.1 + index * 0.04,
@@ -90,16 +83,7 @@ const HeroSection = () => {
                       stiffness: 140,
                       damping: 18
                     }}
-                    whileHover={{
-                      y: -8,
-                      scale: 1.12,
-                      transition: { 
-                        type: "spring",
-                        stiffness: 800,
-                        damping: 10,
-                        duration: 0.12
-                      }
-                    }}
+                    whileHover={letterVariants.hover}
                   >
                     {letter}
                   </motion.span>
@@ -171,19 +155,12 @@ const HeroSection = () => {
       >
         <motion.div
           className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
-          whileHover={{ 
-            borderColor: 'rgba(255,255,255,0.8)',
-            transition: { duration: 0.12 }
-          }}
+          whileHover={scrollIndicatorVariants.border.hover}
         >
           <motion.div
             className="w-1 h-3 bg-white rounded-full mt-2"
-            animate={{ y: [0, 12, 0] }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            animate={scrollIndicatorVariants.container.animate}
+            transition={scrollIndicatorVariants.container.transition}
           />
         </motion.div>
       </motion.div>

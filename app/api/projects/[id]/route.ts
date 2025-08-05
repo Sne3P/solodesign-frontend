@@ -5,10 +5,10 @@ import { AuthService } from '../../../../lib/authService'
 // GET - Récupérer un projet par ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { id } = await context.params
     
     // Valider que l'ID est valide
     if (!ProjectService.validateProjectId(id)) {
@@ -40,7 +40,7 @@ export async function GET(
 // PUT - Mettre à jour un projet (nécessite authentification)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -52,7 +52,7 @@ export async function PUT(
       )
     }
 
-    const { id } = await params
+    const { id } = await context.params
     const projectData = await request.json()
 
     // Traitement des technologies et tags
@@ -93,7 +93,7 @@ export async function PUT(
 // DELETE - Supprimer un projet (nécessite authentification)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -105,7 +105,7 @@ export async function DELETE(
       )
     }
 
-    const { id } = await params
+    const { id } = await context.params
     const deleted = ProjectService.deleteProject(id)
     
     if (!deleted) {

@@ -1,0 +1,85 @@
+# robots.txt optimisé pour SoloDesign
+# Autorise tous les bots de moteurs de recherche principaux
+# Optimise l'indexation pour un meilleur référencement
+
+User-agent: *
+Allow: /
+
+# Bots spécifiques - Autorisations explicites
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+User-agent: DuckDuckBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Désallower les fichiers/dossiers non nécessaires pour l'indexation
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /private/
+Disallow: /tmp/
+Disallow: /.env
+Disallow: /package.json
+Disallow: /package-lock.json
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /.next/
+Disallow: /public/screenshots/
+Disallow: /uploads/temp/
+
+# Autoriser spécifiquement les ressources importantes
+Allow: /uploads/
+Allow: /images/
+Allow: /static/
+Allow: /favicon.ico
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /manifest.json
+
+# Désallower les paramètres de tracking et pages temporaires
+Disallow: /*?utm_*
+Disallow: /*?ref=*
+Disallow: /*?source=*
+Disallow: /*?campaign=*
+Disallow: /search?*
+Disallow: /*?preview=*
+Disallow: /*?test=*
+
+# Sitemaps - Multiples pour couvrir tous les contenus
+Sitemap: https://solodesign.fr/sitemap.xml
+Sitemap: https://solodesign.fr/sitemap-images.xml
+Sitemap: https://solodesign.fr/sitemap-projects.xml
+Sitemap: https://solodesign.fr/sitemap-services.xml
+
+# Host pour spécifier le domaine principal
+Host: https://solodesign.fr

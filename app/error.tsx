@@ -4,6 +4,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Home, RefreshCw, AlertTriangle } from 'lucide-react';
 import CustomLink from '@/components/ui/CustomLink';
+import ActionButton from '@/components/ui/ActionButton';
+import { animations } from '@/lib/animations';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -11,29 +13,6 @@ interface ErrorProps {
 }
 
 const Error: React.FC<ErrorProps> = ({ error, reset }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden flex items-center justify-center">
@@ -41,14 +20,7 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
       <div className="absolute inset-0 opacity-[0.02]">
         <motion.div
           className="w-full h-full"
-          animate={{
-            backgroundPosition: ["0% 0%", "100% 100%"],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
+          animate={animations.backgroundPattern.animate}
           style={{
             backgroundImage: `
               linear-gradient(45deg, white 1px, transparent 1px),
@@ -70,10 +42,7 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
               y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1080),
               opacity: 0 
             }}
-            animate={{ 
-              opacity: [0, 0.6, 0],
-              scale: [0, 1.5, 0]
-            }}
+            animate={animations.particle.animate}
             transition={{
               duration: 3 + Math.random() * 2,
               repeat: Infinity,
@@ -86,37 +55,22 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
 
       {/* Main content */}
       <motion.div
-        variants={containerVariants}
+        variants={animations.container}
         initial="hidden"
         animate="visible"
         className="relative z-10 text-center max-w-2xl mx-auto px-4"
       >
         {/* Error icon */}
         <motion.div
-          variants={itemVariants}
+          variants={animations.slideUp}
           className="mb-8 flex justify-center"
         >
           <motion.div
-            animate={{ 
-              rotate: [0, 5, -5, 0],
-              scale: [1, 1.1, 1]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            animate={animations.errorIcon.animate}
             className="w-24 h-24 border-2 border-red-500/30 rounded-full flex items-center justify-center"
           >
             <motion.div
-              animate={{
-                opacity: [0.5, 1, 0.5]
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              animate={animations.glow.animate}
             >
               <AlertTriangle className="w-12 h-12 text-red-400" />
             </motion.div>
@@ -125,33 +79,26 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
 
         {/* Error title */}
         <motion.div
-          variants={itemVariants}
+          variants={animations.slideUp}
           className="mb-8"
         >
           <motion.h1
             className="text-6xl md:text-7xl font-extralight tracking-wider mb-4"
-            animate={{
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{
-              duration: 2.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
+            animate={animations.titleGlow.animate}
           >
             500
           </motion.h1>
           
           <motion.h2
             className="text-2xl md:text-3xl font-light mb-4 tracking-wide"
-            variants={itemVariants}
+            variants={animations.slideUp}
           >
             Erreur serveur
           </motion.h2>
           
           <motion.p
             className="text-white/60 text-lg leading-relaxed mb-6"
-            variants={itemVariants}
+            variants={animations.slideUp}
           >
             Une erreur inattendue s&apos;est produite. Veuillez réessayer.
           </motion.p>
@@ -159,7 +106,7 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
           {/* Error details */}
           {error.message && (
             <motion.div
-              variants={itemVariants}
+              variants={animations.slideUp}
               className="bg-white/5 border border-white/10 rounded-lg p-4 mb-8 text-left"
             >
               <p className="text-red-400 text-sm font-mono">
@@ -176,42 +123,29 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
 
         {/* Animated separator */}
         <motion.div
-          variants={itemVariants}
+          variants={animations.slideUp}
           className="w-32 h-px bg-red-500/20 mx-auto mb-12"
         >
           <motion.div
             className="h-full bg-gradient-to-r from-transparent via-red-400 to-transparent"
-            animate={{
-              x: [-100, 100]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
+            animate={animations.slideBar.animate}
             style={{ width: "50px" }}
           />
         </motion.div>
 
         {/* Action buttons */}
         <motion.div
-          variants={itemVariants}
+          variants={animations.slideUp}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
         >
-          <motion.button
+          <ActionButton
             onClick={reset}
-            className="group px-8 py-4 bg-red-500/20 text-white rounded-full font-light hover:bg-red-500/30 transition-all duration-300 flex items-center space-x-3"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            icon={RefreshCw}
+            variant="danger"
+            iconAnimation="rotate"
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            >
-              <RefreshCw className="w-5 h-5" />
-            </motion.div>
-            <span>Réessayer</span>
-          </motion.button>
+            Réessayer
+          </ActionButton>
 
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -229,17 +163,14 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
 
         {/* Status indicator */}
         <motion.div
-          variants={itemVariants}
+          variants={animations.slideUp}
           className="flex justify-center space-x-2"
         >
           {Array.from({ length: 3 }, (_, i) => (
             <motion.div
               key={i}
               className="w-2 h-2 bg-red-500/30 rounded-full"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.3, 0.8, 0.3]
-              }}
+              animate={animations.statusIndicator.animate}
               transition={{
                 duration: 1.5,
                 repeat: Infinity,

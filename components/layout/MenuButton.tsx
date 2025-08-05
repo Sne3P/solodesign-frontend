@@ -6,14 +6,24 @@ import { useRouter } from "next/navigation"
 
 interface MenuButtonProps {
   initialMenuOpen?: boolean
+  menuOpen?: boolean
+  setMenuOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const MenuButton: React.FC<MenuButtonProps> = ({ initialMenuOpen = false }) => {
-  const [menuOpen, setMenuOpen] = useState(initialMenuOpen)
+const MenuButton: React.FC<MenuButtonProps> = ({ 
+  initialMenuOpen = false, 
+  menuOpen: externalMenuOpen, 
+  setMenuOpen: externalSetMenuOpen 
+}) => {
+  const [internalMenuOpen, setInternalMenuOpen] = useState(initialMenuOpen)
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 })
   const [isRedirecting, setIsRedirecting] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const router = useRouter()
+
+  // Utiliser les props externes si fournis, sinon utiliser l'état interne
+  const menuOpen = externalMenuOpen !== undefined ? externalMenuOpen : internalMenuOpen
+  const setMenuOpen = externalSetMenuOpen || setInternalMenuOpen
 
   useEffect(() => {
     const updateButtonPosition = () => {

@@ -238,12 +238,14 @@ interface GlowingCardsProps {
   children: React.ReactNode;
 }
 const GlowingCards = ({ children }: GlowingCardsProps) => {
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [globalPos, setGlobalPos] = useState({ x: 0, y: 0 })
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current.getBoundingClientRect()
-    setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setGlobalPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+    }
   }
 
   const handleMouseLeave = () => {
@@ -257,9 +259,12 @@ const GlowingCards = ({ children }: GlowingCardsProps) => {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
-      {React.Children.map(children, (child) =>
-        React.cloneElement(child, { globalPos, containerRef })
-      )}
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child as React.ReactElement<{ globalPos?: { x: number; y: number }; containerRef?: React.RefObject<HTMLDivElement> }>, { globalPos, containerRef })
+        }
+        return child
+      })}
     </motion.div>
   )
 }
@@ -271,18 +276,18 @@ const GlowingCards = ({ children }: GlowingCardsProps) => {
 interface GlowingCardProps {
   children: React.ReactNode;
   index: number;
-  globalPos: any;
-  containerRef: React.RefObject<HTMLDivElement>;
+  globalPos?: { x: number; y: number };
+  containerRef?: React.RefObject<HTMLDivElement>;
 }
 const GlowingCard = ({ children, index, globalPos, containerRef }: GlowingCardProps) => {
-  const cardRef = useRef(null)
+  const cardRef = useRef<HTMLDivElement>(null)
   const hoverState = useSpring(0, { stiffness: 300, damping: 30 })
   const localX = useMotionValue(0)
   const localY = useMotionValue(0)
 
   useEffect(() => {
     if (globalPos && cardRef.current && containerRef?.current) {
-      const cardRect = cardRef.current?.getBoundingClientRect()
+      const cardRect = cardRef.current.getBoundingClientRect()
       const containerRect = containerRef.current.getBoundingClientRect()
       const relativeX = globalPos.x - (cardRect.left - containerRect.left)
       const relativeY = globalPos.y - (cardRect.top - containerRect.top)

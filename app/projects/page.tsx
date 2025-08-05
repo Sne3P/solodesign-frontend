@@ -10,7 +10,7 @@ import BackgroundPattern from "../../components/layout/BackgroundPattern"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import ProgressBar from "../../components/layout/ProgressBar"
-import Footer from "../../components/sections/Footer"
+import FooterMinimal from "../../components/sections/FooterMinimal";
 import ProjectCard from "../../components/ProjectCard"
 import { Project } from "../../lib/types"
 import { ParallaxProvider } from 'react-scroll-parallax';
@@ -333,7 +333,7 @@ export default function ProjectsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1 }}
           >
-            <Footer />
+            <FooterMinimal />
           </motion.div>
         </div>
 

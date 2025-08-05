@@ -1,12 +1,19 @@
-import ProjectDetailClient from "./ProjectDetailClient"
+"use client";
+
+import ProjectDetailClient from "./ProjectDetailClient";
+import { ParallaxProvider } from "react-scroll-parallax";
 
 interface PageProps {
-  params: { id: string }
+  params: { id: string };
 }
 
-const ProjectPage = async ({ params }: PageProps) => {
-  const { id } = await params
-  return <ProjectDetailClient id={id} />
-}
+const ProjectPage = ({ params }: PageProps) => {
+  const { id } = params;
+  return (
+    <ParallaxProvider>
+      <ProjectDetailClient id={id} />
+    </ParallaxProvider>
+  );
+};
 
-export default ProjectPage
+export default ProjectPage;

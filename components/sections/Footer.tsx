@@ -1,28 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowUp, Heart, Github, Linkedin, Twitter } from 'lucide-react';
 
 const socialLinks = [
-  { icon: Github, href: "#", label: "Github" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" }
+  { icon: Github, href: "https://github.com", label: "Github" },
+  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+  { icon: Twitter, href: "https://twitter.com", label: "Twitter" }
 ];
 
 const footerLinks = [
-  { label: "Conditions d'utilisation", href: "#" },
-  { label: "Politique de confidentialité", href: "#" },
-  { label: "Mentions légales", href: "#" }
+  { label: "Conditions d'utilisation", href: "/terms" },
+  { label: "Politique de confidentialité", href: "/privacy" },
+  { label: "Mentions légales", href: "/legal" }
+];
+
+const navigationLinks = [
+  { label: "Accueil", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "Projets", href: "/projects" },
+  { label: "À propos", href: "/about-us" },
+  { label: "Contact", href: "/contact" }
 ];
 
 const Footer = () => {
+  const [newsletterMessage, setNewsletterMessage] = useState("");
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleNewsletterClick = () => {
+    setNewsletterMessage("Momentanément indisponible, veuillez réessayer plus tard.");
+    setTimeout(() => setNewsletterMessage(""), 3000);
+  };
+
   return (
     <Parallax speed={-3}>
-      <footer className="bg-gray-950 text-white relative overflow-hidden">
+      <footer className="text-white relative overflow-hidden">
         {/* Background Pattern */}
         <motion.div 
           className="absolute inset-0 opacity-[0.02]"
@@ -115,6 +130,7 @@ const Footer = () => {
                     }}
                   />
                   <motion.button
+                    onClick={handleNewsletterClick}
                     className="px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-gray-200 transition-colors"
                     whileHover={{ scale: 1.05, y: -1 }}
                     whileTap={{ scale: 0.98 }}
@@ -122,6 +138,16 @@ const Footer = () => {
                     S&apos;abonner
                   </motion.button>
                 </motion.div>
+                {newsletterMessage && (
+                  <motion.div
+                    className="text-red-500 mt-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    {newsletterMessage}
+                  </motion.div>
+                )}
               </motion.div>
 
               {/* Quick Links */}
@@ -133,10 +159,10 @@ const Footer = () => {
               >
                 <h4 className="text-lg font-semibold mb-6 text-white">Navigation</h4>
                 <ul className="space-y-3">
-                  {['Accueil', 'Services', 'Projets', 'À propos', 'Contact'].map((item, index) => (
-                    <motion.li key={item}>
+                  {navigationLinks.map((item, index) => (
+                    <motion.li key={item.label}>
                       <motion.a
-                        href={`#${item.toLowerCase()}`}
+                        href={item.href}
                         className="text-gray-400 hover:text-white transition-colors block"
                         whileHover={{ x: 5, color: "#ffffff" }}
                         transition={{ duration: 0.2 }}
@@ -145,7 +171,7 @@ const Footer = () => {
                         viewport={{ once: true }}
                         custom={index}
                       >
-                        {item}
+                        {item.label}
                       </motion.a>
                     </motion.li>
                   ))}
@@ -171,7 +197,7 @@ const Footer = () => {
                     whileHover={{ x: 5 }}
                     transition={{ duration: 0.2 }}
                   >
-                    +33 1 23 45 67 89
+                    +33 06 60 94 98 79
                   </motion.p>
                   <motion.p
                     whileHover={{ x: 5 }}
@@ -239,7 +265,7 @@ const Footer = () => {
                 >
                   <Heart size={14} />
                 </motion.span>
-                à Paris
+                à la Réunion 
               </motion.p>
 
               <div className="flex space-x-6">

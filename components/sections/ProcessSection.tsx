@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Palette, CheckCircle, Rocket, HeadphonesIcon } from 'lucide-react';
+import ActionButton from '../ui/ActionButton';
 
 const ProcessSection = () => {
   const steps = [
@@ -229,21 +230,13 @@ const ProcessSection = () => {
           <p className="text-lg text-gray-300 mb-8">
             Prêt à démarrer votre projet ? • Devis gratuit • Prototype offert
           </p>
-          <motion.button
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full font-bold text-lg transition-all duration-200"
-            whileHover={{ 
-              scale: 1.05,
-              y: -3
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ 
-              type: "spring", 
-              stiffness: 400, 
-              damping: 20 
-            }}
+          <ActionButton
+            variant="primary"
+            size="lg"
+            onClick={() => window.location.href = '/contact'}
           >
             Discutons de votre projet
-          </motion.button>
+          </ActionButton>
         </motion.div>
       </div>
     </section>

@@ -10,6 +10,7 @@ import SocialLinks from "../../../components/layout/SocialLinks"
 import MenuButton from "../../../components/layout/MenuButton"
 import Footer from "../../../components/sections/Footer"
 import ScrollArrow from "../../../components/layout/ScrollArrow"
+import ActionButton from "../../../components/ui/ActionButton"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../../components/layout/Cursor'), { ssr: false });
 import { Project } from "../../../lib/types"
@@ -117,14 +118,13 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Erreur</h1>
           <p className="text-gray-600 mb-8">{error}</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <ActionButton
+            variant="primary"
+            size="md"
             onClick={handleBackClick}
-            className="bg-black text-white px-6 py-3 rounded-lg"
           >
             Retour à l'accueil
-          </motion.button>
+          </ActionButton>
         </div>
       </div>
     )

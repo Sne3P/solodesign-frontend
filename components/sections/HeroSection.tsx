@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
 import { Parallax } from 'react-scroll-parallax';
+import ActionButton from '../ui/ActionButton';
+import SecondaryButton from '../ui/SecondaryButton';
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -63,8 +65,8 @@ const HeroSection = () => {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.4 }}
               whileHover={{ 
-                scale: 1.05,
-                transition: { duration: 0.2 }
+                scale: 1.08,
+                transition: { duration: 0.12 }
               }}
             >
               <Sparkles className="w-5 h-5 text-white" />
@@ -95,7 +97,12 @@ const HeroSection = () => {
                     whileHover={{
                       y: -8,
                       scale: 1.12,
-                      transition: { duration: 0.18 }
+                      transition: { 
+                        type: "spring",
+                        stiffness: 800,
+                        damping: 10,
+                        duration: 0.12
+                      }
                     }}
                   >
                     {letter}
@@ -131,19 +138,17 @@ const HeroSection = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 1.0 }}
             >
-              <motion.button
-                className="relative overflow-hidden bg-white text-black px-6 py-3 rounded-full font-bold text-base flex items-center space-x-2 group shadow-lg"
-                whileHover={{ 
-                  scale: 1.04,
-                  transition: { duration: 0.18 }
+              <ActionButton
+                variant="primary"
+                size="lg"
+                icon={ArrowRight}
+                onClick={() => {
+                  const projectsSection = document.getElementById('projects-section');
+                  projectsSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                whileTap={{ scale: 0.97 }}
               >
-                <span className="relative z-10 group-hover:text-white transition-colors duration-200">
-                  Découvrir
-                </span>
-                <ArrowRight className="w-5 h-5 relative z-10 group-hover:text-white transition-colors duration-200" />
-              </motion.button>
+                Découvrir
+              </ActionButton>
 
               {/* Response Time Badge */}
               <motion.div
@@ -170,7 +175,10 @@ const HeroSection = () => {
       >
         <motion.div
           className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
-          whileHover={{ borderColor: 'rgba(255,255,255,0.6)' }}
+          whileHover={{ 
+            borderColor: 'rgba(255,255,255,0.8)',
+            transition: { duration: 0.12 }
+          }}
         >
           <motion.div
             className="w-1 h-3 bg-white rounded-full mt-2"

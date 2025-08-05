@@ -7,6 +7,7 @@ import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
 import { useRouter } from 'next/navigation';
 import { Project } from '../../lib/types';
+import ActionButton from '../ui/ActionButton';
 
 const ProjectsSection = () => {
   const [projects, setProjects] = useState<Project[]>([])
@@ -148,9 +149,15 @@ const ProjectsSection = () => {
                     <motion.div
                       className="project-image relative group cursor-pointer"
                       whileHover={{ 
-                        scale: 1.03, 
+                        scale: 1.05, 
                         rotate: isEven ? -1 : 1,
-                        y: -8
+                        y: -8,
+                        transition: { 
+                          type: "spring", 
+                          stiffness: 800, 
+                          damping: 10,
+                          duration: 0.12
+                        }
                       }}
                       transition={{ 
                         type: "spring", 
@@ -323,7 +330,7 @@ const ProjectsSection = () => {
                     </motion.div>
                   )}
 
-                  {/* Bouton avec animation ultra-fluide et réactive */}
+                  {/* Bouton avec nouveau système centralisé */}
                   <motion.div
                     className="pt-4 sm:pt-6"
                     variants={{
@@ -339,78 +346,15 @@ const ProjectsSection = () => {
                       }
                     }}
                   >
-                    <motion.button
-                      className="relative overflow-hidden bg-white text-black 
-                                 px-8 py-4 sm:px-10 sm:py-5 md:px-12 md:py-6
-                                 rounded-full font-bold text-base sm:text-lg md:text-xl
-                                 flex items-center justify-center space-x-3 sm:space-x-4 
-                                 mx-auto lg:mx-0 group shadow-lg transform-gpu"
+                    <ActionButton
+                      variant="primary"
+                      size="lg"
+                      icon={ArrowRight}
                       onClick={() => handleProjectClick(project.id)}
-                      whileHover={{ 
-                        scale: 1.06,
-                        y: -4
-                      }}
-                      whileTap={{ 
-                        scale: 0.97,
-                        y: 0
-                      }}
-                      transition={{ 
-                        type: "spring", 
-                        stiffness: 350, 
-                        damping: 18,
-                        mass: 0.7,
-                        delay: 0
-                      }}
-                      animate={{
-                        scale: 1,
-                        y: 0
-                      }}
+                      className="mx-auto lg:mx-0"
                     >
-                      {/* Effet de background animé au hover */}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-full"
-                        initial={{ scale: 0, opacity: 0 }}
-                        whileHover={{ 
-                          scale: 1.1,
-                          opacity: 1
-                        }}
-                        transition={{ 
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 15,
-                          mass: 0.6
-                        }}
-                      />
-                      
-                      <motion.span 
-                        className="relative z-10 transition-colors duration-200 group-hover:text-gray-800"
-                        whileHover={{ x: 3 }}
-                        transition={{ 
-                          type: "spring",
-                          stiffness: 350,
-                          damping: 15
-                        }}
-                      >
-                        Voir le Projet
-                      </motion.span>
-                      
-                      <motion.div
-                        className="relative z-10"
-                        whileHover={{ 
-                          x: 6,
-                          rotate: 15
-                        }}
-                        transition={{ 
-                          type: "spring", 
-                          stiffness: 350, 
-                          damping: 12,
-                          mass: 0.4
-                        }}
-                      >
-                        <ArrowRight size={20} className="sm:w-6 sm:h-6 md:w-7 md:h-7 
-                                                         transition-colors duration-200 group-hover:text-gray-800" />
-                      </motion.div>
-                    </motion.button>
+                      Voir le Projet
+                    </ActionButton>
                   </motion.div>
                 </motion.div>
               </motion.div>

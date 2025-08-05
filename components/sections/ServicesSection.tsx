@@ -3,6 +3,8 @@ import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { Paintbrush, Code, Lightbulb, ArrowRight, Sparkles } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
+import SecondaryButton from '../ui/SecondaryButton';
+import ActionButton from '../ui/ActionButton';
 
 const services = [
   { 
@@ -102,9 +104,14 @@ const ServicesSection = () => (
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               whileHover={{ 
-                scale: 1.03,
+                scale: 1.05,
                 y: -5,
-                transition: { duration: 0.3 }
+                transition: { 
+                  type: "spring", 
+                  stiffness: 800, 
+                  damping: 10,
+                  duration: 0.12
+                }
               }}
               variants={{
                 hidden: { 
@@ -224,19 +231,14 @@ const ServicesSection = () => (
                 </motion.ul>
 
                 {/* CTA */}
-                <motion.div
-                  className="flex items-center text-black font-medium cursor-pointer group/cta"
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
+                <SecondaryButton
+                  variant="minimal"
+                  size="sm"
+                  icon={ArrowRight}
+                  onClick={() => window.location.href = '/services'}
                 >
-                  <span className="mr-2">En savoir plus</span>
-                  <motion.div
-                    whileHover={{ x: 3, scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <ArrowRight size={16} />
-                  </motion.div>
-                </motion.div>
+                  En savoir plus
+                </SecondaryButton>
               </motion.div>
 
               {/* Hover overlay */}
@@ -257,17 +259,13 @@ const ServicesSection = () => (
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <motion.button
-            className="bg-black text-white px-8 py-4 rounded-lg font-bold hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ 
-              scale: 1.05, 
-              y: -2,
-              transition: { duration: 0.2 }
-            }}
-            whileTap={{ scale: 0.98 }}
+          <ActionButton
+            variant="primary"
+            size="lg"
+            onClick={() => {/* Navigation vers contact ou projet */}}
           >
             Démarrer un projet
-          </motion.button>
+          </ActionButton>
         </motion.div>
       </Parallax>
     </div>

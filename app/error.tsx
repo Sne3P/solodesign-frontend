@@ -142,7 +142,6 @@ const Error: React.FC<ErrorProps> = ({ error, reset }) => {
             onClick={reset}
             icon={RefreshCw}
             variant="danger"
-            iconAnimation="rotate"
           >
             Réessayer
           </ActionButton>

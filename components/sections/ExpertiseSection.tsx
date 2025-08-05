@@ -11,6 +11,8 @@ import {
   Zap,
   ArrowRight
 } from 'lucide-react';
+import SecondaryButton from '../ui/SecondaryButton';
+import ActionButton from '../ui/ActionButton';
 
 const ExpertiseSection = () => {
   const services = [
@@ -110,8 +112,14 @@ const ExpertiseSection = () => {
                            group-hover:bg-white/10 group-hover:border-white/20
                            overflow-hidden"
                 whileHover={{ 
-                  scale: 1.02,
-                  y: -8
+                  scale: 1.05,
+                  y: -8,
+                  transition: { 
+                    type: "spring", 
+                    stiffness: 800, 
+                    damping: 10,
+                    duration: 0.12
+                  }
                 }}
                 transition={{ 
                   type: "spring", 
@@ -166,17 +174,17 @@ const ExpertiseSection = () => {
                   ))}
                 </div>
 
-                {/* Bouton d'action */}
-                <motion.button
-                  className="inline-flex items-center space-x-2 text-white font-medium 
-                             group-hover:text-white transition-colors opacity-0 group-hover:opacity-100"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ x: 5 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span>En savoir plus</span>
-                  <ArrowRight className="w-4 h-4" />
-                </motion.button>
+                {/* Bouton d'action avec nouveau système */}
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <SecondaryButton
+                    variant="ghost"
+                    size="sm"
+                    icon={ArrowRight}
+                    onClick={() => window.location.href = '/services'}
+                  >
+                    En savoir plus
+                  </SecondaryButton>
+                </div>
 
                 {/* Effet de glow */}
                 <motion.div
@@ -203,22 +211,14 @@ const ExpertiseSection = () => {
             <p className="text-gray-300 mb-8 leading-relaxed">
               Discutons de vos besoins et trouvons ensemble la solution parfaite pour votre entreprise
             </p>
-            <motion.button
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-100 transition-colors duration-200 group"
-              whileHover={{ 
-                scale: 1.05,
-                y: -3
-              }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 300, 
-                damping: 20 
-              }}
+            <ActionButton
+              variant="primary"
+              size="lg"
+              icon={ArrowRight}
+              onClick={() => window.location.href = '/contact'}
             >
-              <span>Commencer un projet</span>
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+              Commencer un projet
+            </ActionButton>
           </div>
         </motion.div>
       </div>

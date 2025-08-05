@@ -1,8 +1,9 @@
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Clock } from 'lucide-react';
+import { Send, Mail, Phone, MapPin, Clock, Star } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
+import ActionButton from '../ui/ActionButton';
 
 const contactInfo = [
   { icon: Mail, label: "Email", value: "hello@solodesign.fr", href: "mailto:hello@solodesign.fr" },
@@ -198,9 +199,7 @@ const ContactSection = () => (
                 />
               </motion.div>
 
-              <motion.button
-                type="submit"
-                className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+              <motion.div
                 variants={{
                   hidden: { opacity: 0, y: 20, scale: 0.9 },
                   visible: { 
@@ -215,16 +214,17 @@ const ContactSection = () => (
                     }
                   }
                 }}
-                whileHover={{ 
-                  scale: 1.02, 
-                  y: -2,
-                  transition: { duration: 0.2 }
-                }}
-                whileTap={{ scale: 0.98 }}
               >
-                <Send size={20} />
-                <span>Envoyer le message</span>
-              </motion.button>
+                <ActionButton
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  icon={Send}
+                  fullWidth
+                >
+                  Envoyer le message
+                </ActionButton>
+              </motion.div>
             </motion.form>
           </Parallax>
         </div>
@@ -313,7 +313,12 @@ const ContactSection = () => (
                       whileHover={{ 
                         scale: 1.1, 
                         rotate: 5,
-                        transition: { duration: 0.2 }
+                        transition: { 
+                          type: "spring", 
+                          stiffness: 800, 
+                          damping: 10,
+                          duration: 0.12
+                        }
                       }}
                     >
                       <info.icon size={20} />

@@ -30,6 +30,7 @@ import LogoTitle from "../../components/layout/LogoTitle"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import Footer from "../../components/sections/Footer"
+import ActionButton from "../../components/ui/ActionButton"
 import React from "react"
 
 // -------------------- Data --------------------
@@ -563,14 +564,13 @@ const ServicesPage = () => {
         >
           Prêt à Innover ?
         </motion.h2>
-        <motion.button
-          className="bg-white text-black px-8 py-3 rounded-full text-lg font-bold"
-          whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
-          whileTap={{ scale: 0.9 }}
+        <ActionButton
+          variant="primary"
+          size="lg"
           onClick={() => router.push("/contact")}
         >
           Contactez-nous
-        </motion.button>
+        </ActionButton>
       </motion.div>
 
       <Footer />

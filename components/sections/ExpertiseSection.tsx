@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Monitor, 
@@ -9,12 +9,80 @@ import {
   Globe, 
   Camera, 
   Zap,
-  ArrowRight
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
+import { 
+  navButtonVariants,
+  mobileSliderVariants
+} from '@/lib/animations';
 import SecondaryButton from '../ui/SecondaryButton';
 import ActionButton from '../ui/ActionButton';
 
 const ExpertiseSection = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Animations ultra-dynamiques avec effet rebond
+  const DYNAMIC_BOUNCE_HOVER = {
+    initial: { 
+      scale: 1, 
+      y: 0,
+      boxShadow: "0 4px 15px rgba(0,0,0,0.1)" 
+    },
+    hover: { 
+      scale: 1.08,
+      y: -10,
+      boxShadow: "0 25px 50px rgba(0,0,0,0.25)",
+      transition: { 
+        type: "spring", 
+        stiffness: 1200, 
+        damping: 12,
+        mass: 0.5
+      }
+    },
+    tap: { 
+      scale: 0.95,
+      y: -2,
+      transition: { 
+        type: "spring", 
+        stiffness: 1500, 
+        damping: 25,
+        mass: 0.3
+      }
+    }
+  };
+
+  const ULTRA_FAST_BOUNCE = {
+    initial: { 
+      scale: 1, 
+      y: 0,
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)" 
+    },
+    hover: { 
+      scale: 1.06,
+      y: -8,
+      boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+      transition: { 
+        type: "spring", 
+        stiffness: 1400, 
+        damping: 10,
+        mass: 0.4
+      }
+    },
+    tap: { 
+      scale: 0.96,
+      y: -1,
+      transition: { 
+        type: "spring", 
+        stiffness: 1600, 
+        damping: 20,
+        mass: 0.2
+      }
+    }
+  };
+
   const services = [
     {
       icon: <Monitor className="w-8 h-8" />,
@@ -60,6 +128,28 @@ const ExpertiseSection = () => {
     }
   ];
 
+  // Fonction pour naviguer dans le slider mobile
+  const scrollToSlide = (index: number) => {
+    if (sliderRef.current) {
+      const slideWidth = sliderRef.current.scrollWidth / services.length;
+      sliderRef.current.scrollTo({
+        left: slideWidth * index,
+        behavior: 'smooth'
+      });
+      setCurrentSlide(index);
+    }
+  };
+
+  const nextSlide = () => {
+    const next = (currentSlide + 1) % services.length;
+    scrollToSlide(next);
+  };
+
+  const prevSlide = () => {
+    const prev = (currentSlide - 1 + services.length) % services.length;
+    scrollToSlide(prev);
+  };
+
   return (
     <section className="py-20 sm:py-24 md:py-28 lg:py-32 xl:py-36 relative">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
@@ -92,8 +182,8 @@ const ExpertiseSection = () => {
           </p>
         </motion.div>
 
-        {/* Grille de services */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+        {/* Desktop Grid - Hidden on mobile */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
           {services.map((service, index) => (
             <motion.div
               key={index}
@@ -108,29 +198,22 @@ const ExpertiseSection = () => {
             >
               <motion.div
                 className="relative bg-white/5 backdrop-blur-sm border border-white/10 
-                           rounded-2xl p-8 h-full transition-all duration-300
-                           group-hover:bg-white/10 group-hover:border-white/20
-                           overflow-hidden"
-                whileHover={{ 
-                  scale: 1.05,
-                  y: -8,
-                  transition: { 
-                    type: "spring", 
-                    stiffness: 800, 
-                    damping: 10,
-                    duration: 0.12
-                  }
-                }}
-                transition={{ 
-                  type: "spring", 
-                  stiffness: 300, 
-                  damping: 20 
-                }}
+                           rounded-2xl p-8 h-full overflow-hidden"
+                variants={DYNAMIC_BOUNCE_HOVER}
+                initial="initial"
+                whileHover="hover"
+                whileTap="tap"
               >
                 {/* Gradient background au hover */}
                 <motion.div
-                  className={`absolute inset-0 opacity-0 group-hover:opacity-10 
-                             bg-gradient-to-br ${service.color} transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-gradient-to-br ${service.color}`}
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 0.1 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 600, 
+                    damping: 20 
+                  }}
                 />
 
                 {/* Icône */}
@@ -139,9 +222,14 @@ const ExpertiseSection = () => {
                              bg-gradient-to-br ${service.color} rounded-xl mb-6 text-white shadow-lg`}
                   whileHover={{ 
                     rotate: 360,
-                    scale: 1.1 
+                    scale: 1.15 
                   }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 600, 
+                    damping: 8,
+                    duration: 0.15
+                  }}
                 >
                   {service.icon}
                 </motion.div>
@@ -196,6 +284,145 @@ const ExpertiseSection = () => {
           ))}
         </div>
 
+        {/* Mobile Slider */}
+        <div className="md:hidden relative">
+          {/* Navigation Arrows */}
+          <div className="flex justify-between items-center mb-6">
+            <motion.button
+              onClick={prevSlide}
+              className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm 
+                         border border-white/20 rounded-full text-white hover:bg-white/20 transition-all"
+              variants={navButtonVariants}
+              initial="initial"
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <ChevronLeft size={20} />
+            </motion.button>
+            
+            <div className="flex space-x-2">
+              {services.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    currentSlide === index 
+                      ? 'bg-white w-6' 
+                      : 'bg-white/30 hover:bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <motion.button
+              onClick={nextSlide}
+              className="flex items-center justify-center w-12 h-12 bg-white/10 backdrop-blur-sm 
+                         border border-white/20 rounded-full text-white hover:bg-white/20 transition-all"
+              variants={navButtonVariants}
+              initial="initial"
+              whileHover="hover"
+              whileTap="tap"
+            >
+              <ChevronRight size={20} />
+            </motion.button>
+          </div>
+
+          {/* Slider Container */}
+          <motion.div
+            ref={sliderRef}
+            className="flex overflow-x-auto scrollbar-hide mobile-slider gap-6 pb-4"
+            variants={mobileSliderVariants}
+            initial="initial"
+            animate="animate"
+          >
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                className="flex-none w-[85vw] max-w-sm"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <motion.div
+                  className="relative bg-white/5 backdrop-blur-sm border border-white/10 
+                             rounded-2xl p-6 h-full overflow-hidden slider-item"
+                  variants={ULTRA_FAST_BOUNCE}
+                  initial="initial"
+                  whileHover="hover"
+                  whileTap="tap"
+                >
+                  {/* Gradient background au hover */}
+                  <motion.div
+                    className={`absolute inset-0 bg-gradient-to-br ${service.color}`}
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 0.1 }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 800, 
+                      damping: 15 
+                    }}
+                  />
+
+                  {/* Icône */}
+                  <motion.div
+                    className={`inline-flex items-center justify-center w-14 h-14 
+                               bg-gradient-to-br ${service.color} rounded-xl mb-4 text-white shadow-lg`}
+                    whileHover={{ 
+                      rotate: 360,
+                      scale: 1.2 
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 800, 
+                      damping: 10,
+                      duration: 0.12
+                    }}
+                  >
+                    {service.icon}
+                  </motion.div>
+
+                  {/* Titre */}
+                  <h3 className="text-lg font-bold text-white mb-3">
+                    {service.title}
+                  </h3>
+
+                  {/* Description */}
+                  <p className="text-gray-300 mb-4 text-sm leading-relaxed">
+                    {service.description}
+                  </p>
+
+                  {/* Features */}
+                  <div className="space-y-2 mb-4">
+                    {service.features.slice(0, 3).map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-center space-x-2">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${service.color}`} />
+                        <span className="text-xs text-gray-400">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bouton d'action */}
+                  <SecondaryButton
+                    variant="ghost"
+                    size="sm"
+                    icon={ArrowRight}
+                    onClick={() => window.location.href = '/services'}
+                  >
+                    En savoir plus
+                  </SecondaryButton>
+
+                  {/* Effet de glow */}
+                  <motion.div
+                    className={`absolute -inset-1 bg-gradient-to-r ${service.color} rounded-2xl 
+                               opacity-0 hover:opacity-20 blur-xl transition-opacity duration-300 -z-10`}
+                  />
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+
         {/* Call to action */}
         <motion.div
           className="text-center mt-16 sm:mt-20"
@@ -204,22 +431,60 @@ const ExpertiseSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 max-w-4xl mx-auto">
+          <motion.div 
+            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 max-w-4xl mx-auto"
+            whileHover={{ 
+              scale: 1.02,
+              y: -5,
+              transition: { 
+                type: "spring", 
+                stiffness: 400, 
+                damping: 15
+              }
+            }}
+            whileTap={{ 
+              scale: 0.98,
+              transition: { 
+                type: "spring", 
+                stiffness: 600, 
+                damping: 20
+              }
+            }}
+          >
             <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               Un projet en tête ?
             </h3>
             <p className="text-gray-300 mb-8 leading-relaxed">
               Discutons de vos besoins et trouvons ensemble la solution parfaite pour votre entreprise
             </p>
-            <ActionButton
-              variant="primary"
-              size="lg"
-              icon={ArrowRight}
-              onClick={() => window.location.href = '/contact'}
+            <motion.div
+              whileHover={{ 
+                scale: 1.05,
+                transition: { 
+                  type: "spring", 
+                  stiffness: 600, 
+                  damping: 12
+                }
+              }}
+              whileTap={{ 
+                scale: 0.95,
+                transition: { 
+                  type: "spring", 
+                  stiffness: 800, 
+                  damping: 15
+                }
+              }}
             >
-              Commencer un projet
-            </ActionButton>
-          </div>
+              <ActionButton
+                variant="primary"
+                size="lg"
+                icon={ArrowRight}
+                onClick={() => window.location.href = '/contact'}
+              >
+                Commencer un projet
+              </ActionButton>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

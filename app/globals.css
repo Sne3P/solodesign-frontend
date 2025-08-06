@@ -156,4 +156,26 @@ body {
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+
+  /* Slider mobile optimisé */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Smooth scroll pour mobile */
+  .mobile-slider {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Amélioration des performances du slider */
+  .slider-item {
+    will-change: transform;
+    transform: translateZ(0);
+  }
 }

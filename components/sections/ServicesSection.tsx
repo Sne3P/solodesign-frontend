@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { 
   Palette, 
   Code, 
@@ -12,10 +12,96 @@ import {
   Search,
   Smartphone,
   Camera,
-  Megaphone
+  Megaphone,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { slideUpStaggerVariants } from '@/lib/animations';
 import SectionTitle from '../ui/SectionTitle';
+import SecondaryButton from '../ui/SecondaryButton';
+
+// Animations locales optimisées pour performance maximale
+const ULTRA_FAST_HOVER = {
+  initial: { 
+    scale: 1, 
+    y: 0,
+    boxShadow: "0 2px 4px rgba(0,0,0,0.05)" 
+  },
+  hover: { 
+    scale: 1.04,
+    y: -4,
+    boxShadow: "0 15px 35px rgba(0,0,0,0.15)",
+    transition: {
+      type: "spring",
+      stiffness: 1000,
+      damping: 10,
+      mass: 0.3
+    }
+  },
+  tap: { 
+    scale: 0.97,
+    y: 0,
+    transition: {
+      type: "spring",
+      stiffness: 1400,
+      damping: 12,
+      mass: 0.2
+    }
+  }
+};
+
+const CARD_DYNAMIC_HOVER = {
+  initial: { 
+    scale: 1, 
+    y: 0,
+    borderColor: "rgba(229, 231, 235, 1)", // gray-200
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)" 
+  },
+  hover: { 
+    scale: 1.05,
+    y: -8,
+    borderColor: "rgba(0, 0, 0, 1)", // black
+    boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+    transition: {
+      type: "spring",
+      stiffness: 800,
+      damping: 12,
+      mass: 0.4
+    }
+  },
+  tap: { 
+    scale: 0.96,
+    y: -2,
+    transition: {
+      type: "spring",
+      stiffness: 1200,
+      damping: 15,
+      mass: 0.3
+    }
+  }
+};
+
+const NAV_BUTTON = {
+  initial: { 
+    scale: 1, 
+    backgroundColor: "rgba(255, 255, 255, 1)",
+    borderColor: "rgba(209, 213, 219, 1)", // gray-300
+    color: "rgba(107, 114, 128, 1)" // gray-500
+  },
+  hover: { 
+    scale: 1.1,
+    backgroundColor: "rgba(0, 0, 0, 1)",
+    borderColor: "rgba(0, 0, 0, 1)",
+    color: "rgba(255, 255, 255, 1)",
+    transition: { 
+      duration: 0.15,
+      ease: "easeOut"
+    }
+  },
+  tap: { 
+    scale: 0.95,
+    transition: { duration: 0.1 }
+  }
+};
 
 const services = [
   { 
@@ -64,15 +150,48 @@ const additionalServices = [
   { title: "Nom de Domaine", icon: Globe, desc: "Gestion & renouvellement" }
 ];
 
-const ServicesSection = () => (
-  <section id="services" className="py-16 sm:py-20 lg:py-24 bg-white text-black relative overflow-hidden">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      {/* Header Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+const ServicesSection = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+
+  // Mobile slider controls optimisés
+  const scrollToSlide = (direction: 'prev' | 'next') => {
+    if (!scrollRef.current) return;
+    
+    const container = scrollRef.current;
+    const cardWidth = 150 + 16; // width + gap
+    const itemsPerView = 2;
+    const maxSlide = Math.ceil(additionalServices.length / itemsPerView) - 1;
+    
+    let newSlide = currentSlide;
+    if (direction === 'next' && currentSlide < maxSlide) {
+      newSlide = currentSlide + 1;
+    } else if (direction === 'prev' && currentSlide > 0) {
+      newSlide = currentSlide - 1;
+    }
+    
+    if (newSlide !== currentSlide) {
+      setCurrentSlide(newSlide);
+      
+      // Scroll fluide avec easing
+      const targetPosition = newSlide * cardWidth * itemsPerView;
+      container.scrollTo({
+        left: targetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <section ref={sectionRef} id="services" className="py-16 sm:py-20 lg:py-24 bg-white text-black relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         className="text-center mb-12 sm:mb-16 lg:mb-20"
       >
         <SectionTitle>Services</SectionTitle>
@@ -94,31 +213,34 @@ const ServicesSection = () => (
           <motion.div
             key={service.titre}
             className="group cursor-pointer"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            whileHover={{ y: -8 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            variants={slideUpStaggerVariants}
+            initial="initial"
+            animate={isInView ? "initial" : "initial"}
+            whileHover="hover"
+            whileTap="tap"
+            variants={CARD_DYNAMIC_HOVER}
+            style={{ perspective: 1000 }}
           >
-            <div className="bg-white border border-gray-100 p-6 sm:p-8 h-full transition-all duration-300 hover:border-black hover:shadow-xl">
+            <div className="bg-white border border-gray-200 p-6 sm:p-8 h-full transition-all duration-200 hover:border-black hover:shadow-xl rounded-lg">
               <div className="flex flex-col space-y-6">
                 {/* Icon */}
                 <motion.div 
-                  className="w-14 h-14 sm:w-16 sm:h-16 border border-gray-200 flex items-center justify-center transition-all duration-300 group-hover:border-black group-hover:bg-black"
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
+                  className="w-14 h-14 sm:w-16 sm:h-16 border border-gray-200 flex items-center justify-center transition-all duration-200 group-hover:border-black group-hover:bg-black rounded-lg"
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -10 }}
                   transition={{ 
                     type: "spring", 
-                    stiffness: 200, 
+                    stiffness: 400, 
                     damping: 15, 
-                    delay: index * 0.1 + 0.3 
+                    delay: index * 0.1 + 0.4 
+                  }}
+                  whileHover={{
+                    rotate: 5,
+                    transition: { duration: 0.2 }
                   }}
                 >
                   <service.icon 
                     size={20} 
-                    className="text-gray-600 transition-colors duration-300 group-hover:text-white sm:text-[24px]" 
+                    className="text-gray-600 transition-colors duration-200 group-hover:text-white sm:text-[24px]" 
                   />
                 </motion.div>
 
@@ -150,30 +272,44 @@ const ServicesSection = () => (
       {/* Additional Services Section */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
         className="mb-12 sm:mb-16 lg:mb-20"
       >
-        <h3 className="text-xl sm:text-2xl font-medium text-center text-black mb-8 sm:mb-12">
+        <motion.h3 
+          className="text-xl sm:text-2xl font-medium text-center text-black mb-8 sm:mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
           Services Complémentaires
-        </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+        </motion.h3>
+        
+        {/* Desktop Grid - Optimisé */}
+        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-6 lg:gap-8">
           {additionalServices.map((service, index) => (
             <motion.div
               key={service.title}
-              className="group text-center p-4 sm:p-6 border border-gray-100 transition-all duration-300 hover:border-black hover:shadow-lg"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 + 0.4 }}
-              whileHover={{ y: -4 }}
+              className="group text-center p-6 border border-gray-200 transition-all duration-200 rounded-lg cursor-pointer"
+              initial="initial"
+              animate={isInView ? "initial" : "initial"}
+              whileHover="hover"
+              whileTap="tap"
+              variants={ULTRA_FAST_HOVER}
+              transition={{ delay: index * 0.05 + 0.8 }}
             >
-              <service.icon 
-                size={20} 
-                className="mx-auto mb-3 text-gray-600 group-hover:text-black transition-colors duration-300 sm:text-[24px]" 
-              />
-              <h4 className="text-xs sm:text-sm font-medium text-black mb-1">
+              <motion.div
+                whileHover={{ 
+                  rotate: [0, -5, 5, 0],
+                  transition: { duration: 0.3 }
+                }}
+              >
+                <service.icon 
+                  size={24} 
+                  className="mx-auto mb-3 text-gray-600 group-hover:text-black transition-colors duration-200" 
+                />
+              </motion.div>
+              <h4 className="text-sm font-medium text-black mb-1">
                 {service.title}
               </h4>
               <p className="text-xs text-gray-500">
@@ -181,6 +317,125 @@ const ServicesSection = () => (
               </p>
             </motion.div>
           ))}
+        </div>
+
+        {/* Mobile Slider - Ultra Responsive */}
+        <div className="md:hidden relative">
+          <motion.div 
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 mobile-slider px-2"
+            style={{ 
+              scrollSnapType: 'x mandatory',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.4, delay: 0.8 }}
+          >
+            {additionalServices.map((service, index) => (
+              <motion.div
+                key={service.title}
+                className="group text-center p-4 border border-gray-200 transition-all duration-200 min-w-[150px] max-w-[150px] flex-shrink-0 rounded-xl slider-item cursor-pointer"
+                style={{ scrollSnapAlign: 'center' }}
+                initial={{ opacity: 0, x: 30, scale: 0.9 }}
+                animate={isInView ? { 
+                  opacity: 1, 
+                  x: 0, 
+                  scale: 1,
+                  transition: { delay: index * 0.1 + 0.9, duration: 0.4 }
+                } : { opacity: 0, x: 30, scale: 0.9 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  y: -4,
+                  borderColor: "#000000",
+                  boxShadow: "0 8px 25px rgba(0,0,0,0.12)",
+                  transition: { duration: 0.15 }
+                }}
+                whileTap={{ 
+                  scale: 0.95,
+                  transition: { duration: 0.1 }
+                }}
+              >
+                <motion.div
+                  whileHover={{ 
+                    rotate: [0, -8, 8, 0],
+                    scale: 1.1,
+                    transition: { duration: 0.3 }
+                  }}
+                >
+                  <service.icon 
+                    size={20} 
+                    className="mx-auto mb-3 text-gray-600 group-hover:text-black transition-colors duration-200" 
+                  />
+                </motion.div>
+                <h4 className="text-sm font-medium text-black mb-1 leading-tight">
+                  {service.title}
+                </h4>
+                <p className="text-xs text-gray-500 leading-tight">
+                  {service.desc}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Navigation améliorée */}
+          <motion.div 
+            className="flex justify-center items-center gap-6 mt-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.4, delay: 1.2 }}
+          >
+            <motion.button
+              onClick={() => scrollToSlide('prev')}
+              disabled={currentSlide === 0}
+              className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+              variants={NAV_BUTTON}
+              initial="initial"
+              whileHover={currentSlide > 0 ? "hover" : "initial"}
+              whileTap={currentSlide > 0 ? "tap" : "initial"}
+            >
+              <ChevronLeft size={20} />
+            </motion.button>
+            
+            {/* Indicateurs de navigation */}
+            <div className="flex gap-3">
+              {Array.from({ length: Math.ceil(additionalServices.length / 2) }).map((_, index) => (
+                <motion.button
+                  key={index}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'bg-black scale-110' 
+                      : 'bg-gray-300 hover:bg-gray-400 hover:scale-105'
+                  }`}
+                  whileHover={{ scale: index === currentSlide ? 1.1 : 1.05 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    setCurrentSlide(index);
+                    if (scrollRef.current) {
+                      const cardWidth = 150 + 16; // width + gap
+                      scrollRef.current.scrollTo({
+                        left: index * cardWidth * 2,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                />
+              ))}
+            </div>
+
+            <motion.button
+              onClick={() => scrollToSlide('next')}
+              disabled={currentSlide === Math.ceil(additionalServices.length / 2) - 1}
+              className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200"
+              variants={NAV_BUTTON}
+              initial="initial"
+              whileHover={currentSlide < Math.ceil(additionalServices.length / 2) - 1 ? "hover" : "initial"}
+              whileTap={currentSlide < Math.ceil(additionalServices.length / 2) - 1 ? "tap" : "initial"}
+            >
+              <ChevronRight size={20} />
+            </motion.button>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -201,21 +456,16 @@ const ServicesSection = () => (
           </p>
         </div>
         
-        <motion.a
+        <SecondaryButton 
           href="/services"
-          className="group inline-flex items-center space-x-3 px-6 sm:px-8 py-3 sm:py-4 border border-black text-black hover:bg-black hover:text-white transition-all duration-300 font-light text-base sm:text-lg"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          icon={ArrowRight}
         >
-          <span>Découvrir tous nos services</span>
-          <ArrowRight 
-            size={18} 
-            className="transition-transform duration-300 group-hover:translate-x-1 sm:text-[20px]" 
-          />
-        </motion.a>
+          Découvrir tous nos services
+        </SecondaryButton>
       </motion.div>
     </div>
   </section>
-);
+  );
+};
 
 export default ServicesSection;

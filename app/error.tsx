@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Home, RefreshCw, AlertTriangle } from 'lucide-react';
 import CustomLink from '@/components/ui/CustomLink';
 import ActionButton from '@/components/ui/ActionButton';
-import { animations } from '@/lib/animations';
+import animations from '@/lib/animations';
 
 interface ErrorProps {
   error: Error & { digest?: string };

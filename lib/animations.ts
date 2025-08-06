@@ -519,8 +519,104 @@ export const createScrollProgress = (scrollYProgress: import('framer-motion').Mo
   };
 };
 
-// Export d'un objet contenant tous les variants pour faciliter l'import
-export const animations = {
+// Hover animations ultra-rapides et fluides
+const ultraFastHover: Variants = {
+  initial: { 
+    scale: 1, 
+    y: 0,
+    boxShadow: "0 0 0 rgba(0,0,0,0)" 
+  },
+  hover: { 
+    scale: 1.03,
+    y: -2,
+    boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+    transition: transitions.ultraFast
+  },
+  tap: { 
+    scale: 0.98,
+    y: 0,
+    transition: transitions.ultraFast
+  }
+};
+
+// Card hover avec élévation dynamique
+const cardHoverDynamic: Variants = {
+  initial: { 
+    scale: 1, 
+    y: 0,
+    rotateX: 0,
+    rotateY: 0,
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)" 
+  },
+  hover: { 
+    scale: 1.02,
+    y: -4,
+    rotateX: 2,
+    rotateY: 2,
+    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+    transition: {
+      type: "spring",
+      stiffness: 400,
+      damping: 15,
+      duration: 0.15
+    }
+  },
+  tap: { 
+    scale: 0.98,
+    y: -1,
+    transition: transitions.ultraFast
+  }
+};
+
+// Slider mobile optimisé
+const mobileSliderVariants = {
+  container: {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  },
+  item: {
+    hidden: { x: 60, opacity: 0 },
+    visible: { 
+      x: 0, 
+      opacity: 1,
+      transition: transitions.fast
+    }
+  }
+};
+
+// Button navigation fluide
+const navButtonVariants: Variants = {
+  initial: { 
+    scale: 1, 
+    backgroundColor: "rgba(0,0,0,0.05)",
+    borderColor: "rgba(0,0,0,0.1)"
+  },
+  hover: { 
+    scale: 1.1,
+    backgroundColor: "rgba(0,0,0,0.8)",
+    borderColor: "rgba(0,0,0,1)",
+    transition: { duration: 0.15 }
+  },
+  tap: { 
+    scale: 0.95,
+    transition: { duration: 0.1 }
+  },
+  disabled: {
+    scale: 1,
+    backgroundColor: "rgba(0,0,0,0.02)",
+    borderColor: "rgba(0,0,0,0.05)"
+  }
+};
+
+export { ultraFastHover, cardHoverDynamic, mobileSliderVariants, navButtonVariants };
+
+const animations = {
   fadeIn: fadeInVariants,
   fadeInUp: fadeInUp,
   fadeInDown: fadeInDown,

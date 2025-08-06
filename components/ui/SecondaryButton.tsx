@@ -55,14 +55,14 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
     initial: { 
       scale: 1, 
       y: 0,
-      borderColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.3)' : 'transparent',
-      backgroundColor: 'transparent'
+      borderColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+      backgroundColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)'
     },
     hover: { 
       scale: 1.05, 
       y: -3,
-      borderColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.1)',
-      backgroundColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.1)',
+      borderColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(255, 255, 255, 0.15)',
+      backgroundColor: variant === 'outline' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)',
       transition: { 
         type: "spring", 
         stiffness: 600, 

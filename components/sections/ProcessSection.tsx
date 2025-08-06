@@ -64,7 +64,7 @@ const ProcessSection = () => {
         {/* Timeline des étapes */}
         <div className="relative">
           {/* Ligne centrale pour desktop */}
-          <div className="hidden lg:block absolute left-1/2 transform -translate-x-0.5 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
+          <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
           
           {/* Ligne latérale pour mobile */}
           <div className="lg:hidden absolute left-8 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
@@ -86,56 +86,62 @@ const ProcessSection = () => {
                 }}
               >
                 {/* Layout desktop */}
-                <div className={`hidden lg:flex items-center ${
-                  index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-                } gap-8`}>
-                  
-                  {/* Contenu */}
-                  <motion.div
-                    className="w-5/12"
-                    whileHover={{ scale: 1.02, y: -5 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-                      
-                      {/* Icône et durée */}
-                      <div className={`flex items-center gap-4 mb-6 ${
-                        index % 2 === 0 ? 'justify-start' : 'justify-end'
-                      }`}>
-                        <motion.div
-                          className="flex items-center justify-center w-14 h-14 bg-white/10 rounded-xl text-white"
-                          whileHover={{ 
-                            rotate: 360,
-                            scale: 1.1 
-                          }}
-                          transition={{ duration: 0.4 }}
-                        >
-                          {step.icon}
-                        </motion.div>
-                        <span className="text-sm font-medium text-gray-400 bg-white/5 px-3 py-1 rounded-full">
-                          {step.duration}
-                        </span>
+                <div className="hidden lg:block">
+                  {/* Contenu à gauche ou à droite */}
+                  <div className={`flex w-full ${
+                    index % 2 === 0 ? 'justify-start' : 'justify-end'
+                  }`}>
+                    <motion.div
+                      className="w-5/12"
+                      whileHover={{ scale: 1.02, y: -5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+                        
+                        {/* Icône et durée */}
+                        <div className={`flex items-center gap-4 mb-6 ${
+                          index % 2 === 0 ? 'justify-start' : 'justify-end'
+                        }`}>
+                          <motion.div
+                            className="flex items-center justify-center w-14 h-14 bg-white/10 rounded-xl text-white"
+                            whileHover={{ 
+                              rotate: 360,
+                              scale: 1.1 
+                            }}
+                            transition={{ duration: 0.4 }}
+                          >
+                            {step.icon}
+                          </motion.div>
+                          <span className="text-sm font-medium text-gray-400 bg-white/5 px-3 py-1 rounded-full">
+                            {step.duration}
+                          </span>
+                        </div>
+
+                        {/* Titre */}
+                        <h3 className={`text-2xl font-bold text-white mb-4 ${
+                          index % 2 === 0 ? 'text-left' : 'text-right'
+                        }`}>
+                          {step.title}
+                        </h3>
+
+                        {/* Description */}
+                        <p className={`text-gray-300 leading-relaxed ${
+                          index % 2 === 0 ? 'text-left' : 'text-right'
+                        }`}>
+                          {step.description}
+                        </p>
                       </div>
+                    </motion.div>
+                  </div>
 
-                      {/* Titre */}
-                      <h3 className={`text-2xl font-bold text-white mb-4 ${
-                        index % 2 === 0 ? 'text-left' : 'text-right'
-                      }`}>
-                        {step.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p className={`text-gray-300 leading-relaxed ${
-                        index % 2 === 0 ? 'text-left' : 'text-right'
-                      }`}>
-                        {step.description}
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {/* Numéro central */}
+                  {/* Numéro central - Absolument positionné au centre */}
                   <motion.div
-                    className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg z-10"
+                    className="absolute w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg z-10"
+                    style={{
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)'
+                    }}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
@@ -153,16 +159,16 @@ const ProcessSection = () => {
                   >
                     {index + 1}
                   </motion.div>
-
-                  {/* Espace pour équilibrer */}
-                  <div className="w-5/12" />
                 </div>
 
                 {/* Layout mobile */}
-                <div className="lg:hidden flex items-start gap-6">
-                  {/* Numéro mobile */}
+                <div className="lg:hidden relative flex items-center">
+                  {/* Numéro mobile - aligné avec la ligne */}
                   <motion.div
-                    className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg flex-shrink-0"
+                    className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg flex-shrink-0 relative z-10"
+                    style={{
+                      marginLeft: '-2rem' // Pour centrer sur la ligne qui est à left-8
+                    }}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
@@ -172,6 +178,10 @@ const ProcessSection = () => {
                       type: "spring",
                       stiffness: 300,
                       damping: 15
+                    }}
+                    whileHover={{ 
+                      scale: 1.2,
+                      rotate: 5
                     }}
                   >
                     {index + 1}
@@ -230,13 +240,15 @@ const ProcessSection = () => {
           <p className="text-lg text-gray-300 mb-8">
             Prêt à démarrer votre projet ? • Devis gratuit • Prototype offert
           </p>
-          <ActionButton
-            variant="primary"
-            size="lg"
-            onClick={() => window.location.href = '/contact'}
-          >
-            Discutons de votre projet
-          </ActionButton>
+          <div className="flex justify-center">
+            <ActionButton
+              variant="primary"
+              size="lg"
+              onClick={() => window.location.href = '/contact'}
+            >
+              Discutons de votre projet
+            </ActionButton>
+          </div>
         </motion.div>
       </div>
     </section>

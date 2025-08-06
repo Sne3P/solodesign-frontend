@@ -431,50 +431,14 @@ const ExpertiseSection = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.4 }}
         >
-          <motion.div 
-            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 max-w-4xl mx-auto"
-            whileHover={{ 
-              scale: 1.02,
-              y: -5,
-              transition: { 
-                type: "spring", 
-                stiffness: 400, 
-                damping: 15
-              }
-            }}
-            whileTap={{ 
-              scale: 0.98,
-              transition: { 
-                type: "spring", 
-                stiffness: 600, 
-                damping: 20
-              }
-            }}
-          >
-            <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+          <div className="bg-white backdrop-blur-sm border border-gray-200 rounded-2xl p-8 sm:p-10 max-w-4xl mx-auto">
+            <h3 className="text-2xl sm:text-3xl font-bold text-black mb-4">
               Un projet en tête ?
             </h3>
-            <p className="text-gray-300 mb-8 leading-relaxed">
+            <p className="text-gray-600 mb-8 leading-relaxed">
               Discutons de vos besoins et trouvons ensemble la solution parfaite pour votre entreprise
             </p>
-            <motion.div
-              whileHover={{ 
-                scale: 1.05,
-                transition: { 
-                  type: "spring", 
-                  stiffness: 600, 
-                  damping: 12
-                }
-              }}
-              whileTap={{ 
-                scale: 0.95,
-                transition: { 
-                  type: "spring", 
-                  stiffness: 800, 
-                  damping: 15
-                }
-              }}
-            >
+            <div className="flex justify-center">
               <ActionButton
                 variant="primary"
                 size="lg"
@@ -483,8 +447,8 @@ const ExpertiseSection = () => {
               >
                 Commencer un projet
               </ActionButton>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

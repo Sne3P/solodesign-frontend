@@ -8,21 +8,21 @@ const StatsSection = () => {
   const stats = [
     {
       icon: Users,
-      number: "150+",
-      label: "Clients Satisfaits",
-      description: "Projets réalisés avec succès"
+      number: "Partenaires",
+      label: "Clients Fidèles",
+      description: "Collaboration long terme"
     },
     {
       icon: Trophy,
-      number: "95%",
-      label: "Taux de Satisfaction",
-      description: "Clients qui recommandent"
+      number: "Excellence",
+      label: "Qualité Garantie",
+      description: "Résultats professionnels"
     },
     {
       icon: Clock,
       number: "48h",
-      label: "Délai Moyen",
-      description: "De la conception à la livraison"
+      label: "Premier Prototype",
+      description: "Gratuit et sans engagement"
     },
     {
       icon: Star,

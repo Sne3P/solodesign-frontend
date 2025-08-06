@@ -3,46 +3,37 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
-import Image from 'next/image';
 
 const TestimonialsSection = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
     {
-      name: "Marie Dubois",
       position: "Directrice Marketing",
-      company: "TechStart",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+      company: "Startup Tech",
       rating: 5,
-      text: "SoloDesign a transformé notre présence en ligne. Leur approche créative et leur professionnalisme sont exceptionnels. Le site web dépasse nos attentes !",
+      text: "Une approche créative exceptionnelle qui a transformé notre présence en ligne. Le résultat dépasse nos attentes et reflète parfaitement notre vision !",
       project: "Site Web E-commerce"
     },
     {
-      name: "Thomas Martin",
       position: "CEO",
-      company: "InnovateCorp",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+      company: "Entreprise Innovante",
       rating: 5,
-      text: "Une équipe fantastique ! Ils ont su comprendre notre vision et la traduire en une identité visuelle forte. Nos ventes ont augmenté de 40% depuis le rebranding.",
+      text: "Une équipe qui sait comprendre nos besoins et les traduire en solutions visuelles percutantes. Nos résultats commerciaux s'en ressentent positivement.",
       project: "Identité Visuelle Complète"
     },
     {
-      name: "Sophie Leroux",
       position: "Fondatrice",
-      company: "EcoMode",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+      company: "Marque Éthique",
       rating: 5,
-      text: "Réactivité, créativité et expertise technique. SoloDesign nous accompagne depuis 3 ans et chaque projet est une réussite. Je recommande vivement !",
+      text: "Réactivité, créativité et expertise technique remarquables. Un accompagnement sur le long terme qui porte ses fruits à chaque projet.",
       project: "Accompagnement Long Terme"
     },
     {
-      name: "David Chen",
       position: "Product Manager",
-      company: "FinTech Solutions",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+      company: "Solution Digitale",
       rating: 5,
-      text: "L'application mobile développée dépasse nos espérances. Interface intuitive, performances excellentes et respect des délais. Du travail de pro !",
+      text: "Une application mobile qui répond parfaitement à nos exigences. Interface intuitive, performances excellentes et respect des délais.",
       project: "Application Mobile"
     }
   ];
@@ -139,30 +130,18 @@ const TestimonialsSection = () => {
 
               {/* Client info */}
               <motion.div
-                className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+                className="flex flex-col items-center justify-center space-y-4"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src={testimonials[currentTestimonial].avatar}
-                    alt={testimonials[currentTestimonial].name}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover border-2 border-white/20"
-                  />
-                  <div className="text-left">
-                    <h4 className="text-lg font-semibold text-white">
-                      {testimonials[currentTestimonial].name}
-                    </h4>
-                    <p className="text-gray-400">
-                      {testimonials[currentTestimonial].position}
-                    </p>
-                    <p className="text-gray-500 text-sm">
-                      {testimonials[currentTestimonial].company}
-                    </p>
-                  </div>
+                <div className="text-center">
+                  <p className="text-gray-400 text-lg">
+                    {testimonials[currentTestimonial].position}
+                  </p>
+                  <p className="text-gray-500">
+                    {testimonials[currentTestimonial].company}
+                  </p>
                 </div>
                 
                 <div className="bg-white/10 px-4 py-2 rounded-full">
@@ -226,12 +205,12 @@ const TestimonialsSection = () => {
             <div className="text-gray-400">Note moyenne</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl sm:text-4xl font-bold text-white mb-2">120+</div>
-            <div className="text-gray-400">Projets réalisés</div>
+            <div className="text-3xl sm:text-4xl font-bold text-white mb-2">Portfolio</div>
+            <div className="text-gray-400">Projets variés</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl sm:text-4xl font-bold text-white mb-2">100%</div>
-            <div className="text-gray-400">Clients satisfaits</div>
+            <div className="text-3xl sm:text-4xl font-bold text-white mb-2">Excellence</div>
+            <div className="text-gray-400">Satisfaction garantie</div>
           </div>
         </motion.div>
       </div>

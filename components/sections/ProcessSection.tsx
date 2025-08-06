@@ -63,13 +63,13 @@ const ProcessSection = () => {
 
         {/* Timeline des étapes */}
         <div className="relative">
-          {/* Ligne centrale pour desktop */}
-          <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
+          {/* Ligne centrale pour desktop - parfaitement centrée */}
+          <div className="hidden lg:block absolute left-1/2 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" style={{ transform: 'translateX(-50%)' }} />
           
-          {/* Ligne latérale pour mobile */}
+          {/* Ligne latérale pour mobile - alignée avec le cercle */}
           <div className="lg:hidden absolute left-8 top-0 h-full w-0.5 bg-gradient-to-b from-white/20 via-white/40 to-white/20" />
 
-          <div className="space-y-20">
+          <div className="space-y-24 lg:space-y-20">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
@@ -134,13 +134,13 @@ const ProcessSection = () => {
                     </motion.div>
                   </div>
 
-                  {/* Numéro central - Absolument positionné au centre */}
+                  {/* Numéro central - Parfaitement centré sur la ligne */}
                   <motion.div
                     className="absolute w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg z-10"
                     style={{
-                      left: '50%',
+                      left: 'calc(50% - 32px)',
                       top: '50%',
-                      transform: 'translate(-50%, -50%)'
+                      transform: 'translateY(-50%)'
                     }}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
@@ -162,12 +162,12 @@ const ProcessSection = () => {
                 </div>
 
                 {/* Layout mobile */}
-                <div className="lg:hidden relative flex items-center">
-                  {/* Numéro mobile - aligné avec la ligne */}
+                <div className="lg:hidden relative flex items-start gap-4 pl-4">
+                  {/* Numéro mobile - parfaitement aligné avec la ligne */}
                   <motion.div
                     className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-xl font-bold shadow-lg flex-shrink-0 relative z-10"
                     style={{
-                      marginLeft: '-2rem' // Pour centrer sur la ligne qui est à left-8
+                      marginLeft: '-2rem'
                     }}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
@@ -189,7 +189,7 @@ const ProcessSection = () => {
 
                   {/* Contenu mobile */}
                   <motion.div
-                    className="flex-1"
+                    className="flex-1 ml-4"
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >

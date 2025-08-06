@@ -6,6 +6,8 @@ import {
   useScroll,
   useSpring,
   useInView,
+  useMotionValue,
+  useTransform,
 } from "framer-motion"
 import {
   Code,
@@ -14,6 +16,7 @@ import {
   Zap,
   Layers,
   Globe,
+  Database,
   ArrowLeft,
   Users,
   Lightbulb,
@@ -103,45 +106,6 @@ const mainServices = [
   }
 ];
 
-const additionalServices = [
-  {
-    icon: "📧",
-    title: "Email Marketing",
-    description: "Campagnes automatisées et segmentées pour maximiser l'engagement",
-    details: ["Automation comportementale", "Segmentation avancée", "A/B Testing optimisé", "Analytics en temps réel"]
-  },
-  {
-    icon: "📸",
-    title: "Photo & Vidéo",
-    description: "Contenu visuel professionnel et impactant",
-    details: ["Shooting corporate & produits", "Montage vidéo cinématographique", "Motion design animé", "Captation drone & 360°"]
-  },
-  {
-    icon: "📢",
-    title: "Marketing Digital",
-    description: "Stratégies multi-canaux pour amplifier votre présence",
-    details: ["Social Media Management", "Publicité ciblée performante", "Influencer Marketing", "Content Marketing stratégique"]
-  },
-  {
-    icon: "🔒",
-    title: "Cybersécurité",
-    description: "Protection complète et conformité réglementaire",
-    details: ["Audit sécurité approfondi", "Tests d'intrusion", "Mise en conformité RGPD", "Formation sécurité équipes"]
-  },
-  {
-    icon: "🌐",
-    title: "Nom de Domaine",
-    description: "Gestion complète de votre identité web",
-    details: ["Recherche & réservation", "Configuration DNS optimisée", "Certificats SSL sécurisés", "Renouvellement automatique"]
-  },
-  {
-    icon: "⚡",
-    title: "Maintenance & Support",
-    description: "Accompagnement technique continu et réactif",
-    details: ["Mises à jour sécurité", "Sauvegarde automatique", "Support prioritaire 24/7", "Monitoring performance"]
-  }
-];
-
 const expertiseAreas = [
   {
     category: "Technologies Frontend",
@@ -172,6 +136,112 @@ const expertiseAreas = [
 
 
 // -------------------- Components --------------------
+
+const ServiceSlider = ({ services }: { services: typeof mainServices }) => {
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % services.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + services.length) % services.length)
+  }
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index)
+  }
+
+  if (!isMobile) {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        {services.map((service, index) => (
+          <ServiceCard key={index} service={service} index={index} />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative w-full">
+      {/* Slider Container */}
+      <motion.div
+        ref={containerRef}
+        className="overflow-hidden rounded-2xl"
+      >
+        <motion.div
+          className="flex"
+          animate={{ x: -currentIndex * 100 + "%" }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          drag="x"
+          dragConstraints={{ left: -(services.length - 1) * 100, right: 0 }}
+          onDragEnd={(_, info) => {
+            if (Math.abs(info.offset.x) > 100) {
+              if (info.offset.x > 0) {
+                prevSlide()
+              } else {
+                nextSlide()
+              }
+            }
+          }}
+        >
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              className="w-full flex-shrink-0 px-2"
+              style={{ minWidth: "100%" }}
+            >
+              <ServiceCard service={service} index={index} />
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-6 gap-2">
+        {services.map((_, index) => (
+          <motion.button
+            key={index}
+            className={`w-3 h-3 rounded-full transition-all duration-200 ${
+              index === currentIndex ? 'bg-white' : 'bg-white/30'
+            }`}
+            onClick={() => goToSlide(index)}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          />
+        ))}
+      </div>
+
+      {/* Navigation Arrows */}
+      <motion.button
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20"
+        onClick={prevSlide}
+        whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <ArrowLeft size={20} className="text-white" />
+      </motion.button>
+
+      <motion.button
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20"
+        onClick={nextSlide}
+        whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+        whileTap={{ scale: 0.9 }}
+      >
+        <ArrowLeft size={20} className="text-white rotate-180" />
+      </motion.button>
+    </div>
+  )
+}
 
 interface ServiceCardProps {
   service: {
@@ -315,7 +385,7 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
   return (
     <motion.div
       ref={stepRef}
-      className={`relative flex items-center mb-16 ${isEven ? 'flex-row' : 'flex-row-reverse'}`}
+      className="relative flex items-center mb-8 sm:mb-16"
       initial={{ opacity: 0, x: isEven ? -60 : 60, y: 20 }}
       animate={isInView ? { 
         opacity: 1, 
@@ -325,315 +395,565 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
           type: "spring",
           stiffness: 200,
           damping: 20,
-          delay: index * 0.08
+          delay: index * 0.1
         }
       } : { opacity: 0, x: isEven ? -60 : 60, y: 20 }}
     >
-      {/* Timeline Line */}
-      {index < totalSteps - 1 && (
-        <motion.div
-          className="absolute left-1/2 top-20 w-1 h-32 bg-gradient-to-b from-white to-gray-600 transform -translate-x-1/2 z-0"
-          initial={{ scaleY: 0, opacity: 0 }}
-          animate={isInView ? { 
-            scaleY: 1, 
-            opacity: 1,
-            transition: { delay: index * 0.08 + 0.3, duration: 0.6 }
-          } : { scaleY: 0, opacity: 0 }}
-          style={{ originY: 0 }}
-        />
-      )}
-
-      {/* Step Content */}
-      <motion.div
-        className={`flex-1 ${isEven ? 'pr-8' : 'pl-8'}`}
-        whileHover={{ 
-          scale: 1.02, 
-          y: -4,
-          transition: { type: "spring", stiffness: 300, damping: 15 } 
-        }}
-      >
-        <motion.div
-          className="bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-2xl border border-white border-opacity-20 shadow-xl"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={isInView ? { 
-            scale: 1, 
-            opacity: 1,
-            transition: { 
-              delay: index * 0.08 + 0.15, 
-              type: "spring", 
-              stiffness: 200, 
-              damping: 20 
-            }
-          } : { scale: 0.9, opacity: 0 }}
-          whileHover={{
-            backgroundColor: "rgba(255,255,255,0.15)",
-            borderColor: "rgba(255,255,255,0.4)",
-            transition: { duration: 0.2 }
-          }}
-        >
-          <motion.h3 
-            className="text-xl font-bold mb-3 text-white"
-            initial={{ opacity: 0, y: 15 }}
+      {/* Mobile Layout - Vertical */}
+      <div className="block sm:hidden w-full">
+        {/* Timeline Line for Mobile */}
+        {index < totalSteps - 1 && (
+          <motion.div
+            className="absolute left-8 top-16 w-0.5 h-24 bg-gradient-to-b from-white to-gray-600 z-0"
+            initial={{ scaleY: 0, opacity: 0 }}
             animate={isInView ? { 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: index * 0.08 + 0.25, duration: 0.3 }
-            } : { opacity: 0, y: 15 }}
-          >
-            {step.title}
-          </motion.h3>
-          
-          <motion.p 
-            className="text-gray-300 mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: index * 0.08 + 0.3, duration: 0.3 }
-            } : { opacity: 0, y: 10 }}
-          >
-            {step.description}
-          </motion.p>
+              scaleY: 1, 
+              opacity: 1,
+              transition: { delay: index * 0.1 + 0.3, duration: 0.6 }
+            } : { scaleY: 0, opacity: 0 }}
+            style={{ originY: 0 }}
+          />
+        )}
 
-          {step.details && (
-            <motion.ul 
-              className="space-y-2"
+        {/* Mobile Content */}
+        <div className="flex items-start">
+          {/* Circle for Mobile */}
+          <motion.div
+            className="relative z-10 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl flex-shrink-0"
+            initial={{ scale: 0, rotate: -180, opacity: 0 }}
+            animate={isInView ? { 
+              scale: 1, 
+              rotate: 0, 
+              opacity: 1,
+              transition: {
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+                delay: index * 0.1 + 0.05
+              }
+            } : { scale: 0, rotate: -180, opacity: 0 }}
+            whileHover={{
+              scale: 1.1,
+              boxShadow: "0 0 30px rgba(255,255,255,0.5)",
+              transition: { type: "spring", stiffness: 400, damping: 15 }
+            }}
+          >
+            <motion.span 
+              className="text-black font-bold text-xl"
               initial={{ opacity: 0 }}
               animate={isInView ? { 
                 opacity: 1,
-                transition: { delay: index * 0.08 + 0.35, duration: 0.3 }
+                transition: { delay: index * 0.1 + 0.2, duration: 0.2 }
               } : { opacity: 0 }}
             >
-              {step.details.map((detail: string, detailIndex: number) => (
-                <motion.li
-                  key={detailIndex}
-                  className="flex items-start text-sm text-gray-400"
-                  initial={{ opacity: 0, x: -15 }}
+              {index + 1}
+            </motion.span>
+          </motion.div>
+
+          {/* Content for Mobile */}
+          <motion.div
+            className="ml-4 flex-1"
+            whileHover={{ 
+              scale: 1.02, 
+              y: -2,
+              transition: { type: "spring", stiffness: 300, damping: 15 } 
+            }}
+          >
+            <motion.div
+              className="bg-white bg-opacity-10 backdrop-blur-lg p-4 sm:p-6 rounded-2xl border border-white border-opacity-20 shadow-xl"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={isInView ? { 
+                scale: 1, 
+                opacity: 1,
+                transition: { 
+                  delay: index * 0.1 + 0.15, 
+                  type: "spring", 
+                  stiffness: 200, 
+                  damping: 20 
+                }
+              } : { scale: 0.9, opacity: 0 }}
+              whileHover={{
+                backgroundColor: "rgba(255,255,255,0.15)",
+                borderColor: "rgba(255,255,255,0.4)",
+                transition: { duration: 0.2 }
+              }}
+            >
+              <motion.h3 
+                className="text-lg sm:text-xl font-bold mb-3 text-white"
+                initial={{ opacity: 0, y: 15 }}
+                animate={isInView ? { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: { delay: index * 0.1 + 0.25, duration: 0.3 }
+                } : { opacity: 0, y: 15 }}
+              >
+                {step.title}
+              </motion.h3>
+              
+              <motion.p 
+                className="text-gray-300 mb-4 text-sm sm:text-base"
+                initial={{ opacity: 0, y: 10 }}
+                animate={isInView ? { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: { delay: index * 0.1 + 0.3, duration: 0.3 }
+                } : { opacity: 0, y: 10 }}
+              >
+                {step.description}
+              </motion.p>
+
+              {step.details && (
+                <motion.ul 
+                  className="space-y-2"
+                  initial={{ opacity: 0 }}
                   animate={isInView ? { 
-                    opacity: 1, 
-                    x: 0,
-                    transition: {
-                      delay: index * 0.08 + detailIndex * 0.02 + 0.4,
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20
-                    }
-                  } : { opacity: 0, x: -15 }}
+                    opacity: 1,
+                    transition: { delay: index * 0.1 + 0.35, duration: 0.3 }
+                  } : { opacity: 0 }}
                 >
-                  <motion.div 
-                    className="w-1.5 h-1.5 bg-white rounded-full mt-2 mr-3 flex-shrink-0"
-                    whileHover={{ scale: 1.8, transition: { type: "spring", stiffness: 500, damping: 15 } }}
-                  />
-                  {detail}
-                </motion.li>
-              ))}
-            </motion.ul>
-          )}
-        </motion.div>
-      </motion.div>
+                  {step.details.map((detail: string, detailIndex: number) => (
+                    <motion.li
+                      key={detailIndex}
+                      className="flex items-start text-sm text-gray-400"
+                      initial={{ opacity: 0, x: -15 }}
+                      animate={isInView ? { 
+                        opacity: 1, 
+                        x: 0,
+                        transition: {
+                          delay: index * 0.1 + detailIndex * 0.02 + 0.4,
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20
+                        }
+                      } : { opacity: 0, x: -15 }}
+                    >
+                      <motion.div 
+                        className="w-1.5 h-1.5 bg-white rounded-full mt-2 mr-3 flex-shrink-0"
+                        whileHover={{ scale: 1.8, transition: { type: "spring", stiffness: 500, damping: 15 } }}
+                      />
+                      {detail}
+                    </motion.li>
+                  ))}
+                </motion.ul>
+              )}
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
 
-      {/* Central Circle */}
-      <motion.div
-        className="relative z-10 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl"
-        initial={{ scale: 0, rotate: -180, opacity: 0 }}
-        animate={isInView ? { 
-          scale: 1, 
-          rotate: 0, 
-          opacity: 1,
-          transition: {
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            delay: index * 0.08 + 0.05
-          }
-        } : { scale: 0, rotate: -180, opacity: 0 }}
-        whileHover={{
-          scale: 1.1,
-          boxShadow: "0 0 30px rgba(255,255,255,0.5)",
-          transition: { type: "spring", stiffness: 400, damping: 15 }
-        }}
-      >
-        <motion.span 
-          className="text-black font-bold text-xl"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { 
-            opacity: 1,
-            transition: { delay: index * 0.08 + 0.2, duration: 0.2 }
-          } : { opacity: 0 }}
+      {/* Desktop Layout - Horizontal */}
+      <div className={`hidden sm:flex items-center w-full ${isEven ? 'flex-row' : 'flex-row-reverse'}`}>
+        {/* Timeline Line for Desktop */}
+        {index < totalSteps - 1 && (
+          <motion.div
+            className="absolute left-1/2 top-20 w-1 h-32 bg-gradient-to-b from-white to-gray-600 transform -translate-x-1/2 z-0"
+            initial={{ scaleY: 0, opacity: 0 }}
+            animate={isInView ? { 
+              scaleY: 1, 
+              opacity: 1,
+              transition: { delay: index * 0.1 + 0.3, duration: 0.6 }
+            } : { scaleY: 0, opacity: 0 }}
+            style={{ originY: 0 }}
+          />
+        )}
+
+        {/* Step Content */}
+        <motion.div
+          className={`flex-1 ${isEven ? 'pr-8' : 'pl-8'}`}
+          whileHover={{ 
+            scale: 1.02, 
+            y: -4,
+            transition: { type: "spring", stiffness: 300, damping: 15 } 
+          }}
         >
-          {index + 1}
-        </motion.span>
-      </motion.div>
+          <motion.div
+            className="bg-white bg-opacity-10 backdrop-blur-lg p-6 rounded-2xl border border-white border-opacity-20 shadow-xl"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={isInView ? { 
+              scale: 1, 
+              opacity: 1,
+              transition: { 
+                delay: index * 0.1 + 0.15, 
+                type: "spring", 
+                stiffness: 200, 
+                damping: 20 
+              }
+            } : { scale: 0.9, opacity: 0 }}
+            whileHover={{
+              backgroundColor: "rgba(255,255,255,0.15)",
+              borderColor: "rgba(255,255,255,0.4)",
+              transition: { duration: 0.2 }
+            }}
+          >
+            <motion.h3 
+              className="text-xl font-bold mb-3 text-white"
+              initial={{ opacity: 0, y: 15 }}
+              animate={isInView ? { 
+                opacity: 1, 
+                y: 0,
+                transition: { delay: index * 0.1 + 0.25, duration: 0.3 }
+              } : { opacity: 0, y: 15 }}
+            >
+              {step.title}
+            </motion.h3>
+            
+            <motion.p 
+              className="text-gray-300 mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={isInView ? { 
+                opacity: 1, 
+                y: 0,
+                transition: { delay: index * 0.1 + 0.3, duration: 0.3 }
+              } : { opacity: 0, y: 10 }}
+            >
+              {step.description}
+            </motion.p>
 
-      {/* Empty space for alignment */}
-      <div className={`flex-1 ${isEven ? 'pl-8' : 'pr-8'}`} />
+            {step.details && (
+              <motion.ul 
+                className="space-y-2"
+                initial={{ opacity: 0 }}
+                animate={isInView ? { 
+                  opacity: 1,
+                  transition: { delay: index * 0.1 + 0.35, duration: 0.3 }
+                } : { opacity: 0 }}
+              >
+                {step.details.map((detail: string, detailIndex: number) => (
+                  <motion.li
+                    key={detailIndex}
+                    className="flex items-start text-sm text-gray-400"
+                    initial={{ opacity: 0, x: -15 }}
+                    animate={isInView ? { 
+                      opacity: 1, 
+                      x: 0,
+                      transition: {
+                        delay: index * 0.1 + detailIndex * 0.02 + 0.4,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20
+                      }
+                    } : { opacity: 0, x: -15 }}
+                  >
+                    <motion.div 
+                      className="w-1.5 h-1.5 bg-white rounded-full mt-2 mr-3 flex-shrink-0"
+                      whileHover={{ scale: 1.8, transition: { type: "spring", stiffness: 500, damping: 15 } }}
+                    />
+                    {detail}
+                  </motion.li>
+                ))}
+              </motion.ul>
+            )}
+          </motion.div>
+        </motion.div>
+
+        {/* Central Circle */}
+        <motion.div
+          className="relative z-10 w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl"
+          initial={{ scale: 0, rotate: -180, opacity: 0 }}
+          animate={isInView ? { 
+            scale: 1, 
+            rotate: 0, 
+            opacity: 1,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              delay: index * 0.1 + 0.05
+            }
+          } : { scale: 0, rotate: -180, opacity: 0 }}
+          whileHover={{
+            scale: 1.1,
+            boxShadow: "0 0 30px rgba(255,255,255,0.5)",
+            transition: { type: "spring", stiffness: 400, damping: 15 }
+          }}
+        >
+          <motion.span 
+            className="text-black font-bold text-xl"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { 
+              opacity: 1,
+              transition: { delay: index * 0.1 + 0.2, duration: 0.2 }
+            } : { opacity: 0 }}
+          >
+            {index + 1}
+          </motion.span>
+        </motion.div>
+
+        {/* Empty space for alignment */}
+        <div className={`flex-1 ${isEven ? 'pl-8' : 'pr-8'}`} />
+      </div>
     </motion.div>
   )
 }
 
-const ExpertiseCard = ({ expertise, index }: { expertise: ExpertiseArea; index: number }) => {
-  const cardRef = useRef(null)
-  const isInView = useInView(cardRef, { once: true, amount: 0.2, margin: "-20px" })
+const ExpertiseModal = ({ expertise, isOpen, onClose }: { 
+  expertise: ExpertiseArea | null; 
+  isOpen: boolean; 
+  onClose: () => void 
+}) => {
+  if (!isOpen || !expertise) return null
 
   return (
     <motion.div
-      ref={cardRef}
-      className="relative group"
-      initial={{ opacity: 0, y: 60, rotateX: -15 }}
-      animate={isInView ? { 
-        opacity: 1, 
-        y: 0, 
-        rotateX: 0,
-        transition: {
-          type: "spring",
-          stiffness: 200,
-          damping: 20,
-          delay: index * 0.08
-        }
-      } : { opacity: 0, y: 60, rotateX: -15 }}
-      whileHover={{
-        y: -8,
-        rotateX: 2,
-        rotateY: 2,
-        transition: { type: "spring", stiffness: 400, damping: 15 }
-      }}
-      style={{ perspective: 1000 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
     >
-      {/* Main Card */}
       <motion.div
-        className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-8 h-full"
-        whileHover={{
-          backgroundColor: "rgba(255,255,255,0.25)",
-          borderColor: "rgba(255,255,255,0.4)",
-          transition: { duration: 0.2 }
-        }}
+        className="bg-gradient-to-br from-white/15 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+        initial={{ scale: 0.8, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.8, opacity: 0, y: 50 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Category Header with Icon */}
-        <motion.div 
-          className="flex items-center mb-6"
-          initial={{ opacity: 0, x: -20 }}
-          animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-          transition={{ delay: index * 0.08 + 0.2, duration: 0.3 }}
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
         >
-          <motion.div 
-            className="w-12 h-12 bg-gradient-to-br from-white to-gray-200 rounded-xl flex items-center justify-center mr-4 shadow-lg"
-            whileHover={{
-              scale: 1.1,
-              rotate: 5,
-              transition: { type: "spring", stiffness: 500, damping: 15 }
-            }}
-          >
-            <span className="text-black font-bold text-xl">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Header */}
+        <div className="flex items-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-white to-gray-200 rounded-xl flex items-center justify-center mr-6 shadow-lg">
+            <span className="text-black font-bold text-2xl">
               {expertise.category.split(' ')[0].charAt(0)}
             </span>
-          </motion.div>
-          <div>
-            <motion.h3 
-              className="text-xl font-bold text-white"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: index * 0.08 + 0.3, duration: 0.3 }}
-            >
-              {expertise.category}
-            </motion.h3>
-            <motion.p 
-              className="text-gray-300 text-sm"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ delay: index * 0.08 + 0.4, duration: 0.3 }}
-            >
-              {expertise.skills.length} technologies
-            </motion.p>
           </div>
-        </motion.div>
+          <div>
+            <h2 className="text-3xl font-bold text-white mb-2">{expertise.category}</h2>
+            <p className="text-white/70">Maîtrise complète de {expertise.skills.length} technologies</p>
+          </div>
+        </div>
 
         {/* Skills Grid */}
-        <motion.div 
-          className="grid grid-cols-2 gap-3"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: index * 0.08 + 0.5, duration: 0.4 }}
-        >
-          {expertise.skills.map((skill, skillIndex) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {expertise.skills.map((skill, index) => (
             <motion.div
-              key={skillIndex}
-              className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-lg px-3 py-2 text-center group/skill"
+              key={index}
+              className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-center hover:bg-white/10 hover:border-white/30 transition-all duration-300"
               initial={{ opacity: 0, scale: 0.8 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-              transition={{ 
-                delay: index * 0.08 + skillIndex * 0.03 + 0.6,
-                type: "spring",
-                stiffness: 300,
-                damping: 20
-              }}
-              whileHover={{
-                scale: 1.05,
-                backgroundColor: "rgba(255,255,255,0.1)",
-                borderColor: "rgba(255,255,255,0.3)",
-                transition: { duration: 0.2 }
-              }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.05, type: "spring", stiffness: 300, damping: 20 }}
+              whileHover={{ scale: 1.05 }}
             >
-              <span className="text-white text-sm font-medium">
-                {skill}
-              </span>
+              <span className="text-white font-medium">{skill}</span>
             </motion.div>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Expertise Level Indicator */}
-        <motion.div 
-          className="mt-6 pt-4 border-t border-white/10"
-          initial={{ opacity: 0, y: 10 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
-          transition={{ delay: index * 0.08 + 0.8, duration: 0.3 }}
-        >
+        {/* Experience Level */}
+        <div className="mt-8 pt-6 border-t border-white/10">
           <div className="flex items-center justify-between">
-            <span className="text-gray-300 text-sm">Niveau d&apos;expertise</span>
-            <div className="flex gap-1">
+            <span className="text-white/90 font-medium">Niveau d&apos;expertise</span>
+            <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((level) => (
                 <motion.div
                   key={level}
-                  className="w-2 h-2 rounded-full bg-white"
+                  className="w-3 h-3 rounded-full bg-gradient-to-r from-purple-400 to-pink-400"
                   initial={{ scale: 0 }}
-                  animate={isInView ? { scale: 1 } : { scale: 0 }}
-                  transition={{ 
-                    delay: index * 0.08 + level * 0.05 + 0.9,
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 20
-                  }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: level * 0.1, type: "spring", stiffness: 400, damping: 20 }}
                 />
               ))}
             </div>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
-
-      {/* Floating Elements */}
-      <motion.div
-        className="absolute -top-2 -right-2 w-4 h-4 bg-white/30 rounded-full"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.3, 0.7, 0.3]
-        }}
-        transition={{
-          duration: 3 + index * 0.5,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
     </motion.div>
   )
 }
 
-const ServiceCard = ({ service, index }: ServiceCardProps) => {
+const ExpertiseCard = ({ expertise, index, onClick }: { 
+  expertise: ExpertiseArea; 
+  index: number; 
+  onClick: () => void 
+}) => {
   const cardRef = useRef(null)
   const isInView = useInView(cardRef, { once: true, amount: 0.2, margin: "-20px" })
 
   return (
     <motion.div
       ref={cardRef}
-      className="bg-white text-black p-6 sm:p-8 rounded-lg shadow-lg transform-gpu border border-gray-100 group"
+      className="relative group cursor-pointer"
+      initial={{ opacity: 0, y: 60, scale: 0.8 }}
+      animate={isInView ? { 
+        opacity: 1, 
+        y: 0, 
+        scale: 1,
+        transition: {
+          type: "spring",
+          stiffness: 200,
+          damping: 20,
+          delay: index * 0.1
+        }
+      } : { opacity: 0, y: 60, scale: 0.8 }}
+      whileHover={{
+        y: -12,
+        scale: 1.05,
+        transition: { type: "spring", stiffness: 400, damping: 15 }
+      }}
+      whileTap={{ scale: 0.95 }}
+      onClick={onClick}
+    >
+      {/* Click indicator */}
+      <motion.div
+        className="absolute -top-3 -right-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 shadow-lg"
+        whileHover={{ scale: 1.2, rotate: 360 }}
+        transition={{ duration: 0.5 }}
+      >
+        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </motion.div>
+
+      {/* Glow effect on hover */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        animate={{ 
+          scale: [1, 1.1, 1],
+          rotate: [0, 2, -2, 0] 
+        }}
+        transition={{ 
+          duration: 4, 
+          repeat: Infinity, 
+          ease: "easeInOut" 
+        }}
+      />
+
+      {/* Main Card - Simplified */}
+      <motion.div
+        className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-8 h-full relative overflow-hidden min-h-[200px] flex flex-col items-center justify-center text-center"
+        whileHover={{
+          backgroundColor: "rgba(255,255,255,0.15)",
+          borderColor: "rgba(255,255,255,0.4)",
+          boxShadow: "0 25px 60px rgba(0,0,0,0.4)",
+          transition: { duration: 0.3 }
+        }}
+      >
+        {/* Gradient background shapes */}
+        <motion.div 
+          className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-l from-purple-500/20 to-transparent rounded-full blur-xl"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div 
+          className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-r from-pink-500/20 to-transparent rounded-full blur-xl"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Icon - Sans background, juste l'icône */}
+        <motion.div
+          className="w-16 h-16 mb-4 text-white flex items-center justify-center"
+          whileHover={{ 
+            scale: 1.2, 
+            rotate: [0, -10, 10, 0],
+            transition: { duration: 0.5 }
+          }}
+        >
+          {getExpertiseIcon(expertise.category)}
+        </motion.div>
+
+        {/* Title */}
+        <motion.h3 
+          className="text-xl font-bold text-white mb-3 leading-tight"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { 
+            opacity: 1,
+            transition: { delay: index * 0.1 + 0.2, duration: 0.3 }
+          } : { opacity: 0 }}
+        >
+          {expertise.category}
+        </motion.h3>
+
+        {/* Hint text */}
+        <motion.p 
+          className="text-sm text-purple-300 opacity-75 font-medium"
+          animate={{ 
+            opacity: [0.5, 1, 0.5],
+            scale: [1, 1.02, 1] 
+          }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity, 
+            ease: "easeInOut" 
+          }}
+        >
+          Cliquez pour plus d&apos;infos
+        </motion.p>
+
+        {/* Skills count indicator */}
+        <motion.div
+          className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-xs text-white font-semibold"
+          initial={{ scale: 0 }}
+          animate={isInView ? { 
+            scale: 1,
+            transition: { delay: index * 0.1 + 0.4, type: "spring", stiffness: 400, damping: 20 }
+          } : { scale: 0 }}
+        >
+          {expertise.skills.length} compétences
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// Helper function pour les icônes d'expertise
+const getExpertiseIcon = (category: string) => {
+  switch (category.toLowerCase()) {
+    case 'technologies frontend':
+      return <Globe className="w-full h-full" />
+    case 'technologies backend':
+      return <Code className="w-full h-full" />
+    case 'bases de données':
+      return <Database className="w-full h-full" />
+    case 'cloud & devops':
+      return <Shield className="w-full h-full" />
+    case 'design & ux':
+      return <Paintbrush className="w-full h-full" />
+    case 'marketing digital':
+      return <Zap className="w-full h-full" />
+    default:
+      return <Code className="w-full h-full" />
+  }
+}
+
+const ServiceCard = ({ service, index }: ServiceCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(cardRef, { once: true, amount: 0.2, margin: "-20px" })
+  const [isMobile, setIsMobile] = useState(false)
+  
+  // Cursor light effect
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const lightX = useTransform(mouseX, (value) => `${value}px`)
+  const lightY = useTransform(mouseY, (value) => `${value}px`)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    mouseX.set(event.clientX - rect.left)
+    mouseY.set(event.clientY - rect.top)
+  }
+
+  return (
+    <motion.div
+      ref={cardRef}
+      className="relative overflow-hidden bg-white/5 backdrop-blur-xl text-white p-6 sm:p-8 rounded-3xl border border-white/10 group"
       initial={{ opacity: 0, y: 40, scale: 0.95 }}
       animate={isInView ? { 
         opacity: 1, 
@@ -652,24 +972,42 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
         transition: { type: "spring", stiffness: 300, damping: 15 }
       }}
       whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
+      onMouseMove={handleMouseMove}
     >
-      <motion.div 
-        className="mb-6 text-black" 
-        initial={{ opacity: 0, scale: 0, rotate: -45 }}
-        animate={isInView ? { 
-          opacity: 1, 
-          scale: 1, 
-          rotate: 0,
-          transition: {
-            type: "spring", 
-            stiffness: 400, 
-            damping: 20, 
-            delay: index * 0.06 + 0.15
-          }
-        } : { opacity: 0, scale: 0, rotate: -45 }}
-        whileHover={{
-          scale: 1.1,
-          rotate: 5,
+      {/* Glassmorphic Cursor Light Effect */}
+      {!isMobile && (
+        <motion.div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-3xl"
+          style={{
+            background: `radial-gradient(circle 120px at ${lightX} ${lightY}, rgba(255,255,255,0.15), transparent 70%)`
+          }}
+        />
+      )}
+
+      {/* Enhanced glassmorphic background on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl" />
+      
+      {/* Border glow effect */}
+      <div className="absolute inset-0 rounded-3xl border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      <div className="relative z-10">
+        <motion.div 
+          className="mb-6 text-white" 
+          initial={{ opacity: 0, scale: 0, rotate: -45 }}
+          animate={isInView ? { 
+            opacity: 1, 
+            scale: 1, 
+            rotate: 0,
+            transition: {
+              type: "spring", 
+              stiffness: 400, 
+              damping: 20, 
+              delay: index * 0.06 + 0.15
+            }
+          } : { opacity: 0, scale: 0, rotate: -45 }}
+          whileHover={{
+            scale: 1.1,
+            rotate: 5,
           transition: { type: "spring", stiffness: 500, damping: 15 }
         }}
       >
@@ -678,7 +1016,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
       
       <div className="mb-6">
         <motion.h3 
-          className="text-xl sm:text-2xl font-bold mb-3 text-black"
+          className="text-xl sm:text-2xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 transition-all duration-300"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { 
             opacity: 1, 
@@ -689,7 +1027,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           {service.title}
         </motion.h3>
         <motion.p 
-          className="text-gray-600 mb-4 leading-relaxed text-sm sm:text-base"
+          className="text-white/70 mb-4 leading-relaxed text-sm sm:text-base group-hover:text-white/90 transition-colors duration-300"
           initial={{ opacity: 0, y: 15 }}
           animate={isInView ? { 
             opacity: 1, 
@@ -703,7 +1041,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
       <div className="mb-6">
         <motion.h4 
-          className="font-medium text-black mb-3"
+          className="font-medium text-white/90 mb-3"
           initial={{ opacity: 0 }}
           animate={isInView ? { 
             opacity: 1,
@@ -716,7 +1054,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           {service.features.map((feature: string, idx: number) => (
             <motion.li
               key={idx}
-              className="flex items-start text-sm text-gray-600"
+              className="flex items-start text-sm text-white/70 group-hover:text-white/90 transition-colors duration-300"
               initial={{ opacity: 0, x: -15 }}
               animate={isInView ? { 
                 opacity: 1, 
@@ -730,7 +1068,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
               } : { opacity: 0, x: -15 }}
             >
               <motion.div 
-                className="w-1.5 h-1.5 bg-black rounded-full mt-2 mr-3 flex-shrink-0"
+                className="w-1.5 h-1.5 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mt-2 mr-3 flex-shrink-0 group-hover:scale-125 transition-transform duration-300"
                 whileHover={{ scale: 1.8, transition: { type: "spring", stiffness: 500, damping: 15 } }}
               />
               {feature}
@@ -741,7 +1079,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
       <div className="mb-6">
         <motion.h4 
-          className="font-medium text-black mb-3"
+          className="font-medium text-white/90 mb-3"
           initial={{ opacity: 0 }}
           animate={isInView ? { 
             opacity: 1,
@@ -754,7 +1092,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           {service.benefits.map((benefit: string, idx: number) => (
             <motion.span
               key={idx}
-              className="bg-black text-white px-3 py-1 rounded-full text-xs font-medium cursor-default"
+              className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-3 py-1 rounded-full text-xs font-medium cursor-default group-hover:bg-white/20 group-hover:border-white/30 transition-all duration-300"
               initial={{ opacity: 0, scale: 0.7 }}
               animate={isInView ? { 
                 opacity: 1, 
@@ -780,7 +1118,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 
       <div>
         <motion.h4 
-          className="font-medium text-black mb-3"
+          className="font-medium text-white/90 mb-3"
           initial={{ opacity: 0 }}
           animate={isInView ? { 
             opacity: 1,
@@ -793,7 +1131,7 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           {service.tools.map((tool: string, toolIndex: number) => (
             <motion.span
               key={toolIndex}
-              className="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm border transition-all duration-150 hover:border-black cursor-default"
+              className="bg-white/5 backdrop-blur-sm text-white/80 border border-white/20 px-3 py-1 rounded text-sm transition-all duration-300 hover:border-white/40 hover:bg-white/10 cursor-default"
               initial={{ opacity: 0, y: 10 }}
               animate={isInView ? { 
                 opacity: 1, 
@@ -816,7 +1154,295 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
           ))}
         </div>
       </div>
+      </div>
     </motion.div>
+  )
+}
+
+const AdditionalServicesSection = () => {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, amount: 0.1 })
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+
+  const additionalServices = [
+    {
+      icon: <Globe className="w-8 h-8" />,
+      title: "Email Marketing",
+      description: "Campagnes automatisées et segmentées pour maximiser l'engagement",
+      features: ["Automation comportementale", "Segmentation avancée", "A/B Testing optimisé", "Analytics en temps réel"]
+    },
+    {
+      icon: <Paintbrush className="w-8 h-8" />,
+      title: "Photo & Vidéo",
+      description: "Contenu visuel professionnel et impactant",
+      features: ["Shooting corporate & produits", "Montage vidéo cinématographique", "Motion design animé", "Captation drone & 360°"]
+    },
+    {
+      icon: <TrendingUp className="w-8 h-8" />,
+      title: "Marketing Digital",
+      description: "Stratégies multi-canaux pour amplifier votre présence",
+      features: ["Social Media Management", "Publicité ciblée performante", "Influencer Marketing", "Content Marketing stratégique"]
+    },
+    {
+      icon: <Lightbulb className="w-8 h-8" />,
+      title: "Consultation Stratégique",
+      description: "Analyse approfondie de votre projet et conseils personnalisés pour optimiser votre présence digitale.",
+      features: ["Audit complet", "Stratégie sur mesure", "Roadmap détaillée"]
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "Maintenance & Support",
+      description: "Surveillance continue, mises à jour de sécurité et support technique pour garantir la performance.",
+      features: ["Monitoring 24/7", "Sauvegardes automatiques", "Support prioritaire"]
+    },
+    {
+      icon: <Zap className="w-8 h-8" />,
+      title: "Optimisation Performance",
+      description: "Amélioration des temps de chargement, optimisation SEO et enhancement de l'expérience utilisateur.",
+      features: ["Optimisation vitesse", "SEO technique", "Analytics avancés"]
+    }
+  ]
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!isPaused && isInView) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % additionalServices.length)
+      }, 4000)
+      return () => clearInterval(interval)
+    }
+  }, [isPaused, isInView, additionalServices.length])
+
+  const nextSlide = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % additionalServices.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? additionalServices.length - 1 : prevIndex - 1
+    )
+  }
+
+  return (
+    <section ref={ref} className="relative py-16 sm:py-20 overflow-hidden">
+      {/* Soft animated gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/30 to-slate-900/50">
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,_rgba(120,119,198,0.15),_transparent_60%)]"
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_rgba(255,119,198,0.15),_transparent_60%)]"
+          animate={{
+            scale: [1.1, 1, 1.1],
+            opacity: [0.4, 0.6, 0.4]
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        />
+        <motion.div 
+          className="absolute inset-0 bg-[radial-gradient(circle_at_40%_40%,_rgba(120,219,226,0.1),_transparent_50%)]"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 4
+          }}
+        />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.25, 0.25, 0, 1] }}
+        >
+          <motion.h2 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.25, 0, 1] }}
+          >
+            Services Complémentaires
+          </motion.h2>
+          <motion.p 
+            className="text-lg sm:text-xl text-white/80 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.25, 0.25, 0, 1] }}
+          >
+            Solutions expertes pour accompagner votre croissance digitale
+          </motion.p>
+        </motion.div>
+
+        {/* Infinite Carousel */}
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div className="overflow-hidden rounded-3xl">
+            <motion.div
+              className="flex"
+              animate={{
+                x: `${-currentIndex * (100 / 3)}%`
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 30,
+                mass: 0.8
+              }}
+              style={{
+                width: `${(additionalServices.length * 100) / 3}%`
+              }}
+            >
+              {additionalServices.map((service, index) => (
+                <motion.div
+                  key={index}
+                  className="w-1/3 px-4 flex-shrink-0"
+                  style={{ minWidth: "calc(100% / 3)" }}
+                >
+                  <motion.div
+                    className="group relative h-full"
+                    initial={{ opacity: 0, y: 50, rotateY: -15 }}
+                    animate={isInView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
+                    transition={{ 
+                      duration: 0.8, 
+                      delay: 0.6 + (index % 3) * 0.2,
+                      type: "spring",
+                      stiffness: 150,
+                      damping: 20
+                    }}
+                    whileHover={{ 
+                      y: -10,
+                      scale: 1.02,
+                      transition: { type: "spring", stiffness: 400, damping: 25 }
+                    }}
+                  >
+                    {/* Card Container */}
+                    <div className="relative h-full min-h-[350px]">
+                      {/* Glassmorphic Background */}
+                      <div className="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 group-hover:border-white/20 transition-all duration-500" />
+                      
+                      {/* Gradient Border Effect */}
+                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      
+                      {/* Content */}
+                      <div className="relative p-6 sm:p-8 h-full flex flex-col">
+                        {/* Icon */}
+                        <motion.div 
+                          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.6 }}
+                        >
+                          <div className="text-white text-2xl">
+                            {typeof service.icon === 'string' ? service.icon : service.icon}
+                          </div>
+                        </motion.div>
+
+                        {/* Title */}
+                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 transition-all duration-300">
+                          {service.title}
+                        </h3>
+
+                        {/* Description */}
+                        <p className="text-white/70 mb-6 leading-relaxed flex-grow text-sm sm:text-base">
+                          {service.description}
+                        </p>
+
+                        {/* Features List */}
+                        <div className="space-y-2">
+                          {service.features.slice(0, 3).map((feature, featureIndex) => (
+                            <motion.div
+                              key={featureIndex}
+                              className="flex items-center gap-3"
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={isInView ? { opacity: 1, x: 0 } : {}}
+                              transition={{ 
+                                duration: 0.5, 
+                                delay: 0.8 + (index % 3) * 0.2 + featureIndex * 0.1,
+                                ease: [0.25, 0.25, 0, 1]
+                              }}
+                            >
+                              <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 group-hover:scale-125 transition-transform duration-300" />
+                              <span className="text-white/80 text-xs sm:text-sm group-hover:text-white transition-colors duration-300">
+                                {feature}
+                              </span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Navigation Arrows - Responsive positioning */}
+          <motion.button
+            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 z-10"
+            onClick={prevSlide}
+            whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            <ArrowLeft size={16} className="text-white sm:w-5 sm:h-5" />
+          </motion.button>
+
+          <motion.button
+            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 z-10"
+            onClick={nextSlide}
+            whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+            whileTap={{ scale: 0.9 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1, duration: 0.5 }}
+          >
+            <ArrowLeft size={16} className="text-white rotate-180 sm:w-5 sm:h-5" />
+          </motion.button>
+
+          {/* Dots Indicator */}
+          <div className="flex justify-center mt-8 gap-2">
+            {additionalServices.map((_, index) => (
+              <motion.button
+                key={index}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                  index === currentIndex ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'
+                }`}
+                onClick={() => setCurrentIndex(index)}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 1 + index * 0.1, duration: 0.3 }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -825,9 +1451,32 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
 const ServicesPage = () => {
   const [mounted, setMounted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [selectedExpertise, setSelectedExpertise] = useState<ExpertiseArea | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const { scrollYProgress } = useScroll()
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
   const router = useRouter()
+
+  // Parallax effects pour les sections (sauf la première)
+  // Pas d'effet fade in pour la première section, juste les animations d'entrée
+  const additionalServicesY = useTransform(scrollYProgress, [0.2, 0.5], ['0px', '-30px'])
+  const additionalServicesOpacity = useTransform(scrollYProgress, [0.2, 0.4, 0.6], [0, 1, 1])
+  const expertiseParallaxY = useTransform(scrollYProgress, [0.3, 0.6], ['0px', '-40px'])
+  const expertiseOpacity = useTransform(scrollYProgress, [0.3, 0.5, 0.7], [0, 1, 1])
+  const timelineParallaxY = useTransform(scrollYProgress, [0.5, 0.8], ['0px', '-60px'])
+  const timelineOpacity = useTransform(scrollYProgress, [0.5, 0.7, 0.9], [0, 1, 1])
+  const ctaParallaxY = useTransform(scrollYProgress, [0.7, 1], ['0px', '-30px'])
+  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.9], [0, 1])
+
+  const handleExpertiseClick = (expertise: ExpertiseArea) => {
+    setSelectedExpertise(expertise)
+    setIsModalOpen(true)
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setSelectedExpertise(null)
+  }
 
   const processSteps = [
     {
@@ -886,74 +1535,95 @@ const ServicesPage = () => {
         <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         <Cursor />
 
-        {/* Bouton Retour */}
+        {/* Bouton Retour optimisé pour mobile */}
         <motion.div
-          className="fixed top-24 left-8 z-50"
+          className="fixed top-20 sm:top-24 left-4 sm:left-8 z-50"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
           <MotionLink
             href="/"
-            className="bg-white text-black p-3 rounded-full flex items-center justify-center"
+            className="bg-white text-black p-2 sm:p-3 rounded-full flex items-center justify-center shadow-lg"
             whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 600, damping: 15 } }}
             whileTap={{ scale: 0.9 }}
           >
-            <ArrowLeft size={28} />
+            <ArrowLeft size={20} className="sm:w-7 sm:h-7" />
           </MotionLink>
         </motion.div>
 
-        {/* Hero Section */}
-        <motion.div
-          className="h-screen flex flex-col justify-center items-center relative px-4"
-          initial={{ opacity: 0, y: -60, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 200, 
-            damping: 25, 
-            delay: 0.2,
-            bounce: 0.4 
-          }}
-        >
+        {/* Hero Section - Sans background coloré, avec particules */}
+        <div className="h-screen flex flex-col justify-center items-center relative px-4 z-10 overflow-hidden">
+          {/* Floating Particles - fixes dans cette section */}
+          <div className="absolute inset-0">
+            {[...Array(20)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white rounded-full"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                }}
+                animate={{
+                  y: [0, -100, 0],
+                  x: [0, Math.random() * 50 - 25, 0],
+                  opacity: [0, 1, 0],
+                  scale: [0, 1, 0]
+                }}
+                transition={{
+                  duration: Math.random() * 8 + 4,
+                  repeat: Infinity,
+                  delay: Math.random() * 5,
+                  ease: "easeInOut"
+                }}
+              />
+            ))}
+          </div>
+
           <motion.h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 sm:mb-10 text-center"
+            className="text-4xl sm:text-6xl md:text-7xl font-bold mb-6 sm:mb-10 text-center bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent relative z-10"
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ 
+              type: "spring", 
+              stiffness: 200, 
+              damping: 25, 
+              delay: 0.2,
+              bounce: 0.4 
+            }}
             whileHover={{ 
               rotate: [0, 2, -2, 0],
               scale: 1.02,
               transition: { type: "spring", stiffness: 400, damping: 20 }
             }}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
           >
-            Nos Services
+            Services Premium
           </motion.h1>
           <motion.p
-            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-10 text-center max-w-3xl px-4"
+            className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-10 text-center max-w-3xl px-4 text-gray-300 relative z-10"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
             whileHover={{ 
               scale: 1.02,
-              transition: { type: "spring", stiffness: 400, damping: 20 }
+              transition: { type: "spring", stiffness: 300, damping: 15 }
             }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.8 }}
           >
-            Des solutions innovantes pour propulser votre succès digital
+            Excellence digitale et innovation créative pour votre succès
           </motion.p>
-        </motion.div>
+        </div>
 
-        {/* Services Section */}
+        {/* Services Section - Animation d'entrée seulement */}
         <motion.div
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20"
-          initial={{ opacity: 0, y: 20 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative z-10"
+          initial={{ opacity: 0, y: 60 }}
           whileInView={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.h2
-            className="text-2xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-12 text-center"
+            className="text-2xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-12 text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 1.05 }}
@@ -962,132 +1632,26 @@ const ServicesPage = () => {
           >
             Nos Services Principaux
           </motion.h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            {mainServices.map((service, index) => (
-              <ServiceCard key={index} service={service} index={index} />
-            ))}
-          </div>
+          <ServiceSlider services={mainServices} />
         </motion.div>
 
-        {/* Additional Services Section */}
-        <motion.div
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+        {/* Additional Services Section with Parallax */}
+        <motion.div 
+          style={{ 
+            y: additionalServicesY,
+            opacity: additionalServicesOpacity
+          }}
         >
-          <motion.h2
-            className="text-2xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-12 text-center"
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
-          >
-            Services Complémentaires
-          </motion.h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {additionalServices.map((service, index) => (
-              <motion.div
-                key={index}
-                className="bg-white text-black p-4 sm:p-6 rounded-lg shadow-lg border border-gray-100 hover:border-black transition-all duration-200"
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ 
-                  opacity: 1, 
-                  y: 0, 
-                  scale: 1,
-                  transition: {
-                    delay: index * 0.05,
-                    type: "spring",
-                    stiffness: 200,
-                    damping: 20
-                  }
-                }}
-                viewport={{ once: true, amount: 0.2 }}
-                whileHover={{ 
-                  y: -6, 
-                  scale: 1.02,
-                  transition: { type: "spring", stiffness: 300, damping: 20 }
-                }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <motion.div 
-                  className="text-2xl sm:text-3xl mb-4"
-                  initial={{ opacity: 0, scale: 0, rotate: -90 }}
-                  whileInView={{ 
-                    opacity: 1, 
-                    scale: 1, 
-                    rotate: 0,
-                    transition: {
-                      delay: index * 0.05 + 0.15,
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20
-                    }
-                  }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  whileHover={{
-                    scale: 1.15,
-                    rotate: 8,
-                    transition: { type: "spring", stiffness: 400, damping: 15 }
-                  }}
-                >
-                  {service.icon}
-                </motion.div>
-                <motion.h3 
-                  className="text-lg sm:text-xl font-bold mb-3"
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ 
-                    opacity: 1, 
-                    y: 0,
-                    transition: { delay: index * 0.05 + 0.2, duration: 0.4 }
-                  }}
-                  viewport={{ once: true, amount: 0.2 }}
-                >
-                  {service.title}
-                </motion.h3>
-                <motion.p 
-                  className="text-gray-600 mb-4 text-sm sm:text-base"
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ 
-                    opacity: 1, 
-                    y: 0,
-                    transition: { delay: index * 0.05 + 0.25, duration: 0.4 }
-                  }}
-                  viewport={{ once: true, amount: 0.2 }}
-                >
-                  {service.description}
-                </motion.p>
-                <ul className="space-y-1">
-                  {service.details.map((detail, idx) => (
-                    <motion.li 
-                      key={idx} 
-                      className="text-xs sm:text-sm text-gray-600 flex items-start"
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ 
-                        opacity: 1, 
-                        x: 0,
-                        transition: { delay: index * 0.05 + idx * 0.02 + 0.3 }
-                      }}
-                      viewport={{ once: true, amount: 0.2 }}
-                    >
-                      <motion.div 
-                        className="w-1 h-1 bg-black rounded-full mt-2 mr-2 flex-shrink-0"
-                        whileHover={{ scale: 1.8 }}
-                      />
-                      {detail}
-                    </motion.li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
+          <AdditionalServicesSection />
         </motion.div>
 
-        {/* Expertise Section - Modern Grid Design */}
+        {/* Expertise Section with Parallax */}
         <motion.div
-          className="max-w-7xl mx-auto px-4 py-20"
+          className="max-w-7xl mx-auto px-4 py-20 relative z-10"
+          style={{ 
+            y: expertiseParallaxY, 
+            opacity: expertiseOpacity 
+          }}
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30 }}
@@ -1118,11 +1682,16 @@ const ServicesPage = () => {
           {/* Responsive Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {expertiseAreas.map((area, index) => (
-              <ExpertiseCard key={index} expertise={area} index={index} />
+              <ExpertiseCard 
+                key={index} 
+                expertise={area} 
+                index={index} 
+                onClick={() => handleExpertiseClick(area)}
+              />
             ))}
           </div>
           
-          {/* Enhanced Stats Section */}
+          {/* Enhanced Expertise Highlights */}
           <motion.div 
             className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8"
             initial={{ opacity: 0, y: 40 }}
@@ -1139,14 +1708,15 @@ const ServicesPage = () => {
               }}
             >
               <motion.div 
-                className="text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                className="text-4xl mb-4"
                 initial={{ scale: 0, rotate: -180 }}
                 whileInView={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20, delay: 1 }}
               >
-                50+
+                🚀
               </motion.div>
-              <div className="text-gray-300">Technologies Maîtrisées</div>
+              <div className="text-xl font-bold text-white mb-2">Technologies Modernes</div>
+              <div className="text-gray-300 text-sm">Stack technique de pointe pour des performances optimales</div>
             </motion.div>
             
             <motion.div 
@@ -1158,14 +1728,15 @@ const ServicesPage = () => {
               }}
             >
               <motion.div 
-                className="text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                className="text-4xl mb-4"
                 initial={{ scale: 0, rotate: 180 }}
                 whileInView={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20, delay: 1.1 }}
               >
-                100+
+                ⚡
               </motion.div>
-              <div className="text-gray-300">Projets Réalisés</div>
+              <div className="text-xl font-bold text-white mb-2">Performance Optimisée</div>
+              <div className="text-gray-300 text-sm">Solutions rapides et efficaces adaptées à vos besoins</div>
             </motion.div>
             
             <motion.div 
@@ -1177,21 +1748,26 @@ const ServicesPage = () => {
               }}
             >
               <motion.div 
-                className="text-5xl font-bold mb-3 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                className="text-4xl mb-4"
                 initial={{ scale: 0, rotate: -90 }}
                 whileInView={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20, delay: 1.2 }}
               >
-                24/7
+                🛡️
               </motion.div>
-              <div className="text-gray-300">Support Technique</div>
+              <div className="text-xl font-bold text-white mb-2">Support Continu</div>
+              <div className="text-gray-300 text-sm">Accompagnement technique et maintenance de qualité</div>
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* Process Section - Timeline Design */}
+        {/* Process Section - Timeline Design with Parallax */}
         <motion.div
-          className="max-w-6xl mx-auto px-4 py-20"
+          className="max-w-6xl mx-auto px-4 py-20 relative z-10"
+          style={{ 
+            y: timelineParallaxY, 
+            opacity: timelineOpacity 
+          }}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
@@ -1199,7 +1775,7 @@ const ServicesPage = () => {
           transition={{ duration: 0.5, ease: "easeOut" }}
         >
           <motion.h2
-            className="text-3xl md:text-5xl font-bold mb-16 text-center"
+            className="text-3xl md:text-5xl font-bold mb-16 text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 1.05 }}
@@ -1283,32 +1859,72 @@ const ServicesPage = () => {
           </div>
         </motion.div>
 
-        {/* Call-to-Action Section */}
+        {/* Call-to-Action Section with Parallax */}
         <motion.div
-          className="text-center mt-16 py-20"
-          initial={{ opacity: 0, y: 50, rotate: -5 }}
-          whileInView={{ opacity: 1, y: 0, rotate: 0 }}
-          exit={{ opacity: 0, y: 50, rotate: 5 }}
+          className="max-w-4xl mx-auto text-center py-20 px-4 relative z-10"
+          style={{ 
+            y: ctaParallaxY,
+            opacity: ctaOpacity 
+          }}
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 50, scale: 1.05 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
-          <motion.h2
-            className="text-3xl md:text-5xl font-bold mb-6"
-            whileHover={{ rotate: 2 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          <motion.div
+            className="bg-gradient-to-r from-purple-900 to-pink-900 p-8 sm:p-12 rounded-3xl border border-white border-opacity-20 backdrop-blur-lg shadow-2xl"
+            whileHover={{ 
+              scale: 1.02,
+              transition: { type: "spring", stiffness: 300, damping: 15 }
+            }}
           >
-            Prêt à Innover ?
-          </motion.h2>
-          <ActionButton
-            variant="primary"
-            size="lg"
-            onClick={() => router.push("/contact")}
-          >
-            Contactez-nous
-          </ActionButton>
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold mb-6 text-white"
+              whileHover={{ 
+                rotate: [0, 1, -1, 0],
+                transition: { type: "spring", stiffness: 300, damping: 15 }
+              }}
+            >
+              Prêt à Transformer Votre Vision ?
+            </motion.h2>
+            <motion.p 
+              className="text-gray-300 text-lg mb-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              Collaborons ensemble pour créer quelque chose d&apos;extraordinaire qui marquera votre industrie
+            </motion.p>
+            
+            <div className="flex justify-center">
+              <motion.div
+                whileHover={{ 
+                  scale: 1.05,
+                  transition: { type: "spring", stiffness: 300, damping: 15 }
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <ActionButton
+                  variant="primary"
+                  size="lg"
+                  onClick={() => router.push("/contact")}
+                >
+                  Commencer Votre Projet
+                </ActionButton>
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
 
         <Footer />
+
+        {/* Expertise Modal */}
+        <ExpertiseModal 
+          expertise={selectedExpertise} 
+          isOpen={isModalOpen} 
+          onClose={closeModal} 
+        />
 
         <motion.div
           className="fixed inset-0 pointer-events-none z-10"

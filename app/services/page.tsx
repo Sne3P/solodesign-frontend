@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from "react"
 import {
   motion,
-  useScroll,
-  useSpring,
   useInView,
   useMotionValue,
   useTransform,
@@ -28,11 +26,79 @@ import SocialLinks from "../../components/layout/SocialLinks"
 import MenuButton from "../../components/layout/MenuButton"
 import LogoTitle from "../../components/layout/LogoTitle"
 import dynamic from 'next/dynamic';
+
+// ===== CONSTANTES D'ANIMATION GLOBALES OPTIMISÉES =====
+const SPRING_CONFIG = {
+  fast: { type: "spring" as const, stiffness: 400, damping: 25 },
+  smooth: { type: "spring" as const, stiffness: 200, damping: 20 },
+  soft: { type: "spring" as const, stiffness: 100, damping: 15 }
+}
+
+const TRANSITIONS = {
+  instant: { duration: 0.1 },
+  quick: { duration: 0.2 },
+  normal: { duration: 0.3 },
+  slow: { duration: 0.5 }
+}
+
+const ENTRANCE_VARIANTS = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -20 }
+}
+
+const CARD_VARIANTS = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  hover: { y: -8 }
+}
+
+const HOVER_EFFECTS = {
+  lift: { y: -8, transition: SPRING_CONFIG.fast },
+  scale: { scale: 1.05, transition: SPRING_CONFIG.fast },
+  glow: { filter: "brightness(1.1)", transition: TRANSITIONS.quick }
+}
+
+// Configuration optimisée pour les animations continues
+const FLOATING_CONFIG = {
+  repeat: Infinity,
+  ease: "easeInOut" as const
+}
+
+const ROTATING_CONFIG = {
+  repeat: Infinity,
+  ease: "linear" as const
+}
+
+// Délais optimisés pour les animations séquentielles
+const STAGGER_DELAYS = {
+  fast: 0.05,
+  normal: 0.1,
+  slow: 0.15
+}
+
+// Variantes pour les textes et contenus
+const TEXT_VARIANTS = {
+  hidden: { opacity: 0, y: 15 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 }
+}
+
+const CONTENT_VARIANTS = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 }
+}
+
+// Animations optimisées avec will-change pour de meilleures performances
+const PERFORMANCE_PROPS = {
+  style: { willChange: 'transform, opacity' },
+  layout: false as const,
+  layoutId: undefined
+}
 const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import Footer from "../../components/sections/Footer"
 import ActionButton from "../../components/ui/ActionButton"
 import React from "react"
-import { ParallaxProvider } from "react-scroll-parallax"
 
 // -------------------- Types --------------------
 
@@ -281,9 +347,9 @@ const BentoCard = ({ item, index, className = "" }: { item: BentoItem; index: nu
         rotateX: 2,
         backgroundColor: "rgba(255,255,255,0.15)",
         borderColor: "rgba(255,255,255,0.4)",
-        transition: { type: "spring", stiffness: 400, damping: 15 }
+        transition: SPRING_CONFIG.fast
       }}
-      whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
+      whileTap={{ scale: 0.98, transition: TRANSITIONS.instant }}
       style={{ perspective: 1000 }}
     >
       {/* Animated Background Pattern */}
@@ -355,8 +421,7 @@ const BentoCard = ({ item, index, className = "" }: { item: BentoItem; index: nu
         }}
         transition={{
           duration: 2 + index * 0.5,
-          repeat: Infinity,
-          ease: "easeInOut"
+          ...FLOATING_CONFIG
         }}
       />
       
@@ -367,9 +432,8 @@ const BentoCard = ({ item, index, className = "" }: { item: BentoItem; index: nu
           opacity: [0.4, 0.8, 0.4]
         }}
         transition={{
+          ...FLOATING_CONFIG,
           duration: 3 + index * 0.3,
-          repeat: Infinity,
-          ease: "easeInOut",
           delay: 1
         }}
       />
@@ -392,10 +456,8 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
         x: 0, 
         y: 0,
         transition: {
-          type: "spring",
-          stiffness: 200,
-          damping: 20,
-          delay: index * 0.1
+          ...SPRING_CONFIG.smooth,
+          delay: index * STAGGER_DELAYS.normal
         }
       } : { opacity: 0, x: isEven ? -60 : 60, y: 20 }}
     >
@@ -435,7 +497,7 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
             whileHover={{
               scale: 1.1,
               boxShadow: "0 0 30px rgba(255,255,255,0.5)",
-              transition: { type: "spring", stiffness: 400, damping: 15 }
+              transition: SPRING_CONFIG.fast
             }}
           >
             <motion.span 
@@ -456,7 +518,7 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
             whileHover={{ 
               scale: 1.02, 
               y: -2,
-              transition: { type: "spring", stiffness: 300, damping: 15 } 
+              transition: SPRING_CONFIG.smooth
             }}
           >
             <motion.div
@@ -466,10 +528,8 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
                 scale: 1, 
                 opacity: 1,
                 transition: { 
-                  delay: index * 0.1 + 0.15, 
-                  type: "spring", 
-                  stiffness: 200, 
-                  damping: 20 
+                  delay: index * STAGGER_DELAYS.normal + 0.15, 
+                  ...SPRING_CONFIG.smooth
                 }
               } : { scale: 0.9, opacity: 0 }}
               whileHover={{
@@ -480,24 +540,22 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
             >
               <motion.h3 
                 className="text-lg sm:text-xl font-bold mb-3 text-white"
-                initial={{ opacity: 0, y: 15 }}
-                animate={isInView ? { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: { delay: index * 0.1 + 0.25, duration: 0.3 }
-                } : { opacity: 0, y: 15 }}
+                variants={TEXT_VARIANTS}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                transition={{ delay: index * STAGGER_DELAYS.normal + 0.25, ...TRANSITIONS.normal }}
+                {...PERFORMANCE_PROPS}
               >
                 {step.title}
               </motion.h3>
               
               <motion.p 
                 className="text-gray-300 mb-4 text-sm sm:text-base"
-                initial={{ opacity: 0, y: 10 }}
-                animate={isInView ? { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: { delay: index * 0.1 + 0.3, duration: 0.3 }
-                } : { opacity: 0, y: 10 }}
+                variants={CONTENT_VARIANTS}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                transition={{ delay: index * STAGGER_DELAYS.normal + 0.3, ...TRANSITIONS.normal }}
+                {...PERFORMANCE_PROPS}
               >
                 {step.description}
               </motion.p>
@@ -520,16 +578,14 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
                         opacity: 1, 
                         x: 0,
                         transition: {
-                          delay: index * 0.1 + detailIndex * 0.02 + 0.4,
-                          type: "spring",
-                          stiffness: 300,
-                          damping: 20
+                          delay: index * STAGGER_DELAYS.normal + detailIndex * STAGGER_DELAYS.fast + 0.4,
+                          ...SPRING_CONFIG.smooth
                         }
                       } : { opacity: 0, x: -15 }}
                     >
                       <motion.div 
                         className="w-1.5 h-1.5 bg-white rounded-full mt-2 mr-3 flex-shrink-0"
-                        whileHover={{ scale: 1.8, transition: { type: "spring", stiffness: 500, damping: 15 } }}
+                        whileHover={{ scale: 1.8, transition: SPRING_CONFIG.fast }}
                       />
                       {detail}
                     </motion.li>
@@ -573,38 +629,34 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
               scale: 1, 
               opacity: 1,
               transition: { 
-                delay: index * 0.1 + 0.15, 
-                type: "spring", 
-                stiffness: 200, 
-                damping: 20 
+                delay: index * STAGGER_DELAYS.normal + 0.15, 
+                ...SPRING_CONFIG.smooth
               }
             } : { scale: 0.9, opacity: 0 }}
             whileHover={{
               backgroundColor: "rgba(255,255,255,0.15)",
               borderColor: "rgba(255,255,255,0.4)",
-              transition: { duration: 0.2 }
+              transition: TRANSITIONS.quick
             }}
           >
             <motion.h3 
               className="text-xl font-bold mb-3 text-white"
-              initial={{ opacity: 0, y: 15 }}
-              animate={isInView ? { 
-                opacity: 1, 
-                y: 0,
-                transition: { delay: index * 0.1 + 0.25, duration: 0.3 }
-              } : { opacity: 0, y: 15 }}
+              variants={TEXT_VARIANTS}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              transition={{ delay: index * STAGGER_DELAYS.normal + 0.25, ...TRANSITIONS.normal }}
+              {...PERFORMANCE_PROPS}
             >
               {step.title}
             </motion.h3>
             
             <motion.p 
               className="text-gray-300 mb-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { 
-                opacity: 1, 
-                y: 0,
-                transition: { delay: index * 0.1 + 0.3, duration: 0.3 }
-              } : { opacity: 0, y: 10 }}
+              variants={CONTENT_VARIANTS}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              transition={{ delay: index * STAGGER_DELAYS.normal + 0.3, ...TRANSITIONS.normal }}
+              {...PERFORMANCE_PROPS}
             >
               {step.description}
             </motion.p>
@@ -627,10 +679,8 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
                       opacity: 1, 
                       x: 0,
                       transition: {
-                        delay: index * 0.1 + detailIndex * 0.02 + 0.4,
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 20
+                        delay: index * STAGGER_DELAYS.normal + detailIndex * STAGGER_DELAYS.fast + 0.4,
+                        ...SPRING_CONFIG.smooth
                       }
                     } : { opacity: 0, x: -15 }}
                   >
@@ -664,7 +714,7 @@ const TimelineStep = ({ step, index, totalSteps }: { step: TimelineStepType; ind
           whileHover={{
             scale: 1.1,
             boxShadow: "0 0 30px rgba(255,255,255,0.5)",
-            transition: { type: "spring", stiffness: 400, damping: 15 }
+            transition: SPRING_CONFIG.fast
           }}
         >
           <motion.span 
@@ -782,24 +832,12 @@ const ExpertiseCard = ({ expertise, index, onClick }: {
     <motion.div
       ref={cardRef}
       className="relative group cursor-pointer"
-      initial={{ opacity: 0, y: 60, scale: 0.8 }}
-      animate={isInView ? { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1,
-        transition: {
-          type: "spring",
-          stiffness: 200,
-          damping: 20,
-          delay: index * 0.1
-        }
-      } : { opacity: 0, y: 60, scale: 0.8 }}
-      whileHover={{
-        y: -12,
-        scale: 1.05,
-        transition: { type: "spring", stiffness: 400, damping: 15 }
-      }}
-      whileTap={{ scale: 0.95 }}
+      variants={CARD_VARIANTS}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      whileHover={{ ...HOVER_EFFECTS.lift, ...HOVER_EFFECTS.scale }}
+      whileTap={{ scale: 0.95, transition: TRANSITIONS.instant }}
+      transition={{ ...SPRING_CONFIG.smooth, delay: index * STAGGER_DELAYS.normal }}
       onClick={onClick}
     >
       {/* Click indicator */}
@@ -841,12 +879,12 @@ const ExpertiseCard = ({ expertise, index, onClick }: {
         <motion.div 
           className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-l from-purple-500/20 to-transparent rounded-full blur-xl"
           animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 20, ...ROTATING_CONFIG }}
         />
         <motion.div 
           className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-r from-pink-500/20 to-transparent rounded-full blur-xl"
           animate={{ rotate: -360 }}
-          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 15, ...ROTATING_CONFIG }}
         />
 
         {/* Icon - Sans background, juste l'icône */}
@@ -954,24 +992,12 @@ const ServiceCard = ({ service, index }: ServiceCardProps) => {
     <motion.div
       ref={cardRef}
       className="relative overflow-hidden bg-white/5 backdrop-blur-xl text-white p-6 sm:p-8 rounded-3xl border border-white/10 group"
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-      animate={isInView ? { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1,
-        transition: {
-          type: "spring",
-          stiffness: 200,
-          damping: 20,
-          delay: index * 0.06
-        }
-      } : { opacity: 0, y: 40, scale: 0.95 }}
-      whileHover={{
-        y: -8,
-        scale: 1.02,
-        transition: { type: "spring", stiffness: 300, damping: 15 }
-      }}
-      whileTap={{ scale: 0.98, transition: { duration: 0.1 } }}
+      variants={CARD_VARIANTS}
+      initial="hidden"
+      animate={isInView ? "visible" : "hidden"}
+      whileHover={HOVER_EFFECTS.lift}
+      whileTap={{ scale: 0.98, transition: TRANSITIONS.instant }}
+      transition={{ ...SPRING_CONFIG.smooth, delay: index * STAGGER_DELAYS.fast }}
       onMouseMove={handleMouseMove}
     >
       {/* Glassmorphic Cursor Light Effect */}
@@ -1453,20 +1479,8 @@ const ServicesPage = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [selectedExpertise, setSelectedExpertise] = useState<ExpertiseArea | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { scrollYProgress } = useScroll()
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 })
+  // Pas d'effets de fade avec le scroll - animations d'entrée seulement
   const router = useRouter()
-
-  // Parallax effects pour les sections (sauf la première)
-  // Pas d'effet fade in pour la première section, juste les animations d'entrée
-  const additionalServicesY = useTransform(scrollYProgress, [0.2, 0.5], ['0px', '-30px'])
-  const additionalServicesOpacity = useTransform(scrollYProgress, [0.2, 0.4, 0.6], [0, 1, 1])
-  const expertiseParallaxY = useTransform(scrollYProgress, [0.3, 0.6], ['0px', '-40px'])
-  const expertiseOpacity = useTransform(scrollYProgress, [0.3, 0.5, 0.7], [0, 1, 1])
-  const timelineParallaxY = useTransform(scrollYProgress, [0.5, 0.8], ['0px', '-60px'])
-  const timelineOpacity = useTransform(scrollYProgress, [0.5, 0.7, 0.9], [0, 1, 1])
-  const ctaParallaxY = useTransform(scrollYProgress, [0.7, 1], ['0px', '-30px'])
-  const ctaOpacity = useTransform(scrollYProgress, [0.7, 0.9], [0, 1])
 
   const handleExpertiseClick = (expertise: ExpertiseArea) => {
     setSelectedExpertise(expertise)
@@ -1523,17 +1537,14 @@ const ServicesPage = () => {
 
   if (!mounted) return null
 
-  const MotionLink = motion(Link)
+  const MotionLink = motion.create(Link)
 
   return (
-    <ParallaxProvider>
-      <div className="min-h-screen bg-black text-white overflow-hidden">
-        <motion.div className="fixed top-0 left-0 right-0 h-1 bg-white origin-left z-50" style={{ scaleX }} />
-
-        <LogoTitle />
-        <SocialLinks />
-        <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        <Cursor />
+    <div className="min-h-screen bg-black text-white overflow-hidden">
+      <LogoTitle />
+      <SocialLinks />
+      <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <Cursor />
 
         {/* Bouton Retour optimisé pour mobile */}
         <motion.div
@@ -1571,10 +1582,9 @@ const ServicesPage = () => {
                   scale: [0, 1, 0]
                 }}
                 transition={{
-                  duration: Math.random() * 8 + 4,
-                  repeat: Infinity,
-                  delay: Math.random() * 5,
-                  ease: "easeInOut"
+                  duration: Math.random() * 6 + 4, // Durée plus courte pour de meilleures performances
+                  ...FLOATING_CONFIG,
+                  delay: Math.random() * 3 // Délai plus court
                 }}
               />
             ))}
@@ -1594,7 +1604,7 @@ const ServicesPage = () => {
             whileHover={{ 
               rotate: [0, 2, -2, 0],
               scale: 1.02,
-              transition: { type: "spring", stiffness: 400, damping: 20 }
+              transition: SPRING_CONFIG.fast
             }}
           >
             Services Premium
@@ -1603,10 +1613,10 @@ const ServicesPage = () => {
             className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-10 text-center max-w-3xl px-4 text-gray-300 relative z-10"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            transition={{ delay: 0.4, ...TRANSITIONS.slow }}
             whileHover={{ 
               scale: 1.02,
-              transition: { type: "spring", stiffness: 300, damping: 15 }
+              transition: SPRING_CONFIG.smooth
             }}
           >
             Excellence digitale et innovation créative pour votre succès
@@ -1624,39 +1634,32 @@ const ServicesPage = () => {
         >
           <motion.h2
             className="text-2xl sm:text-4xl md:text-5xl font-bold mb-8 sm:mb-12 text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 1.05 }}
+            variants={ENTRANCE_VARIANTS}
+            initial="hidden"
+            whileInView="visible"
+            exit="exit"
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+            transition={{ ...SPRING_CONFIG.smooth, delay: 0.2 }}
+            {...PERFORMANCE_PROPS}
           >
             Nos Services Principaux
           </motion.h2>
           <ServiceSlider services={mainServices} />
         </motion.div>
 
-        {/* Additional Services Section with Parallax */}
-        <motion.div 
-          style={{ 
-            y: additionalServicesY,
-            opacity: additionalServicesOpacity
-          }}
-        >
-          <AdditionalServicesSection />
-        </motion.div>
+        {/* Additional Services Section - Animation d'entrée seulement */}
+        <AdditionalServicesSection />
 
-        {/* Expertise Section with Parallax */}
+        {/* Expertise Section - Animation d'entrée seulement */}
         <motion.div
           className="max-w-7xl mx-auto px-4 py-20 relative z-10"
-          style={{ 
-            y: expertiseParallaxY, 
-            opacity: expertiseOpacity 
-          }}
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 30 }}
+          variants={ENTRANCE_VARIANTS}
+          initial="hidden"
+          whileInView="visible"
+          exit="exit"
           viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ ...TRANSITIONS.slow, ease: "easeOut" }}
+          {...PERFORMANCE_PROPS}
         >
           <motion.div className="text-center mb-16">
             <motion.h2
@@ -1764,15 +1767,13 @@ const ServicesPage = () => {
         {/* Process Section - Timeline Design with Parallax */}
         <motion.div
           className="max-w-6xl mx-auto px-4 py-20 relative z-10"
-          style={{ 
-            y: timelineParallaxY, 
-            opacity: timelineOpacity 
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
+          variants={ENTRANCE_VARIANTS}
+          initial="hidden"
+          whileInView="visible"
+          exit="exit"
           viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          transition={{ ...TRANSITIONS.normal, ease: "easeOut" }}
+          {...PERFORMANCE_PROPS}
         >
           <motion.h2
             className="text-3xl md:text-5xl font-bold mb-16 text-center bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
@@ -1859,24 +1860,22 @@ const ServicesPage = () => {
           </div>
         </motion.div>
 
-        {/* Call-to-Action Section with Parallax */}
+        {/* Call-to-Action Section - Animation d'entrée seulement */}
         <motion.div
           className="max-w-4xl mx-auto text-center py-20 px-4 relative z-10"
-          style={{ 
-            y: ctaParallaxY,
-            opacity: ctaOpacity 
-          }}
-          initial={{ opacity: 0, y: 50, scale: 0.95 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 50, scale: 1.05 }}
+          variants={CARD_VARIANTS}
+          initial="hidden"
+          whileInView="visible"
+          exit="exit"
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15 }}
+          transition={SPRING_CONFIG.smooth}
+          {...PERFORMANCE_PROPS}
         >
           <motion.div
             className="bg-gradient-to-r from-purple-900 to-pink-900 p-8 sm:p-12 rounded-3xl border border-white border-opacity-20 backdrop-blur-lg shadow-2xl"
             whileHover={{ 
               scale: 1.02,
-              transition: { type: "spring", stiffness: 300, damping: 15 }
+              transition: SPRING_CONFIG.smooth
             }}
           >
             <motion.h2
@@ -1937,7 +1936,6 @@ const ServicesPage = () => {
           transition={{ repeat: Infinity, repeatType: "loop", duration: 10, ease: "linear" }}
         />
       </div>
-    </ParallaxProvider>
   )
 }
 

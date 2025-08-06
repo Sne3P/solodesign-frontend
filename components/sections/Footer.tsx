@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowUp, Heart, Github, Linkedin, Twitter } from 'lucide-react';
 
@@ -36,14 +35,13 @@ const Footer = () => {
   };
 
   return (
-    <Parallax speed={-3}>
-      <footer className="text-white relative overflow-hidden">
-        {/* Background Pattern */}
-        <motion.div 
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px), radial-gradient(circle at 80% 50%, #fff 1px, transparent 1px)`,
-            backgroundSize: '100px 100px'
+    <footer className="text-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <motion.div 
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `radial-gradient(circle at 20% 50%, #fff 1px, transparent 1px), radial-gradient(circle at 80% 50%, #fff 1px, transparent 1px)`,
+          backgroundSize: '100px 100px'
           }}
           animate={{
             backgroundPosition: ['0% 0%', '100% 100%']
@@ -311,7 +309,6 @@ const Footer = () => {
           </div>
         </div>
       </footer>
-    </Parallax>
   );
 };
 

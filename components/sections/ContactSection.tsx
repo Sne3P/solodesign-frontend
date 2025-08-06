@@ -1,17 +1,23 @@
 import React from 'react';
 import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
-import { Send, Mail, Phone, MapPin, Clock, Star } from 'lucide-react';
+import { Send, Mail, Phone, MapPin, Clock } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
 import ActionButton from '../ui/ActionButton';
 
 const contactInfo = [
-  { icon: Mail, label: "Email", value: "hello@solodesign.fr", href: "mailto:hello@solodesign.fr" },
-  { icon: Phone, label: "Téléphone", value: "+33 1 23 45 67 89", href: "tel:+33123456789" },
+  { icon: Mail, label: "Email", value: "contact@solodesign.fr", href: "mailto:contact@solodesign.fr" },
+  { icon: Phone, label: "Téléphone", value: "+33 06 60 94 98 79", href: "tel:+33660949879" },
   { icon: MapPin, label: "Adresse", value: "Paris, France", href: "#" }
 ];
 
-const ContactSection = () => (
+const ContactSection = () => {
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    alert("✉️ Fonctionnalité temporairement indisponible\n\nVeuillez nous envoyer votre message directement à :\ncontact@solodesign.fr\n\nNous vous répondrons dans les plus brefs délais !")
+  }
+
+  return (
   <section id="contact" className="py-16 sm:py-24 md:py-32 bg-white text-black relative overflow-hidden">
     {/* Background Pattern */}
     <motion.div 
@@ -86,6 +92,7 @@ const ContactSection = () => (
           <Parallax translateY={[-30, 30]}>
             <motion.form
               className="space-y-4 sm:space-y-6 bg-gray-50 p-6 sm:p-8 rounded-lg shadow-lg"
+              onSubmit={handleContactSubmit}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -158,7 +165,7 @@ const ContactSection = () => (
                   id="email"
                   name="email"
                   className="w-full p-3 bg-white rounded-lg text-black border border-gray-300 focus:border-black focus:outline-none transition-colors"
-                  placeholder="votre.email@exemple.com"
+                  placeholder="votre.email@contact.com"
                   whileFocus={{ 
                     scale: 1.02,
                     boxShadow: "0 0 0 2px rgba(0, 0, 0, 0.1)"
@@ -359,6 +366,7 @@ const ContactSection = () => (
       </div>
     </div>
   </section>
-);
+  )
+}
 
 export default ContactSection;

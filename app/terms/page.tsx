@@ -46,7 +46,7 @@ const TermsPage = () => {
         "Éditeur du site : Solo Design",
         "Forme juridique : [À compléter]",
         "Adresse : Paris, France",
-        "Email : hello@solodesign.fr",
+        "Email : contact@solodesign.fr",
         "Téléphone : +33 06 60 94 98 79",
         "Numéro SIRET : [À compléter]",
         "Directeur de la publication : [À compléter]",

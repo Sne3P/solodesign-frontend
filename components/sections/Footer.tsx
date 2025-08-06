@@ -189,7 +189,7 @@ const Footer = () => {
                     whileHover={{ x: 5 }}
                     transition={{ duration: 0.2 }}
                   >
-                    hello@solodesign.fr
+                    contact@solodesign.fr
                   </motion.p>
                   <motion.p
                     whileHover={{ x: 5 }}

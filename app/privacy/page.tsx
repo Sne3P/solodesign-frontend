@@ -36,7 +36,7 @@ const PrivacyPage = () => {
       title: "1. Responsable du traitement",
       content: [
         "Solo Design, dont le siège social est situé à Paris, France, est responsable du traitement de vos données personnelles.",
-        "Contact : hello@solodesign.fr - +33 06 60 94 98 79"
+        "Contact : contact@solodesign.fr - +33 06 60 94 98 79"
       ]
     },
     {
@@ -126,7 +126,7 @@ const PrivacyPage = () => {
       title: "9. Exercice de vos droits",
       content: [
         "Pour exercer vos droits, contactez-nous :",
-        "• Email : hello@solodesign.fr",
+        "• Email : contact@solodesign.fr",
         "• Courrier : Solo Design - Paris, France",
         "Nous vous répondrons dans un délai d&apos;un mois.",
         "Vous pouvez également introduire une réclamation auprès de la CNIL."

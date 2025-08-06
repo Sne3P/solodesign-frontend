@@ -264,8 +264,8 @@ const ContactPage = () => {
     {
       icon: Phone,
       title: "Téléphone",
-      value: "+33 1 23 45 67 89",
-      action: "tel:+33123456789"
+      value: "+33 06 60 94 98 79",
+      action: "tel:+33660949879"
     },
     {
       icon: MapPin,
@@ -292,6 +292,13 @@ const ContactPage = () => {
     const message = formData.get("message") as string
 
     try {
+      // Message d'indisponibilité temporaire
+      setTimeout(() => {
+        setIsSubmitting(false)
+        alert("✉️ Fonctionnalité temporairement indisponible\n\nVeuillez nous envoyer votre message directement à :\ncontact@solodesign.fr\n\nNous vous répondrons dans les plus brefs délais !")
+      }, 1000)
+      return
+      
       const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
@@ -437,6 +444,13 @@ const ContactPage = () => {
     setIsSubmitting(true)
     
     try {
+      // Message d'indisponibilité temporaire pour le devis
+      setTimeout(() => {
+        setIsSubmitting(false)
+        alert("📋 Générateur de devis temporairement indisponible\n\nPour obtenir un devis personnalisé gratuit, veuillez nous contacter directement à :\ncontact@solodesign.fr\n\nNotre équipe vous répondra avec un devis détaillé sous 24h !")
+      }, 1000)
+      return
+      
       // Generate PDF
       const pdfBlob = await generateQuotePdf()
       
@@ -547,7 +561,7 @@ Un PDF détaillé est joint à cette demande.`,
 
           {/* Navigation des onglets */}
           <motion.div
-            className="fixed top-24 right-8 z-50 flex space-x-4"
+            className="fixed top-24 right-8 z-40 flex space-x-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}

@@ -6,7 +6,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
-import { buttonVariants, iconVariants, transitions } from '@/lib/animations';
 
 interface ActionButtonProps {
   onClick?: () => void;

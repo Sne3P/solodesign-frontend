@@ -22,21 +22,26 @@ class MediaService {
   private loadMediaData(): void {
     try {
       const mediaData = dataPersistence.loadMedia()
+      console.log('💾 MediaService: Chargement des médias depuis fichier:', mediaData) // Debug
       
       // Convertir les objets en Map
       if (mediaData.images) {
         Object.entries(mediaData.images).forEach(([projectId, images]) => {
           this.projectImages.set(projectId, images as ProjectImage[])
+          console.log(`📸 MediaService: Chargé ${(images as ProjectImage[]).length} images pour projet ${projectId}`) // Debug
         })
       }
       
       if (mediaData.videos) {
         Object.entries(mediaData.videos).forEach(([projectId, videos]) => {
           this.projectVideos.set(projectId, videos as ProjectVideo[])
+          console.log(`🎥 MediaService: Chargé ${(videos as ProjectVideo[]).length} vidéos pour projet ${projectId}`) // Debug
         })
       }
+      
+      console.log('✅ MediaService: Médias chargés avec succès') // Debug
     } catch (error) {
-      console.error('Erreur chargement médias:', error)
+      console.error('💥 MediaService: Erreur chargement médias:', error)
     }
   }
 
@@ -55,13 +60,8 @@ class MediaService {
 
   // Générer un ID unique pour les médias
   private generateMediaId(): string {
-    // Utilise un identifiant stable ou passé en paramètre pour éviter les mismatches SSR/CSR
-    // Par exemple, utiliser un uuid ou un timestamp généré côté client uniquement
-    if (typeof window !== 'undefined') {
-        return `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-    // Valeur fallback côté serveur (jamais utilisée pour l'hydratation)
-    return 'media_ssr_placeholder';
+    // Génération d'un ID unique vraiment aléatoire
+    return `media_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   // Obtenir une extension sécurisée
@@ -127,12 +127,16 @@ class MediaService {
 
   // Obtenir toutes les images d'un projet
   getProjectImages(projectId: string): ProjectImage[] {
-    return this.projectImages.get(projectId) || []
+    const images = this.projectImages.get(projectId) || []
+    console.log(`📸 MediaService: Images pour projet ${projectId}:`, images.length) // Debug
+    return images
   }
 
   // Obtenir toutes les vidéos d'un projet
   getProjectVideos(projectId: string): ProjectVideo[] {
-    return this.projectVideos.get(projectId) || []
+    const videos = this.projectVideos.get(projectId) || []
+    console.log(`🎥 MediaService: Vidéos pour projet ${projectId}:`, videos.length) // Debug
+    return videos
   }
 
   // Supprimer un fichier média

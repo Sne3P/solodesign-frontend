@@ -22,12 +22,28 @@ export async function POST(request: NextRequest) {
     }
 
     const token = AuthService.generateToken()
+    
+    console.log("🔐 API Login: Token généré, définition du cookie...")
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       token,
       message: 'Connexion réussie'
     })
+
+    // Définir le cookie côté serveur
+    response.cookies.set({
+      name: 'admin_token',
+      value: token,
+      httpOnly: false, // Permet l'accès côté client
+      secure: process.env.NODE_ENV === 'production', // HTTPS en production seulement
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60, // 24 heures
+      path: '/'
+    })
+
+    console.log("✅ API Login: Cookie défini côté serveur")
+    return response
 
   } catch (error) {
     console.error('Erreur d\'authentification:', error)

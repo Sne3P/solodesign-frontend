@@ -62,14 +62,25 @@ export class ProjectService {
 
   static getProjectById(id: string): Project | undefined {
     const project = projects.find(project => project.id === id)
-    if (!project) return undefined
+    if (!project) {
+      console.log(`❌ ProjectService: Projet ${id} non trouvé`) // Debug
+      return undefined
+    }
+    
+    console.log(`📋 ProjectService: Récupération projet ${id}`) // Debug
     
     // Ajouter les médias en temps réel
-    return {
+    const images = mediaService.getProjectImages(project.id)
+    const videos = mediaService.getProjectVideos(project.id)
+    
+    const fullProject = {
       ...project,
-      images: mediaService.getProjectImages(project.id),
-      videos: mediaService.getProjectVideos(project.id)
+      images,
+      videos
     }
+    
+    console.log(`✅ ProjectService: Projet ${id} avec ${images.length} images et ${videos.length} vidéos`) // Debug
+    return fullProject
   }
 
   static createProject(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Project {

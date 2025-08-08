@@ -39,7 +39,7 @@ export default function MediaManager({
     setUploading(true)
 
     try {
-      for (const file of Array.from(files)) {
+      const uploadPromises = Array.from(files).map(async (file) => {
         const formData = new FormData()
         formData.append('file', file)
         formData.append('projectId', projectId)
@@ -57,12 +57,16 @@ export default function MediaManager({
           throw new Error(error.error || 'Erreur lors de l\'upload')
         }
 
-        const result = await response.json()
-        toast({
-          title: "Succès",
-          description: `${file.name} uploadé avec succès`
-        })
-      }
+        return await response.json()
+      })
+
+      // Attendre que tous les uploads soient terminés
+      const results = await Promise.all(uploadPromises)
+      
+      toast({
+        title: "Succès",
+        description: `${results.length} fichier(s) uploadé(s) avec succès`
+      })
 
       // Rafraîchir les données du projet pour afficher les nouveaux médias
       onRefreshProject()
@@ -294,15 +298,28 @@ export default function MediaManager({
                   />
                 </div>
                 
-                {/* Actions */}
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => handleDelete(video.id)}
-                    className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                    title="Supprimer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                {/* Overlay avec actions */}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all rounded-lg flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                    <button
+                      onClick={() => handleCoverImageSet(video.url)}
+                      className={`p-2 rounded-full transition-colors ${
+                        coverImage === video.url
+                          ? 'bg-green-600 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                      }`}
+                      title={coverImage === video.url ? 'Vidéo de couverture' : 'Définir comme couverture'}
+                    >
+                      <Monitor className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(video.id)}
+                      className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Informations */}

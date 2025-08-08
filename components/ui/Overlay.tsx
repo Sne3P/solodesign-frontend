@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Eye } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 import { transitions } from '@/lib/animations';
 
 interface OverlayProps {

@@ -41,18 +41,22 @@ const AdminDashboard = () => {
   const { toast } = useToast()
 
   useEffect(() => {
+    console.log("🔍 Dashboard: Vérification de l'authentification...")
     checkAuth()
-    fetchProjects()
   }, [])
 
   const checkAuth = async () => {
+    console.log("🔍 Dashboard: Récupération du token...")
     const token = localStorage.getItem('admin_token')
+    
     if (!token) {
+      console.log("❌ Dashboard: Pas de token, redirection vers admin")
       router.push('/admin')
       return
     }
 
     try {
+      console.log("🔍 Dashboard: Vérification du token avec le serveur...")
       const response = await fetch('/api/auth/verify', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -60,13 +64,33 @@ const AdminDashboard = () => {
       })
 
       if (!response.ok) {
+        console.log("❌ Dashboard: Token invalide, nettoyage et redirection")
         localStorage.removeItem('admin_token')
+        document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
         router.push('/admin')
+        return
       }
+
+      console.log("✅ Dashboard: Token valide, chargement des projets...")
+      fetchProjects()
     } catch (error) {
+      console.error("💥 Dashboard: Erreur vérification token:", error)
       localStorage.removeItem('admin_token')
+      document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       router.push('/admin')
     }
+  }
+
+  const handleLogout = () => {
+    console.log("🚪 Dashboard: Déconnexion...")
+    localStorage.removeItem('admin_token')
+    document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+    router.push('/admin')
+    
+    toast({
+      title: "Déconnexion réussie",
+      description: "À bientôt !",
+    })
   }
 
   const fetchProjects = async () => {
@@ -87,29 +111,37 @@ const AdminDashboard = () => {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_token')
-    router.push('/admin')
-  }
-
-  const handleMediaUpdate = () => {
-    // Recharger les projets pour avoir les médias à jour
-    fetchProjects()
+  const handleMediaUpdate = async () => {
+    console.log('handleMediaUpdate appelé') // Debug
     
-    // Si on édite un projet, le rafraîchir aussi
+    // Forcer le rafraîchissement du projet en cours d'édition
     if (editingProject) {
-      handleRefreshProject()
+      await handleRefreshProject()
     }
+    
+    // Recharger tous les projets pour s'assurer de la cohérence
+    await fetchProjects()
   }
 
   const handleRefreshProject = async () => {
     if (!editingProject) return
 
     try {
-      const response = await fetch(`/api/projects/${editingProject.id}`)
+      const token = localStorage.getItem('admin_token')
+      const response = await fetch(`/api/projects/${editingProject.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Cache-Control': 'no-cache'
+        }
+      })
+      
       if (response.ok) {
         const updatedProject = await response.json()
+        console.log('Projet mis à jour:', updatedProject) // Debug
         setEditingProject(updatedProject)
+        
+        // Recharger également la liste des projets
+        fetchProjects()
       }
     } catch (error) {
       console.error('Erreur refresh projet:', error)
@@ -152,18 +184,64 @@ const AdminDashboard = () => {
     }
   }
 
-  const openModal = (project?: Project) => {
+  const openModal = async (project?: Project) => {
     if (project) {
-      setEditingProject(project)
-      setFormData({
-        title: project.title,
-        description: project.description,
-        technologies: project.technologies.join(', '),
-        tags: project.tags.join(', '),
-        duration: project.duration,
-        teamSize: project.teamSize,
-        scope: project.scope
-      })
+      console.log('Ouverture modal pour projet:', project.id) // Debug
+      
+      // Récupérer les données fraîches du projet avec ses médias
+      try {
+        const token = localStorage.getItem('admin_token')
+        const response = await fetch(`/api/projects/${project.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-cache'
+          }
+        })
+        
+        if (response.ok) {
+          const freshProject = await response.json()
+          console.log('Projet frais récupéré:', freshProject) // Debug
+          console.log('Images:', freshProject.images?.length || 0) // Debug
+          console.log('Videos:', freshProject.videos?.length || 0) // Debug
+          
+          setEditingProject(freshProject)
+          setFormData({
+            title: freshProject.title,
+            description: freshProject.description,
+            technologies: freshProject.technologies.join(', '),
+            tags: freshProject.tags.join(', '),
+            duration: freshProject.duration,
+            teamSize: freshProject.teamSize,
+            scope: freshProject.scope
+          })
+        } else {
+          // Fallback vers les données du projet de la liste
+          setEditingProject(project)
+          setFormData({
+            title: project.title,
+            description: project.description,
+            technologies: project.technologies.join(', '),
+            tags: project.tags.join(', '),
+            duration: project.duration,
+            teamSize: project.teamSize,
+            scope: project.scope
+          })
+        }
+      } catch (error) {
+        console.error('Erreur récupération projet:', error)
+        // Fallback vers les données du projet de la liste
+        setEditingProject(project)
+        setFormData({
+          title: project.title,
+          description: project.description,
+          technologies: project.technologies.join(', '),
+          tags: project.tags.join(', '),
+          duration: project.duration,
+          teamSize: project.teamSize,
+          scope: project.scope
+        })
+      }
+      
       setActiveTab('details') // Commencer par l'onglet détails pour les projets existants
     } else {
       setEditingProject(null)

@@ -11,6 +11,7 @@ import MenuButton from '@/components/layout/MenuButton';
 import FooterMinimal from '@/components/sections/FooterMinimal';
 import BackgroundPattern from '@/components/layout/BackgroundPattern';
 import Cursor from '@/components/layout/Cursor';
+import legalData from '@/lib/legal-data';
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -29,6 +30,7 @@ const staggerContainer = {
 
 const CookiesPage = () => {
   const router = useRouter();
+  const { cookies } = legalData;
 
   const cookieTypes = [
     {
@@ -36,86 +38,21 @@ const CookiesPage = () => {
       title: "Cookies essentiels",
       description: "Nécessaires au fonctionnement du site",
       essential: true,
-      cookies: [
-        {
-          name: "session_id",
-          purpose: "Maintenir votre session utilisateur",
-          duration: "Session",
-          provider: "Solo Design"
-        },
-        {
-          name: "csrf_token",
-          purpose: "Protection contre les attaques CSRF",
-          duration: "Session",
-          provider: "Solo Design"
-        },
-        {
-          name: "cookie_consent",
-          purpose: "Mémoriser vos préférences cookies",
-          duration: "12 mois",
-          provider: "Solo Design"
-        }
-      ]
+      cookies: cookies.essential
     },
     {
       icon: BarChart3,
       title: "Cookies analytiques",
       description: "Nous aident à comprendre comment vous utilisez notre site",
       essential: false,
-      cookies: [
-        {
-          name: "_ga",
-          purpose: "Identifier les utilisateurs uniques",
-          duration: "2 ans",
-          provider: "Google Analytics"
-        },
-        {
-          name: "_ga_*",
-          purpose: "Persister l&apos;état de session",
-          duration: "2 ans",
-          provider: "Google Analytics"
-        },
-        {
-          name: "_gid",
-          purpose: "Identifier les utilisateurs uniques",
-          duration: "24 heures",
-          provider: "Google Analytics"
-        }
-      ]
+      cookies: cookies.analytics
     },
     {
       icon: Settings,
       title: "Cookies de préférences",
       description: "Personnalisent votre expérience sur le site",
       essential: false,
-      cookies: [
-        {
-          name: "theme_preference",
-          purpose: "Mémoriser votre thème préféré",
-          duration: "6 mois",
-          provider: "Solo Design"
-        },
-        {
-          name: "language_preference",
-          purpose: "Mémoriser votre langue préférée",
-          duration: "12 mois",
-          provider: "Solo Design"
-        }
-      ]
-    },
-    {
-      icon: Eye,
-      title: "Cookies publicitaires",
-      description: "Utilisés pour afficher des publicités pertinentes",
-      essential: false,
-      cookies: [
-        {
-          name: "Actuellement aucun",
-          purpose: "Nous n&apos;utilisons pas de cookies publicitaires",
-          duration: "-",
-          provider: "-"
-        }
-      ]
+      cookies: cookies.preferences
     }
   ];
 
@@ -359,10 +296,6 @@ const CookiesPage = () => {
                             <div className="col-span-2">
                               <span className="font-semibold text-gray-700">Objectif:</span>
                               <span className="text-gray-600 ml-1">{cookie.purpose}</span>
-                            </div>
-                            <div className="col-span-2">
-                              <span className="font-semibold text-gray-700">Fournisseur:</span>
-                              <span className="text-gray-600 ml-1">{cookie.provider}</span>
                             </div>
                           </div>
                         </motion.div>

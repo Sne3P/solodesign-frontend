@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { cardVariants, scaleAnimations, transitions } from '@/lib/animations';
@@ -76,9 +77,11 @@ const Card: React.FC<CardProps> = ({
       {/* Image */}
       {image && (
         <div className="relative mb-4 rounded-lg overflow-hidden">
-          <img 
+          <Image 
             src={image} 
             alt={title || "Card image"} 
+            width={400}
+            height={192}
             className="w-full h-48 object-cover"
             loading="lazy"
           />

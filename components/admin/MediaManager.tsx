@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import Image from 'next/image'
 import { ProjectImage, ProjectVideo } from '../../lib/types'
 import { Trash2, Upload, Image as ImageIcon, Video, Monitor } from 'lucide-react'
 import { useToast } from '../../hooks/use-toast'
@@ -234,9 +235,11 @@ export default function MediaManager({
             {images.map((image) => (
               <div key={image.id} className="relative group">
                 <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                  <img
+                  <Image
                     src={image.url}
                     alt={image.originalName}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover"
                   />
                 </div>

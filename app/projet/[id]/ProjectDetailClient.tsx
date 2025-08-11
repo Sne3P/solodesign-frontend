@@ -11,6 +11,7 @@ import MenuButton from "../../../components/layout/MenuButton"
 import Footer from "../../../components/sections/Footer"
 import ScrollArrow from "../../../components/layout/ScrollArrow"
 import ActionButton from "../../../components/ui/ActionButton"
+import CoverMedia from "../../../components/ui/CoverMedia"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../../components/layout/Cursor'), { ssr: false });
 import { Project } from "../../../lib/types"
@@ -171,13 +172,16 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
           <AnimatedSection>
             <div className="mb-16">
-              <Image
+              <CoverMedia
                 src={project.coverImage}
                 alt={`Image de couverture - ${project.title}`}
-                width={1200}
-                height={600}
                 className="w-full h-[600px] object-cover rounded-lg"
                 priority
+                autoPlay={true}
+                muted={true}
+                loop={true}
+                controls={false}
+                fallbackSrc="/placeholder.svg"
               />
             </div>
           </AnimatedSection>

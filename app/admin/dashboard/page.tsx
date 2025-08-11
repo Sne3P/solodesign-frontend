@@ -21,6 +21,7 @@ import {
 import { Project, ProjectFormData } from "../../../lib/types"
 import { useToast } from "../../../hooks/use-toast"
 import MediaManager from "../../../components/admin/MediaManager"
+import CoverMedia from "../../../components/ui/CoverMedia"
 
 const AdminDashboard = () => {
   const [projects, setProjects] = useState<Project[]>([])
@@ -419,7 +420,7 @@ const AdminDashboard = () => {
                 className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
               >
                 <div className="aspect-video bg-gray-200 relative">
-                  <img
+                  <CoverMedia
                     src={project.coverImage}
                     alt={project.title}
                     className="w-full h-full object-cover"

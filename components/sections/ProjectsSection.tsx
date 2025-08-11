@@ -5,6 +5,7 @@ import { Parallax } from 'react-scroll-parallax';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import SectionTitle from '../ui/SectionTitle';
+import CoverMedia from '../ui/CoverMedia';
 import { useRouter } from 'next/navigation';
 import { Project } from '../../lib/types';
 import ActionButton from '../ui/ActionButton';
@@ -167,12 +168,17 @@ const ProjectsSection = () => {
                       }}
                       onClick={() => handleProjectClick(project.id)}
                     >
-                      <motion.img
+                      <CoverMedia
                         src={project.coverImage || '/placeholder.svg'}
                         alt={project.title}
                         className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[480px] 
                                    object-cover rounded-3xl shadow-2xl"
-                        loading="lazy"
+                        onClick={() => handleProjectClick(project.id)}
+                        autoPlay={true}
+                        muted={true}
+                        loop={true}
+                        controls={false}
+                        fallbackSrc="/placeholder.svg"
                       />
                       
                       {/* Overlay d'interaction */}

@@ -1,9 +1,9 @@
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
 import { Project } from "../lib/types"
 import ActionButton from "./ui/ActionButton"
+import CoverMedia from "./ui/CoverMedia"
 
 export default function ProjectCard({ project }: { project: Project }) {
   const router = useRouter()
@@ -28,13 +28,16 @@ export default function ProjectCard({ project }: { project: Project }) {
         }}
       >
         <div className="relative group overflow-hidden rounded-xl shadow-2xl">
-          <Image
+          <CoverMedia
             src={project.coverImage || "/placeholder.svg"}
             alt={project.title}
-            width={800}
-            height={600}
             className="w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[450px] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             priority
+            autoPlay={true}
+            muted={true}
+            loop={true}
+            controls={false}
+            fallbackSrc="/placeholder.svg"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250" />
         </div>

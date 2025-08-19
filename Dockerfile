@@ -10,7 +10,15 @@ RUN apk add --no-cache libc6-compat \
 WORKDIR /app
 COPY package.json package-lock.json* ./
 # Installer toutes les dépendances (prod+dev) nécessaires pour le build Next
-RUN npm ci && npm cache clean --force
+RUN set -e; \
+  echo "➡️ Installation dépendances (npm ci)"; \
+  if npm ci; then \
+	  echo "✅ npm ci réussi"; \
+  else \
+	  echo "⚠️ npm ci a échoué -> fallback npm install"; \
+	  npm install; \
+  fi; \
+  npm cache clean --force
 
 # Rebuild le code source uniquement quand nécessaire
 FROM base AS builder

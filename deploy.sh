@@ -102,6 +102,12 @@ $NO_CACHE && BUILD_ARGS+=(--no-cache)
 $PULL && BUILD_ARGS+=(--pull)
 
 log "🐳 Build image Docker (tag: ${DOCKER_IMAGE})..."
+# Vérification lock file sync (sharp etc.)
+if grep -q '"sharp"' package.json && ! grep -q '"sharp"' package-lock.json; then
+    warning "package-lock.json désynchronisé (sharp manquant). Sync lock..."
+    npm install --package-lock-only >/dev/null 2>&1 || warning "Échec sync lock automatique"
+fi
+
 docker build ${BUILD_ARGS[@]} -t "$DOCKER_IMAGE" -t "$LATEST_TAG" . || error "Échec build Docker"
 
 # Arrêt du conteneur existant

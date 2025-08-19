@@ -168,18 +168,23 @@ const ProjectsSection = () => {
                       }}
                       onClick={() => handleProjectClick(project.id)}
                     >
-                      <CoverMedia
-                        src={project.coverImage || '/placeholder.svg'}
-                        alt={project.title}
-                        className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[480px] 
+                      {(() => {
+                        const coverSrc = (project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.png'
+                        return (
+                          <CoverMedia
+                            src={coverSrc}
+                            alt={project.title}
+                            className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[480px] 
                                    object-cover rounded-3xl shadow-2xl"
-                        onClick={() => handleProjectClick(project.id)}
-                        autoPlay={true}
-                        muted={true}
-                        loop={true}
-                        controls={false}
-                        fallbackSrc="/placeholder.svg"
-                      />
+                            onClick={() => handleProjectClick(project.id)}
+                            autoPlay={true}
+                            muted={true}
+                            loop={true}
+                            controls={false}
+                            fallbackSrc="/placeholder.png"
+                          />
+                        )
+                      })()}
                       
                       {/* Overlay d'interaction */}
                       <motion.div

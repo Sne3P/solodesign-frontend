@@ -25,7 +25,12 @@ const geistMono = localFont({
 });
 
 // Métadonnées générées automatiquement avec notre système SEO optimisé
-export const metadata: Metadata = generatePageMetadata('home');
+// Ajout explicite de metadataBase pour corriger l'avertissement Next.js
+const baseMetadata = generatePageMetadata('home') as Metadata;
+export const metadata: Metadata = {
+  ...baseMetadata,
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000')
+};
 
 // IMPORTANT :
 // Ne jamais modifier la classe du <html> côté client (pas de document.documentElement.classList.add/remove)

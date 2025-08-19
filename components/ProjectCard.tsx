@@ -29,7 +29,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       >
         <div className="relative group overflow-hidden rounded-xl shadow-2xl">
           <CoverMedia
-            src={project.coverImage || "/placeholder.svg"}
+            src={project.coverImage || "/placeholder.png"}
             alt={project.title}
             className="w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[450px] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             priority
@@ -37,7 +37,7 @@ export default function ProjectCard({ project }: { project: Project }) {
             muted={true}
             loop={true}
             controls={false}
-            fallbackSrc="/placeholder.svg"
+            fallbackSrc="/placeholder.png"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250" />
         </div>

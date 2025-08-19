@@ -11,7 +11,7 @@ const values = [
   { icon: Zap, title: "Innovation", desc: "Solutions créatives et avant-gardistes" },
   { icon: Target, title: "Précision", desc: "Attention méticuleuse aux détails" }
 ];
-
+ 
 const AboutSection = () => (
   <Parallax speed={-10}>
     <section id="about" className="py-24 md:py-32 bg-black text-white relative overflow-hidden">
@@ -166,7 +166,7 @@ const AboutSection = () => (
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image 
-                  src="../../public/logo_white_png.png" 
+                  src="/logo_white_png.png" 
                   alt="À propos" 
                   width={600}
                   height={400}

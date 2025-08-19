@@ -33,7 +33,7 @@ export default function CoverMedia({
   loop = true,
   controls = false,
   poster,
-  fallbackSrc = "/placeholder.svg"
+  fallbackSrc = "/placeholder.png"
 }: CoverMediaProps) {
   const [isPlaying, setIsPlaying] = useState(autoPlay)
   const [hasError, setHasError] = useState(false)

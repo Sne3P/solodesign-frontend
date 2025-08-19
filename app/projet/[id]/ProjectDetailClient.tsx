@@ -173,7 +173,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
           <AnimatedSection>
             <div className="mb-16">
               <CoverMedia
-                src={project.coverImage}
+                src={(project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.png'}
                 alt={`Image de couverture - ${project.title}`}
                 className="w-full h-[600px] object-cover rounded-lg"
                 priority
@@ -181,7 +181,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 muted={true}
                 loop={true}
                 controls={false}
-                fallbackSrc="/placeholder.svg"
+                fallbackSrc="/placeholder.png"
               />
             </div>
           </AnimatedSection>
@@ -248,12 +248,11 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 </div>
                 <div>
                   {project.images.length > 0 && (
-                    <Image
-                      src={project.images[0].url}
+                    <CoverMedia
+                      src={project.images[0].url || '/placeholder.png'}
                       alt="Détail du projet"
-                      width={600}
-                      height={320}
                       className="w-full h-80 object-cover rounded-lg"
+                      fallbackSrc="/placeholder.png"
                     />
                   )}
                 </div>
@@ -275,12 +274,11 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                       transition={{ duration: 0.3 }}
                       onClick={() => setSelectedImage(image.url)}
                     >
-                      <Image
-                        src={image.url}
+                      <CoverMedia
+                        src={image.url || '/placeholder.png'}
                         alt={`Image ${index + 1} du projet ${project.title}`}
-                        width={400}
-                        height={256}
                         className="w-full h-64 object-cover"
+                        fallbackSrc="/placeholder.png"
                       />
                     </motion.div>
                   ))}

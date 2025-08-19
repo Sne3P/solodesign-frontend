@@ -29,7 +29,7 @@ export const projectSchema = z.object({
   tags: arrayOrString(),
   
   // Médias
-  coverImage: z.string().optional().default('/placeholder.svg'),
+  coverImage: z.string().optional().default('/placeholder.png'),
   coverVideo: z.string().optional(),
   images: z.array(z.any()).optional().default([]),
   videos: z.array(z.any()).optional().default([]),
@@ -141,7 +141,7 @@ export function getFileCategory(mimeType: string): 'image' | 'video' | null {
 // ===== VALIDATION MEDIA DE COUVERTURE =====
 
 export function isValidCoverMedia(url: string): boolean {
-  if (!url || url === '/placeholder.svg') return true
+  if (!url || url === '/placeholder.png') return true
   
   const extension = url.split('.').pop()?.toLowerCase()
   const validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'mp4', 'webm', 'ogg', 'avi', 'mov']
@@ -150,7 +150,7 @@ export function isValidCoverMedia(url: string): boolean {
 }
 
 export function getCoverMediaType(url: string): 'image' | 'video' | 'unknown' {
-  if (!url || url === '/placeholder.svg') return 'image'
+  if (!url || url === '/placeholder.png') return 'image'
   
   const extension = url.split('.').pop()?.toLowerCase()
   const imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif']
@@ -166,7 +166,7 @@ export function validateCoverMedia(url: string): {
   type: 'image' | 'video' | 'unknown'
   message?: string 
 } {
-  if (!url || url === '/placeholder.svg') {
+  if (!url || url === '/placeholder.png') {
     return { valid: true, type: 'image' }
   }
   

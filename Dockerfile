@@ -51,7 +51,7 @@ EXPOSE 3000
 ENV PORT=3000 \
 	HOSTNAME=0.0.0.0
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=25s --retries=4 \
 	CMD wget -q -O /dev/null http://127.0.0.1:3000/api/health || exit 1
 
 # Commande de démarrage (standalone Next embarque server.js)

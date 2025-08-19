@@ -44,6 +44,7 @@ for arg in "$@"; do
 done
 
 PROJECT_NAME="solodesign"
+CONTAINER_NAME="solodesign-frontend"
 GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "local")
 BUILD_TAG="${ENVIRONMENT}-${GIT_SHA}"
 DOCKER_IMAGE="${PROJECT_NAME}:${BUILD_TAG}"
@@ -127,22 +128,28 @@ log "🔄 Nettoyage images dangling..."
 docker image prune -f >/dev/null 2>&1 || true
 
 # Vérification de la santé
-log "🏥 Vérification de la santé de l'application..."
-sleep 10
-
-HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/api/health || echo "000")
-if [ "$HEALTH_CHECK" = "200" ]; then
-    success "✅ Application déployée avec succès!"
-else
-    error "❌ L'application ne répond pas correctement (Code: $HEALTH_CHECK)"
-fi
+log "🏥 Vérification de la santé de l'application (port 3010)..."
+ATTEMPTS=0
+MAX_ATTEMPTS=15
+SLEEP_BETWEEN=4
+until [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; do
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3010/api/health || echo "000")
+    if [ "$STATUS" = "200" ]; then
+         success "✅ Application healthy (code 200)"
+         break
+    fi
+    ATTEMPTS=$((ATTEMPTS+1))
+    log "⏳ En attente de l'application... tentative $ATTEMPTS/$MAX_ATTEMPTS (dernier code: $STATUS)"
+    sleep $SLEEP_BETWEEN
+done
+[ "$STATUS" = "200" ] || error "❌ L'application ne répond pas correctement après $MAX_ATTEMPTS tentatives (dernier code: $STATUS)"
 
 # Nettoyage des images Docker orphelines
 log "🧹 Nettoyage des images Docker orphelines..."
 docker image prune -f
 
 success "🎉 Déploiement terminé avec succès!"
-success "🌐 Application accessible sur: http://$(hostname -I | awk '{print $1}'):3000"
+success "🌐 Application accessible sur: http://$(hostname -I | awk '{print $1}'):3010"
 
 # Logs en temps réel (optionnel)
 if command -v docker compose &>/dev/null; then

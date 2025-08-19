@@ -16,11 +16,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Variables d'environnement de build
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1 \
+	NODE_ENV=production
 
 # Build de l'application (production)
-ENV NODE_ENV=production
 RUN npm run build && \
 	# Supprimer les sources tests éventuels (pas utilisés au runtime)
 	find . -type f -name "*.test.*" -delete && \
@@ -30,8 +29,8 @@ RUN npm run build && \
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production \
+	NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -46,8 +45,8 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000 \
+	HOSTNAME=0.0.0.0
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 	CMD wget -q -O /dev/null http://127.0.0.1:3000/api/health || exit 1

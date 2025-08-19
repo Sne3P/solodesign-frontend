@@ -9,6 +9,8 @@ export async function GET() {
     memory: process.memoryUsage(),
   };
 
+  // TODO: Ajouter vérifications additionnelles (ex: accès FS uploads, future DB, env critiques) et renvoyer 500 si échec
+
   return Response.json(healthStatus, {
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',

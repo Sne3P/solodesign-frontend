@@ -5,9 +5,11 @@ services:
     # L'image est construite en amont par deploy.sh et injectée via IMAGE_OVERRIDE.
     image: ${IMAGE_OVERRIDE:-solodesign:latest}
     container_name: solodesign-frontend
-    # Port externe 3010 pour éviter conflit avec une autre appli (interne 3000).
-    ports:
-      - "3010:3000"
+  # Option A (actuel): publier sur le host (accès direct :3010) -> garder tant que la config NPM n'est pas ajustée.
+  # ports:
+  #   - "3010:3000"
+  # Option B (recommandé avec Nginx Proxy Manager): PAS de publication, on joint le réseau externe 'npm_network'
+  # et on cible 'solodesign-frontend:3000' dans NPM.
     # Charge toutes les variables runtime (ne pas commiter .env.production si sensible)
     env_file:
       - .env.production
@@ -21,19 +23,28 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - npm_network
     
-  nginx:
-    image: nginx:alpine
-    container_name: solodesign-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
-      - ./public:/var/www/html/public
-    depends_on:
-      - solodesign-app
-    restart: unless-stopped
+  # nginx interne désactivé car vous utilisez Nginx Proxy Manager externe.
+  # Supprimer totalement ce bloc une fois la migration confirmée.
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: solodesign-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #     - ./ssl:/etc/nginx/ssl
+  #     - ./public:/var/www/html/public
+  #   depends_on:
+  #     - solodesign-app
+  #   restart: unless-stopped
 
   # redis supprimé (non utilisé). Ajouter à nouveau si besoin de cache/session.
+
+networks:
+  # Réseau externe créé par Nginx Proxy Manager (à créer s'il n'existe pas) :
+  npm_network:
+    external: true

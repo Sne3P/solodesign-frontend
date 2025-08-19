@@ -3,7 +3,10 @@ FROM node:20-alpine AS base
 
 # Installer les dépendances uniquement quand nécessaire
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat \
+	vips-dev \
+	build-base \
+	python3
 WORKDIR /app
 COPY package.json package-lock.json* ./
 # Installer toutes les dépendances (prod+dev) nécessaires pour le build Next

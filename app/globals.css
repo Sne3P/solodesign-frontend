@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import des styles utilitaires centralisés */
+@import '../styles/utilities.css';
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -75,5 +78,104 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Optimisations pour la section projets */
+@layer utilities {
+  /* Performances des animations */
+  .project-section {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  .project-card {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  .project-image {
+    will-change: transform;
+    transform: translateZ(0);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  /* Smooth scrolling pour les parallax */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Optimisations mobile */
+  @media (max-width: 768px) {
+    .project-parallax {
+      transform: none !important;
+    }
+  }
+
+  /* Micro-interactions pour les boutons */
+  .project-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+  }
+
+  /* Support pour les écrans à haute densité */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .project-image img {
+      image-rendering: -webkit-optimize-contrast;
+    }
+  }
+
+  /* Accessibilité - respect des préférences utilisateur */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Animations optimisées pour BackgroundPattern */
+  @keyframes backgroundMove-30 {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 0px -30px; }
+  }
+
+  @keyframes backgroundMove-40 {
+    0% { background-position: 0px 0px; }
+    100% { background-position: 0px -40px; }
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Slider mobile optimisé */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Smooth scroll pour mobile */
+  .mobile-slider {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Amélioration des performances du slider */
+  .slider-item {
+    will-change: transform;
+    transform: translateZ(0);
   }
 }

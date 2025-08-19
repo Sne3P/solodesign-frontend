@@ -6,8 +6,8 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion"
 import SocialLinks from "../../components/layout/SocialLinks"
 import MenuButton from "../../components/layout/MenuButton"
 import ScrollArrow from "../../components/layout/ScrollArrow"
-import Cursor from "../../components/layout/Cursor"
-import Footer from "../../components/sections/Footer"
+import dynamic from 'next/dynamic';
+const Cursor = dynamic(() => import('../../components/layout/Cursor'), { ssr: false });
 import LogoTitle from "../../components/layout/LogoTitle"
 
 const AboutUs = () => {
@@ -54,17 +54,18 @@ const AboutUs = () => {
 
   return (
     <ParallaxProvider>
-      <div className="relative min-h-screen bg-black text-white overflow-hidden px-4 sm:px-8 md:px-16 lg:px-32">
+      <div className="relative min-h-screen bg-black text-white overflow-hidden px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <LogoTitle />
         <SocialLinks />
         <MenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
-        <main className="pt-24 pb-16">
-          <div className="fixed top-4 left-4 sm:top-1/3 sm:left-8 md:left-16 lg:left-32 z-10">
+        <main className="pt-16 sm:pt-20 md:pt-24 pb-16">
+          {/* Titre fixe - responsive selon la taille d'écran */}
+          <div className="hidden lg:block fixed top-4 lg:top-1/3 lg:left-12 xl:left-16 z-10">
             {titleWords.map((word, index) => (
               <motion.h1
                 key={word}
-                className={`text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tighter mb-1 sm:mb-2 transition-colors duration-1000 ease-in-out ${
+                className={`text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold tracking-tighter mb-2 transition-colors duration-1000 ease-in-out ${
                   activeSection === index ? "text-white" : "text-gray-500"
                 }`}
                 style={{ fontFamily: "'Playfair Display', serif" }}
@@ -84,16 +85,16 @@ const AboutUs = () => {
               setActiveSection={setActiveSection}
               {...section}
               totalSections={sections.length}
+              titleWords={titleWords}
             />
           ))}
         </main>
 
-        <Footer />
         <ScrollArrow />
         <Cursor />
 
         <motion.div
-          className="fixed top-0 left-0 right-0 h-1 bg-white mix-blend-difference origin-left"
+          className="fixed top-0 left-0 right-0 h-1 bg-white mix-blend-difference origin-left z-50"
           style={{ scaleX: smoothProgress }}
         />
       </div>
@@ -108,6 +109,7 @@ interface AboutSectionProps {
   subtitle: string
   content: string
   totalSections: number
+  titleWords: string[]
 }
 
 const AboutSection: React.FC<AboutSectionProps> = ({
@@ -117,6 +119,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   subtitle,
   content,
   totalSections,
+  titleWords,
 }) => {
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -199,54 +202,217 @@ const AboutSection: React.FC<AboutSectionProps> = ({
   )
 
   return (
-    <section ref={sectionRef} className="min-h-screen flex items-center justify-end mb-32 sm:mb-64">
-      <motion.div
-        className="w-full sm:max-w-2xl sm:fixed sm:top-1/2 sm:right-8 md:right-16 lg:right-32 transform sm:-translate-y-1/2"
-        style={{
-          opacity,
-          y,
-          x,
-          rotate,
-          scale,
-          willChange: "opacity, transform",
-        }}
-        initial={
-          index === 0
-            ? { opacity: 1, y: 0, x: 0, rotate: 0, scale: 1 }
-            : { opacity: 0, y: 50, x: 100, rotate: 10, scale: 0.9 }
-        }
-        transition={{
-          type: "spring",
-          stiffness: 50,
-          damping: 20,
-          duration: 1,
-        }}
-      >
-        <motion.h2
-          className="text-2xl sm:text-3xl md:text-4xl font-semibold mb-2"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
+    <section ref={sectionRef} className="min-h-screen mb-16 sm:mb-20 md:mb-24 lg:mb-32 xl:mb-48 2xl:mb-64">
+      {/* Layout Mobile - Titre en haut, contenu en bas */}
+      <div className="sm:hidden flex flex-col h-screen">
+        {/* Titre mobile en haut */}
+        <div className="flex-1 flex items-end justify-center pb-8">
+          <motion.div
+            className="text-center"
+            style={{
+              opacity,
+              y: useTransform(y, (value) => value * 0.5),
+              scale,
+              willChange: "opacity, transform",
+            }}
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 50,
+              damping: 20,
+              duration: 1,
+              delay: 0.2,
+            }}
+          >
+            <motion.h1
+              className={`text-4xl font-bold tracking-tighter mb-2 transition-colors duration-1000 ease-in-out text-white`}
+              style={{ fontFamily: "'Playfair Display', serif" }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+            >
+              {titleWords[index]}
+            </motion.h1>
+          </motion.div>
+        </div>
+
+        {/* Contenu mobile en bas */}
+        <div className="flex-1 flex items-start justify-center pt-8 px-6">
+          <motion.div
+            className="w-full max-w-md text-center"
+            style={{
+              opacity,
+              y: useTransform(y, (value) => value * -0.5),
+              scale,
+              willChange: "opacity, transform",
+            }}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              type: "spring",
+              stiffness: 50,
+              damping: 20,
+              duration: 1,
+              delay: 0.4,
+            }}
+          >
+            <motion.h2
+              className="text-xl font-semibold mb-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            >
+              {title}
+            </motion.h2>
+            <motion.h3
+              className="text-base text-gray-400 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+            >
+              {subtitle}
+            </motion.h3>
+            <motion.p
+              className="text-sm text-gray-300 leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.6 }}
+            >
+              {content}
+            </motion.p>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Layout Tablette - Version hybride centrée */}
+      <div className="hidden sm:flex lg:hidden flex-col items-center justify-center h-screen px-8 md:px-12">
+        {/* Titre tablette centré en haut */}
+        <motion.div
+          className="text-center mb-12 md:mb-16"
+          style={{
+            opacity,
+            y: useTransform(y, (value) => value * 0.3),
+            scale,
+            willChange: "opacity, transform",
+          }}
+          initial={{ opacity: 0, y: -30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 50,
+            damping: 20,
+            duration: 1,
+            delay: 0.2,
+          }}
         >
-          {title}
-        </motion.h2>
-        <motion.h3
-          className="text-lg sm:text-xl md:text-2xl text-gray-400 mb-4 sm:mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
+          <motion.h1
+            className={`text-5xl md:text-6xl font-bold tracking-tighter mb-4 transition-colors duration-1000 ease-in-out text-white`}
+            style={{ fontFamily: "'Playfair Display', serif" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            {titleWords[index]}
+          </motion.h1>
+        </motion.div>
+
+        {/* Contenu tablette centré */}
+        <motion.div
+          className="w-full max-w-2xl md:max-w-3xl text-center"
+          style={{
+            opacity,
+            y: useTransform(y, (value) => value * -0.3),
+            scale,
+            willChange: "opacity, transform",
+          }}
+          initial={{ opacity: 0, y: 30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{
+            type: "spring",
+            stiffness: 50,
+            damping: 20,
+            duration: 1,
+            delay: 0.4,
+          }}
         >
-          {subtitle}
-        </motion.h3>
-        <motion.p
-          className="text-base sm:text-lg md:text-xl text-gray-300"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
+          <motion.h2
+            className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+          >
+            {title}
+          </motion.h2>
+          <motion.h3
+            className="text-lg md:text-xl text-gray-400 mb-6 md:mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            {subtitle}
+          </motion.h3>
+          <motion.p
+            className="text-base md:text-lg text-gray-300 leading-relaxed max-w-xl md:max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+          >
+            {content}
+          </motion.p>
+        </motion.div>
+      </div>
+
+      {/* Layout Desktop - Original côte à côte (lg et plus) */}
+      <div className="hidden lg:flex items-center justify-end h-screen">
+        <motion.div
+          className="w-full lg:max-w-4xl xl:max-w-5xl lg:fixed lg:top-1/2 lg:right-12 xl:right-16 transform lg:-translate-y-1/2"
+          style={{
+            opacity,
+            y,
+            x,
+            rotate,
+            scale,
+            willChange: "opacity, transform",
+          }}
+          initial={
+            index === 0
+              ? { opacity: 1, y: 0, x: 0, rotate: 0, scale: 1 }
+              : { opacity: 0, y: 50, x: 100, rotate: 10, scale: 0.9 }
+          }
+          transition={{
+            type: "spring",
+            stiffness: 50,
+            damping: 20,
+            duration: 1,
+          }}
         >
-          {content}
-        </motion.p>
-      </motion.div>
+          <motion.h2
+            className="text-3xl lg:text-4xl xl:text-5xl font-semibold mb-4 lg:mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            {title}
+          </motion.h2>
+          <motion.h3
+            className="text-xl lg:text-2xl xl:text-3xl text-gray-400 mb-6 lg:mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            {subtitle}
+          </motion.h3>
+          <motion.p
+            className="text-lg lg:text-xl xl:text-2xl text-gray-300 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+          >
+            {content}
+          </motion.p>
+        </motion.div>
+      </div>
     </section>
   )
 }

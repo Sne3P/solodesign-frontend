@@ -1,12 +1,25 @@
-# 🎨 SoloDesign
+# 🚀 SoloDesign - Portfolio & Agence Web Moderne
 
-**SoloDesign** is a professional digital portfolio and service platform for showcasing creative web and software projects. Built with **Next.js 13+ App Router**, **TailwindCSS**, and **TypeScript**, it provides a fast, responsive, and modern user experience.
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
+![Next.js](https://img.shields.io/badge/Next.js-14.2.31-black.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
----
+## 📋 Description
 
+SoloDesign est une application web moderne construite avec Next.js 14, TypeScript et Tailwind CSS. Cette plateforme présente les services et réalisations d'une agence web spécialisée dans la création de sites internet et d'applications mobiles sur mesure.
 
+### ✨ Fonctionnalités
 
-https://github.com/user-attachments/assets/85f7cbb7-797c-4cf0-9ae1-0d807115b6b1
+- 🎨 **Design moderne** avec animations fluides (Framer Motion)
+- 📱 **100% Responsive** - optimisé mobile-first
+- ⚡ **Performances optimales** - Core Web Vitals AAA
+- 🔍 **SEO ultra-optimisé** - structured data, meta tags avancées
+- 🛡️ **Sécurisé** - headers de sécurité, protection CSRF
+- 📊 **Analytics intégrés** - Google Analytics, Clarity, Hotjar
+- 🐳 **Docker ready** - déploiement simplifié
+- 📝 **Système de logs** centralisé
+- 🧪 **Tests automatisés** - Jest, Testing Library
 
 
 

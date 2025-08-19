@@ -1,0 +1,19 @@
+# Ignore all files in this directory
+*.*
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.mp4
+*.webm
+*.avi
+*.mov
+*.mp3
+*.wav
+*.ogg
+
+# Except this .gitignore file
+!.gitignore
+!.gitkeep

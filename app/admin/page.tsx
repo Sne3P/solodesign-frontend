@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Lock } from "lucide-react"
-import LogoTitle from "../../components/layout/LogoTitle"
 import { useToast } from "../../hooks/use-toast"
 
 const AdminLogin = () => {
@@ -17,33 +16,13 @@ const AdminLogin = () => {
   // Vérifier si déjà connecté
   useEffect(() => {
     const checkAuth = () => {
-      console.log("🔍 AdminLogin: Vérification du token...")
-      const token = localStorage.getItem('admin_token')
-      
-      if (token) {
-        console.log("✅ AdminLogin: Token trouvé, vérification avec le serveur...")
-        
-        fetch('/api/auth/verify', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        .then(response => {
-          if (response.ok) {
-            console.log("✅ AdminLogin: Token valide, redirection vers dashboard")
-            router.push('/admin/dashboard')
-          } else {
-            console.log("❌ AdminLogin: Token invalide, suppression")
-            localStorage.removeItem('admin_token')
-          }
-        })
-        .catch(error => {
-          console.error("💥 AdminLogin: Erreur vérification token:", error)
-          localStorage.removeItem('admin_token')
-        })
-      } else {
-        console.log("❌ AdminLogin: Aucun token trouvé")
-      }
+      const token = localStorage.getItem('admin_token') // fallback legacy
+      fetch('/api/auth/verify', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+        cache: 'no-store'
+      }).then(res => {
+        if (res.ok) router.push('/admin/dashboard')
+      }).catch(() => {})
     }
     
     checkAuth()
@@ -52,8 +31,6 @@ const AdminLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
-    console.log("🔐 AdminLogin: Tentative de connexion...")
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -65,16 +42,9 @@ const AdminLogin = () => {
       })
 
       const data = await response.json()
-      console.log("🔐 AdminLogin: Réponse serveur:", { ok: response.ok, status: response.status })
-
       if (response.ok) {
-        console.log("✅ AdminLogin: Connexion réussie!")
-        
-        // Stocker seulement dans localStorage pour le côté client
-        // Le cookie est défini automatiquement par le serveur
-        localStorage.setItem('admin_token', data.token)
-        
-        console.log("🍪 AdminLogin: Vérification des cookies après connexion:", document.cookie)
+  // Optionnel: conserver token en fallback si on veut usage côté client (non nécessaire car cookie httpOnly)
+  localStorage.setItem('admin_token', data.token)
         
         toast({
           title: "Connexion réussie",
@@ -82,20 +52,15 @@ const AdminLogin = () => {
         })
         
         // Attendre un peu pour que le cookie soit bien défini
-        setTimeout(() => {
-          console.log("🔄 AdminLogin: Redirection vers dashboard...")
-          router.push('/admin/dashboard')
-        }, 100)
+  setTimeout(() => router.push('/admin/dashboard'), 150)
       } else {
-        console.log("❌ AdminLogin: Échec de connexion:", data.error)
         toast({
           title: "Erreur de connexion",
           description: data.error || "Mot de passe incorrect",
           variant: "destructive",
         })
       }
-    } catch (error) {
-      console.error("💥 AdminLogin: Erreur lors de la connexion:", error)
+  } catch {
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de la connexion",

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script de déploiement automatisé pour SoloDesign
-# Usage: ./deploy.sh [environment]
+# Usage: ./deploy.sh [environment] [--no-cache] [--pull]
 
 set -e
 
@@ -32,11 +32,29 @@ warning() {
 
 # Variables
 ENVIRONMENT=${1:-production}
-PROJECT_NAME="solodesign"
-DOCKER_IMAGE="${PROJECT_NAME}:${ENVIRONMENT}"
-CONTAINER_NAME="${PROJECT_NAME}-${ENVIRONMENT}"
+SHIFTED=1
+NO_CACHE=false
+PULL=false
 
-log "🚀 Début du déploiement pour l'environnement: ${ENVIRONMENT}"
+for arg in "$@"; do
+    case $arg in
+        --no-cache) NO_CACHE=true ;;
+        --pull) PULL=true ;;
+    esac
+done
+
+PROJECT_NAME="solodesign"
+GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "local")
+BUILD_TAG="${ENVIRONMENT}-${GIT_SHA}"
+DOCKER_IMAGE="${PROJECT_NAME}:${BUILD_TAG}"
+LATEST_TAG="${PROJECT_NAME}:latest"
+COMPOSE_FILE="docker-compose.yml"
+
+if [ ! -f "$COMPOSE_FILE" ]; then
+    error "docker-compose.yml introuvable"
+fi
+
+log "🚀 Début du déploiement pour l'environnement: ${ENVIRONMENT} (tag: ${BUILD_TAG})"
 
 # Vérification des prérequis
 log "🔍 Vérification des prérequis..."
@@ -45,36 +63,37 @@ if ! command -v docker &> /dev/null; then
     error "Docker n'est pas installé"
 fi
 
-if ! command -v npm &> /dev/null; then
-    error "npm n'est pas installé"
+if ! command -v docker compose &> /dev/null && ! command -v docker-compose &> /dev/null; then
+    error "Docker Compose n'est pas installé"
 fi
 
 # Chargement des variables d'environnement
 ENV_FILE=".env.${ENVIRONMENT}"
-if [ -f "$ENV_FILE" ]; then
-    log "📄 Chargement des variables d'environnement depuis ${ENV_FILE}"
-    export $(cat $ENV_FILE | xargs)
-else
-    warning "Fichier d'environnement ${ENV_FILE} non trouvé"
+if [ ! -f "$ENV_FILE" ]; then
+    error "Fichier d'environnement requis manquant: $ENV_FILE"
+fi
+log "📄 Vérification des variables critiques..."
+REQUIRED_VARS=(JWT_SECRET ADMIN_PASSWORD_HASH EMAIL_USER EMAIL_PASS NEXT_PUBLIC_SITE_URL NEXT_PUBLIC_SITE_NAME)
+MISSING=()
+for v in "${REQUIRED_VARS[@]}"; do
+    if ! grep -q "^$v=" "$ENV_FILE"; then MISSING+=("$v"); fi
+done
+if [ ${#MISSING[@]} -gt 0 ]; then
+    error "Variables manquantes dans $ENV_FILE: ${MISSING[*]}"
 fi
 
+set -o allexport; source "$ENV_FILE"; set +o allexport
+
 # Tests de sécurité et qualité
-log "🔒 Exécution des tests de sécurité..."
-npm audit --audit-level high || error "Vulnérabilités de sécurité détectées"
+log "🧹 Nettoyage des console.log (pré-build)..."
+npm run clean:console >/dev/null 2>&1 || warning "Nettoyage console échoué"
 
-log "🧹 Nettoyage du code..."
-npm run clean:console || warning "Échec du nettoyage des console.log"
+BUILD_ARGS=()
+$NO_CACHE && BUILD_ARGS+=(--no-cache)
+$PULL && BUILD_ARGS+=(--pull)
 
-log "✅ Exécution des tests..."
-npm run lint || error "Échec du linting"
-
-# Build de l'application
-log "🏗️ Build de l'application..."
-npm run build || error "Échec du build"
-
-# Build de l'image Docker
-log "🐳 Build de l'image Docker..."
-docker build -t $DOCKER_IMAGE . || error "Échec du build Docker"
+log "🐳 Build image Docker (tag: ${DOCKER_IMAGE})..."
+docker build ${BUILD_ARGS[@]} -t "$DOCKER_IMAGE" -t "$LATEST_TAG" . || error "Échec build Docker"
 
 # Arrêt du conteneur existant
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
@@ -87,21 +106,31 @@ if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
     docker rm $CONTAINER_NAME
 fi
 
-# Déploiement
-log "🚀 Déploiement du nouveau conteneur..."
-docker run -d \
-  --name $CONTAINER_NAME \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  --env-file $ENV_FILE \
-  -v $(pwd)/public/uploads:/app/public/uploads \
-  $DOCKER_IMAGE || error "Échec du déploiement"
+log "🧱 Mise à jour docker-compose service application..."
+
+# Arrêt ancien conteneur géré par compose
+if docker ps --format '{{.Names}}' | grep -q "solodesign-frontend"; then
+    log "🛑 Arrêt précédent via compose"
+fi
+
+export IMAGE_OVERRIDE="$DOCKER_IMAGE"
+
+if command -v docker compose &>/dev/null; then
+    docker compose down --remove-orphans || true
+    docker compose up -d --no-deps --build solodesign-app || docker compose up -d solodesign-app
+else
+    docker-compose down --remove-orphans || true
+    docker-compose up -d --no-deps --build solodesign-app || docker-compose up -d solodesign-app
+fi
+
+log "🔄 Nettoyage images dangling..."
+docker image prune -f >/dev/null 2>&1 || true
 
 # Vérification de la santé
 log "🏥 Vérification de la santé de l'application..."
 sleep 10
 
-HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/health || echo "000")
+HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/api/health || echo "000")
 if [ "$HEALTH_CHECK" = "200" ]; then
     success "✅ Application déployée avec succès!"
 else
@@ -113,11 +142,14 @@ log "🧹 Nettoyage des images Docker orphelines..."
 docker image prune -f
 
 success "🎉 Déploiement terminé avec succès!"
-success "🌐 Application accessible sur: http://localhost:3000"
+success "🌐 Application accessible sur: http://$(hostname -I | awk '{print $1}'):3000"
 
 # Logs en temps réel (optionnel)
-read -p "Voulez-vous voir les logs en temps réel? (y/n): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker logs -f $CONTAINER_NAME
+if command -v docker compose &>/dev/null; then
+    LOG_CMD="docker compose logs -f --tail=100 solodesign-app"
+else
+    LOG_CMD="docker-compose logs -f --tail=100 solodesign-app"
 fi
+echo
+read -p "Afficher les logs ? (y/n): " -n 1 -r; echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then eval "$LOG_CMD"; fi

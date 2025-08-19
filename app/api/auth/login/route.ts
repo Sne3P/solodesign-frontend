@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '../../../../lib/authService'
+import { rateLimits, logRateLimit } from '../../../../lib/rateLimit'
+
+// Petite protection basique bruteforce via rate limiter en mémoire
 
 export async function POST(request: NextRequest) {
   try {
+    const rl = rateLimits.auth.check(request as unknown as Request)
+    logRateLimit(rl.ip || 'unknown', '/api/auth/login', rl.allowed, rl.remaining)
+    if (!rl.allowed) {
+      return NextResponse.json({ error: rl.message }, { status: 429 })
+    }
     const { password } = await request.json()
 
     if (!password) {
@@ -23,26 +31,22 @@ export async function POST(request: NextRequest) {
 
     const token = AuthService.generateToken()
     
-    console.log("🔐 API Login: Token généré, définition du cookie...")
-
     const response = NextResponse.json({
       success: true,
       token,
       message: 'Connexion réussie'
     })
 
-    // Définir le cookie côté serveur
+    // Définir le cookie côté serveur (httpOnly + secure production)
     response.cookies.set({
       name: 'admin_token',
       value: token,
-      httpOnly: false, // Permet l'accès côté client
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production seulement
-      sameSite: 'lax',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 24 * 60 * 60, // 24 heures
       path: '/'
     })
-
-    console.log("✅ API Login: Cookie défini côté serveur")
     return response
 
   } catch (error) {

@@ -35,11 +35,19 @@ ENVIRONMENT=${1:-production}
 SHIFTED=1
 NO_CACHE=false
 PULL=false
+PRUNE_OLD=false
+DEEP_CLEAN=false
+PRUNE_VOLUMES=false
+KEEP_IMAGES=3
 
 for arg in "$@"; do
     case $arg in
         --no-cache) NO_CACHE=true ;;
         --pull) PULL=true ;;
+        --prune-old) PRUNE_OLD=true ;;
+        --deep-clean) DEEP_CLEAN=true ;;
+        --prune-volumes) PRUNE_VOLUMES=true ;;
+        --keep=*) KEEP_IMAGES="${arg#*=}" ;;
     esac
 done
 
@@ -117,39 +125,107 @@ fi
 export IMAGE_OVERRIDE="$DOCKER_IMAGE"
 
 if command -v docker compose &>/dev/null; then
-    docker compose down --remove-orphans || true
-    docker compose up -d --no-deps --build solodesign-app || docker compose up -d solodesign-app
+        docker compose down --remove-orphans || true
+        docker compose up -d --no-deps --build solodesign-app || docker compose up -d solodesign-app
 else
-    docker-compose down --remove-orphans || true
-    docker-compose up -d --no-deps --build solodesign-app || docker-compose up -d solodesign-app
+        docker-compose down --remove-orphans || true
+        docker-compose up -d --no-deps --build solodesign-app || docker-compose up -d solodesign-app
+fi
+
+# Vérification réseau externe (npm_network) si non exposition de port
+if ! docker network inspect npm_network >/dev/null 2>&1; then
+    warning "Réseau externe npm_network introuvable (créez-le avec: docker network create npm_network)."
+else
+    if ! docker network inspect npm_network 2>/dev/null | grep -q 'solodesign-frontend'; then
+        warning "Conteneur pas encore sur npm_network (Docker démarre peut-être)."
+    else
+        log "🔗 Conteneur attaché au réseau npm_network"
+    fi
 fi
 
 log "🔄 Nettoyage images dangling..."
 docker image prune -f >/dev/null 2>&1 || true
 
+if [ "$DEEP_CLEAN" = true ]; then
+    log "🧨 Deep clean: prune images/build cache..."
+    docker builder prune -af >/dev/null 2>&1 || true
+    docker image prune -af >/dev/null 2>&1 || true
+    if [ "$PRUNE_VOLUMES" = true ]; then
+        log "🗃️ Prune volumes non utilisés..."
+        docker volume prune -f >/dev/null 2>&1 || true
+    fi
+fi
+
+# Optionnel: suppression des anciennes images de production (garde les 3 plus récentes)
+if [ "$PRUNE_OLD" = true ]; then
+    log "🧽 Nettoyage anciens tags de production (conservation $KEEP_IMAGES derniers)..."
+    IMAGE_LIST=$(docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '^solodesign:production-' || true)
+    if [ -n "$IMAGE_LIST" ]; then
+        COUNT=0
+        echo "$IMAGE_LIST" | while read -r LINE; do
+            IMG_TAG=$(echo "$LINE" | awk '{print $1}')
+            IMG_ID=$(echo "$LINE" | awk '{print $2}')
+            COUNT=$((COUNT+1))
+            if [ $COUNT -le $KEEP_IMAGES ]; then
+                log "➡️ Conserve $IMG_TAG ($IMG_ID)"
+            else
+                log "🗑️ Suppression image $IMG_TAG ($IMG_ID)"
+                docker rmi -f "$IMG_ID" >/dev/null 2>&1 || true
+            fi
+        done
+    else
+        log "ℹ️ Aucune image ancienne à nettoyer"
+    fi
+fi
+
 # Vérification de la santé
-log "🏥 Vérification de la santé de l'application (port 3010)..."
+log "🏥 Vérification de la santé de l'application..."
 ATTEMPTS=0
 MAX_ATTEMPTS=15
 SLEEP_BETWEEN=4
-until [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; do
-    STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3010/api/health || echo "000")
+
+# Détection exposition port host (ex: 3010:3000)
+EXTERNAL_MAPPING=$(docker ps --format '{{.Names}} {{.Ports}}' | grep "^$CONTAINER_NAME " | awk '{print $2}') || true
+USE_INTERNAL=false
+if echo "$EXTERNAL_MAPPING" | grep -q '3010->3000'; then
+    HEALTH_URL="http://127.0.0.1:3010/api/health"
+else
+    USE_INTERNAL=true
+    HEALTH_URL="http://solodesign-frontend:3000/api/health"
+fi
+
+while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
+    if [ "$USE_INTERNAL" = true ]; then
+         STATUS=$(docker run --rm --network npm_network curlimages/curl:8.8.0 curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+    else
+         STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
+    fi
     if [ "$STATUS" = "200" ]; then
-         success "✅ Application healthy (code 200)"
-         break
+        success "✅ Application healthy (code 200) via ${USE_INTERNAL:true=interne:false=externe}"
+        break
     fi
     ATTEMPTS=$((ATTEMPTS+1))
     log "⏳ En attente de l'application... tentative $ATTEMPTS/$MAX_ATTEMPTS (dernier code: $STATUS)"
     sleep $SLEEP_BETWEEN
 done
-[ "$STATUS" = "200" ] || error "❌ L'application ne répond pas correctement après $MAX_ATTEMPTS tentatives (dernier code: $STATUS)"
+[ "$STATUS" = "200" ] || error "❌ Healthcheck échoué après $MAX_ATTEMPTS tentatives (dernier code: $STATUS | URL: $HEALTH_URL | interne=$USE_INTERNAL)"
 
 # Nettoyage des images Docker orphelines
 log "🧹 Nettoyage des images Docker orphelines..."
 docker image prune -f
 
 success "🎉 Déploiement terminé avec succès!"
-success "🌐 Application accessible sur: http://$(hostname -I | awk '{print $1}'):3010"
+if [ "$USE_INTERNAL" = true ]; then
+    success "🌐 Application accessible via domaine proxifié (Nginx Proxy Manager). Configure solodesign.fr -> solodesign-frontend:3000"
+else
+    success "🌐 Application accessible sur: http://$(hostname -I | awk '{print $1}'):3010"
+fi
+
+log "📋 Récapitulatif déploiement:"
+echo "  - Image utilisée: $DOCKER_IMAGE"
+echo "  - Ports exposés: ${EXTERNAL_MAPPING:-(aucun, mode proxy)}"
+echo "  - Réseau npm_network: $(docker network inspect npm_network 2>/dev/null | grep -q 'solodesign-frontend' && echo OK || echo ABSENT)"
+echo "  - Prune old: $PRUNE_OLD (keep=$KEEP_IMAGES) | Deep clean: $DEEP_CLEAN | Volumes pruned: $PRUNE_VOLUMES"
 
 # Logs en temps réel (optionnel)
 if command -v docker compose &>/dev/null; then

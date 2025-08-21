@@ -5,7 +5,7 @@
 
 export const legalData = {
   company: {
-    name: "SoloDesign",
+    name: "MR BASTIEN ROBERT",
     legalForm: "Micro-entreprise", // À ajuster selon votre statut
     address: "LILLE, France", // Adresse complète requise
     postalCode: "59800", // Code postal requis

@@ -25,7 +25,7 @@ interface QuizStep {
     id: string
     label: string
     value: string
-    icon?: any // Simplifié pour éviter les conflits TypeScript strict
+    icon?: React.ComponentType<{ className?: string }> // Type plus précis pour les icônes
     description?: string
   }>
   multiSelect?: boolean

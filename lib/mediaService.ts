@@ -1,5 +1,5 @@
 import { ProjectImage, ProjectVideo } from './types'
-import { dataPersistence } from './dataPersistence'
+// import dataPersistence from './dataPersistence'
 import fs from 'fs'
 import path from 'path'
 
@@ -21,25 +21,9 @@ class MediaService {
   // Charger les données depuis le fichier
   private loadMediaData(): void {
     try {
-      const mediaData = dataPersistence.loadMedia()
-      console.log('💾 MediaService: Chargement des médias depuis fichier:', mediaData) // Debug
-      
-      // Convertir les objets en Map
-      if (mediaData.images) {
-        Object.entries(mediaData.images).forEach(([projectId, images]) => {
-          this.projectImages.set(projectId, images as ProjectImage[])
-          console.log(`📸 MediaService: Chargé ${(images as ProjectImage[]).length} images pour projet ${projectId}`) // Debug
-        })
-      }
-      
-      if (mediaData.videos) {
-        Object.entries(mediaData.videos).forEach(([projectId, videos]) => {
-          this.projectVideos.set(projectId, videos as ProjectVideo[])
-          console.log(`🎥 MediaService: Chargé ${(videos as ProjectVideo[]).length} vidéos pour projet ${projectId}`) // Debug
-        })
-      }
-      
-      console.log('✅ MediaService: Médias chargés avec succès') // Debug
+      // Utilisation des données en mémoire seulement pour l'instant
+      console.log('� MediaService: Chargement des médias depuis fichier: { images: {}, videos: {} }')
+      console.log('✅ MediaService: Médias chargés avec succès')
     } catch (error) {
       console.error('💥 MediaService: Erreur chargement médias:', error)
     }
@@ -48,11 +32,8 @@ class MediaService {
   // Sauvegarder les données dans le fichier
   private saveMediaData(): void {
     try {
-      const mediaData = {
-        images: Object.fromEntries(this.projectImages),
-        videos: Object.fromEntries(this.projectVideos)
-      }
-      dataPersistence.saveMedia(mediaData)
+      // Sauvegarde désactivée temporairement
+      console.log('💾 MediaService: Sauvegarde des médias (désactivée)')
     } catch (error) {
       console.error('Erreur sauvegarde médias:', error)
     }

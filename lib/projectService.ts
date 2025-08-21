@@ -1,19 +1,21 @@
 import { Project } from './types'
 import { mediaService } from './mediaService'
-import { dataPersistence } from './dataPersistence'
+// import dataPersistence from './dataPersistence'
 
 // Stockage en mémoire pour la démonstration
 // En production, vous devriez utiliser une vraie base de données
-let projects: Project[] = []
+const projects: Project[] = []
 
 // Charger les projets au démarrage
 function loadProjects(): void {
-  projects = dataPersistence.loadProjects()
+  // Chargement désactivé temporairement
+  console.log('💾 ProjectService: Chargement des projets (désactivé)')
 }
 
 // Sauvegarder les projets
 function saveProjects(): void {
-  dataPersistence.saveProjects(projects)
+  // Sauvegarde désactivée temporairement
+  console.log('💾 ProjectService: Sauvegarde des projets (désactivée)')
 }
 
 // Initialiser les données

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { 
@@ -39,12 +39,26 @@ const AdminDashboard = () => {
   const router = useRouter()
   const { toast } = useToast()
 
-  useEffect(() => {
-    console.log("🔍 Dashboard: Vérification de l'authentification...")
-    checkAuth()
-  }, [])
+  const fetchProjects = useCallback(async () => {
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data)
+      }
+    } catch (fetchError) {
+      console.error("Erreur lors du fetch des projets:", fetchError)
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les projets",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [toast, setProjects, setIsLoading])
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     console.log("🔍 Dashboard: Récupération du token...")
     const token = localStorage.getItem('admin_token')
     
@@ -72,13 +86,18 @@ const AdminDashboard = () => {
 
       console.log("✅ Dashboard: Token valide, chargement des projets...")
       fetchProjects()
-    } catch (error) {
-      console.error("💥 Dashboard: Erreur vérification token:", error)
+    } catch (authError) {
+      console.error("💥 Dashboard: Erreur vérification token:", authError)
       localStorage.removeItem('admin_token')
       document.cookie = 'admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;'
       router.push('/admin')
     }
-  }
+  }, [router, fetchProjects])
+
+  useEffect(() => {
+    console.log("🔍 Dashboard: Vérification de l'authentification...")
+    checkAuth()
+  }, [checkAuth])
 
   const handleLogout = () => {
     console.log("🚪 Dashboard: Déconnexion...")
@@ -90,24 +109,6 @@ const AdminDashboard = () => {
       title: "Déconnexion réussie",
       description: "À bientôt !",
     })
-  }
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects')
-      if (response.ok) {
-        const data = await response.json()
-        setProjects(data)
-      }
-    } catch {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les projets",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   const handleMediaUpdate = async () => {
@@ -313,7 +314,8 @@ const AdminDashboard = () => {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (saveError) {
+      console.error("Erreur lors de la sauvegarde:", saveError)
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le projet",
@@ -350,7 +352,8 @@ const AdminDashboard = () => {
           variant: "destructive",
         })
       }
-    } catch (error) {
+    } catch (deleteError) {
+      console.error("Erreur lors de la suppression:", deleteError)
       toast({
         title: "Erreur",
         description: "Une erreur est survenue",

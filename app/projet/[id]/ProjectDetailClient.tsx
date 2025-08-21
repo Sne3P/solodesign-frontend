@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { motion, AnimatePresence, useSpring, useScroll, useInView } from "framer-motion"
 import { ArrowLeft, Calendar, Users, Code, Globe, X } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -62,24 +62,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    document.body.classList.add("cursor-none")
-    window.scrollTo(0, 0)
-    setIsLoaded(true)
-    fetchProject()
-    
-    return () => {
-      document.body.classList.remove("cursor-none")
-    }
-  }, [id])
-
-  useEffect(() => {
-    if (isLoaded) {
-      document.body.style.overflow = selectedImage ? "hidden" : "auto"
-    }
-  }, [isLoaded, selectedImage])
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/projects/${id}`)
       if (response.ok) {
@@ -94,12 +77,30 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
       } else {
         setError('Erreur lors du chargement du projet')
       }
-    } catch (error) {
+    } catch (fetchError) {
+      console.error("Erreur lors du fetch du projet:", fetchError)
       setError('Erreur lors du chargement du projet')
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, router])
+
+  useEffect(() => {
+    document.body.classList.add("cursor-none")
+    window.scrollTo(0, 0)
+    setIsLoaded(true)
+    fetchProject()
+    
+    return () => {
+      document.body.classList.remove("cursor-none")
+    }
+  }, [fetchProject])
+
+  useEffect(() => {
+    if (isLoaded) {
+      document.body.style.overflow = selectedImage ? "hidden" : "auto"
+    }
+  }, [isLoaded, selectedImage])
 
   const handleBackClick = () => {
     router.push("/")
@@ -124,7 +125,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
             size="md"
             onClick={handleBackClick}
           >
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </ActionButton>
         </div>
       </div>
@@ -293,7 +294,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
               <div className="mb-16">
                 <h2 className="text-4xl font-bold mb-8">Vidéos du Projet</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {project.videos.map((video, index) => (
+                  {project.videos.map((video) => (
                     <motion.div
                       key={video.id}
                       className="relative overflow-hidden rounded-lg"

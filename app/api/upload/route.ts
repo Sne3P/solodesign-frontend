@@ -48,10 +48,11 @@ export async function POST(request: NextRequest) {
       message: 'Fichier uploadé avec succès'
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur upload:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'upload'
     return NextResponse.json({ 
-      error: error.message || 'Erreur lors de l\'upload' 
+      error: errorMessage 
     }, { status: 500 })
   }
 }
@@ -91,7 +92,7 @@ export async function DELETE(request: NextRequest) {
       }, { status: 404 })
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur suppression média:', error)
     return NextResponse.json({ 
       error: 'Erreur lors de la suppression' 

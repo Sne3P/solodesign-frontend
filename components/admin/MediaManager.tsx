@@ -73,10 +73,11 @@ export default function MediaManager({
       onRefreshProject()
       onMediaUpdate()
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'upload'
       toast({
         title: "Erreur",
-        description: error.message || 'Erreur lors de l\'upload',
+        description: errorMessage,
         variant: "destructive"
       })
     } finally {
@@ -109,10 +110,11 @@ export default function MediaManager({
       onRefreshProject()
       onMediaUpdate()
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression'
       toast({
         title: "Erreur",
-        description: error.message || 'Erreur lors de la suppression',
+        description: errorMessage,
         variant: "destructive"
       })
     }
@@ -141,10 +143,11 @@ export default function MediaManager({
         title: "Succès",
         description: "Image de couverture mise à jour"
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la mise à jour de l\'image de couverture'
       toast({
         title: "Erreur",
-        description: error.message || 'Erreur lors de la mise à jour de l\'image de couverture',
+        description: errorMessage,
         variant: "destructive"
       })
     }
@@ -345,7 +348,7 @@ export default function MediaManager({
         <div className="text-center py-8 text-gray-500">
           <ImageIcon className="mx-auto h-12 w-12 text-gray-400 mb-3" />
           <p>Aucun média uploadé pour ce projet</p>
-          <p className="text-sm">Utilisez la zone d'upload ci-dessus pour ajouter des images et vidéos</p>
+          <p className="text-sm">Utilisez la zone d&apos;upload ci-dessus pour ajouter des images et vidéos</p>
         </div>
       )}
     </div>

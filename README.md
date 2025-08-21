@@ -3,49 +3,37 @@
 ![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14.2.31-black.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5.4-blue.svg)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4.1-38bdf8.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 📋 Description
 
-SoloDesign est une application web moderne construite avec Next.js 14, TypeScript et Tailwind CSS. Cette plateforme présente les services et réalisations d'une agence web spécialisée dans la création de sites internet et d'applications mobiles sur mesure.
+SoloDesign est une application web moderne construite avec Next.js 14, TypeScript et Tailwind CSS. Cette plateforme présente les services et réalisations d'une agence web spécialisée dans la création de sites internet et d'applications sur mesure.
 
-### ✨ Fonctionnalités
+### ✨ Fonctionnalités Principales
 
 - 🎨 **Design moderne** avec animations fluides (Framer Motion)
-- 📱 **100% Responsive** - optimisé mobile-first
+- 📱 **100% Responsive** - optimisé mobile-first  
 - ⚡ **Performances optimales** - Core Web Vitals AAA
 - 🔍 **SEO ultra-optimisé** - structured data, meta tags avancées
 - 🛡️ **Sécurisé** - headers de sécurité, protection CSRF
-- 📊 **Analytics intégrés** - Google Analytics, Clarity, Hotjar
-- 🐳 **Docker ready** - déploiement simplifié
-- 📝 **Système de logs** centralisé
-- 🧪 **Tests automatisés** - Jest, Testing Library
+- 📊 **Analytics intégrés** - Google Analytics, Microsoft Clarity, Hotjar
+- 🐳 **Docker ready** - déploiement containerisé
+- 📝 **Système de logs** centralisé et optimisé
+- � **Contact form** avec envoi d'emails via SMTP
+- � **Interface admin** sécurisée avec authentification JWT
 
+## 🛠 Stack Technique
 
-
-
-
-## 🌐 Features
-
-- 🖼 Modern and minimalist design with glassmorphism style
-- ⚡ Fast performance with Next.js 13 App Router and optimized build
-- 📂 Dynamic sections: Projects, About, Contact, etc.
-- 📧 Integrated contact form with serverless email sending
-- 📱 Responsive across all devices (desktop, tablet, mobile)
-- 🧩 Modular architecture: easy to extend and maintain
-
----
-
-## 🛠 Tech Stack
-
-- **Framework**: Next.js 13+ (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Form Handling**: Server Actions (API Route: `/api/send-email`)
-- **Deployment Ready**: Vercel, Netlify, or custom VPS
-- **Fonts**: Custom web fonts (`GeistVF`, `GeistMonoVF`)
-
----
+- **Framework**: Next.js 14.2.31 (App Router)
+- **Language**: TypeScript 5.5.4
+- **Styling**: Tailwind CSS 3.4.1 + CSS Modules
+- **Animations**: Framer Motion 11.11.9
+- **Authentification**: JWT + bcrypt
+- **Email**: Nodemailer avec SMTP
+- **Analytics**: Google Analytics 4, Microsoft Clarity, Hotjar
+- **Deployment**: Docker + Docker Compose
+- **Icons**: Lucide React + Radix UI
 
 ## 📁 Project Structure
 

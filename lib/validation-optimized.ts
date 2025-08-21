@@ -77,7 +77,7 @@ export function validateProjectData(data: unknown): ValidationResult<z.infer<typ
     if (error instanceof z.ZodError) {
       return { 
         success: false, 
-        error: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        error: error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
       }
     }
     return { success: false, error: 'Erreur de validation inconnue' }
@@ -92,7 +92,7 @@ export function validateMediaData(data: unknown): ValidationResult<z.infer<typeo
     if (error instanceof z.ZodError) {
       return { 
         success: false, 
-        error: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        error: error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
       }
     }
     return { success: false, error: 'Erreur de validation inconnue' }
@@ -107,7 +107,7 @@ export function validateLoginData(data: unknown): ValidationResult<z.infer<typeo
     if (error instanceof z.ZodError) {
       return { 
         success: false, 
-        error: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+        error: error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
       }
     }
     return { success: false, error: 'Erreur de validation inconnue' }

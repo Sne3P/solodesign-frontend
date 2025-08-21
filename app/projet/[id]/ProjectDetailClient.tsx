@@ -174,7 +174,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
           <AnimatedSection>
             <div className="mb-16">
               <CoverMedia
-                src={(project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.png'}
+                src={(project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.svg'}
                 alt={`Image de couverture - ${project.title}`}
                 className="w-full h-[600px] object-cover rounded-lg"
                 priority
@@ -182,7 +182,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 muted={true}
                 loop={true}
                 controls={false}
-                fallbackSrc="/placeholder.png"
+                fallbackSrc="/placeholder.svg"
               />
             </div>
           </AnimatedSection>
@@ -250,10 +250,10 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 <div>
                   {project.images.length > 0 && (
                     <CoverMedia
-                      src={project.images[0].url || '/placeholder.png'}
+                      src={project.images[0].url || '/placeholder.svg'}
                       alt="Détail du projet"
                       className="w-full h-80 object-cover rounded-lg"
-                      fallbackSrc="/placeholder.png"
+                      fallbackSrc="/placeholder.svg"
                     />
                   )}
                 </div>
@@ -276,10 +276,10 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                       onClick={() => setSelectedImage(image.url)}
                     >
                       <CoverMedia
-                        src={image.url || '/placeholder.png'}
+                        src={image.url || '/placeholder.svg'}
                         alt={`Image ${index + 1} du projet ${project.title}`}
                         className="w-full h-64 object-cover"
-                        fallbackSrc="/placeholder.png"
+                        fallbackSrc="/placeholder.svg"
                       />
                     </motion.div>
                   ))}

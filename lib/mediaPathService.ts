@@ -9,7 +9,7 @@ export class MediaPathService {
    * Chemins statiques valides dans le projet
    */
   private static validStaticPaths = [
-    '/placeholder.png',
+    '/placeholder.svg',
     '/logo_white_png.png',
     '/robots.txt',
     '/sitemap.xml',
@@ -56,11 +56,11 @@ export class MediaPathService {
     
     switch (mediaType) {
       case 'video':
-        return '/placeholder.png' // Ou une miniature vidéo par défaut
+        return '/placeholder.svg' // Ou une miniature vidéo par défaut
       case 'image':
-        return '/placeholder.png'
+        return '/placeholder.svg'
       default:
-        return '/placeholder.png'
+        return '/placeholder.svg'
     }
   }
 

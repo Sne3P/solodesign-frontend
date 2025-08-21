@@ -169,7 +169,7 @@ const ProjectsSection = () => {
                       onClick={() => handleProjectClick(project.id)}
                     >
                       {(() => {
-                        const coverSrc = (project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.png'
+                        const coverSrc = (project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.svg'
                         return (
                           <CoverMedia
                             src={coverSrc}
@@ -181,7 +181,7 @@ const ProjectsSection = () => {
                             muted={true}
                             loop={true}
                             controls={false}
-                            fallbackSrc="/placeholder.png"
+                            fallbackSrc="/placeholder.svg"
                           />
                         )
                       })()}

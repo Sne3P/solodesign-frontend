@@ -9,6 +9,8 @@ const nextConfig = {
   // Optimisations expérimentales
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react', '@radix-ui/react-toast'],
+    serverComponentsExternalPackages: ['sharp'],
+    optimizeCss: true,
     turbo: {
       rules: {
         '*.svg': {
@@ -19,6 +21,7 @@ const nextConfig = {
     },
     // Optimisations validées pour Next.js 14
     scrollRestoration: true,
+    webVitalsAttribution: ['CLS', 'LCP'],
   },
   
   // Configuration des images optimisée

@@ -1,6 +1,6 @@
-const sharp = require('sharp')
-const fs = require('fs')
-const path = require('path')
+import sharp from 'sharp'
+import fs from 'fs'
+import path from 'path'
 
 async function optimizeImages() {
   const inputDir = path.join(process.cwd(), 'public')
@@ -72,8 +72,4 @@ async function optimizeImages() {
   console.log('✅ Optimisation des images terminée!')
 }
 
-if (require.main === module) {
-  optimizeImages().catch(console.error)
-}
-
-module.exports = optimizeImages
+optimizeImages().catch(console.error)

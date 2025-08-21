@@ -7,6 +7,8 @@ import LoaderGlobal from "../components/global/LoaderGlobal";
 import SEO from "../components/seo/SEO";
 import DeferredAnalytics from "../components/analytics/DeferredAnalytics";
 import { generatePageMetadata, getStructuredData } from "../lib/seo-utils";
+import PerformanceMonitor from "../components/performance/PerformanceMonitor";
+import ServiceWorkerRegistration from "../components/performance/ServiceWorkerRegistration";
 
 // Configuration optimisée des fonts pour Performance
 const geistSans = localFont({
@@ -91,6 +93,8 @@ export default function RootLayout({
           {children}
           <Toaster />
           <DeferredAnalytics />
+          <PerformanceMonitor />
+          <ServiceWorkerRegistration />
         </LoadingProvider>
       </body>
     </html>

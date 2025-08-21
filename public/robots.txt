@@ -1,0 +1,62 @@
+User-agent: *
+Allow: /
+
+# Optimisé pour tous les crawlers et robots
+Allow: /about-us
+Allow: /services  
+Allow: /projects
+Allow: /contact
+Allow: /legal
+Allow: /privacy
+Allow: /cookies
+Allow: /terms
+Allow: /mentions-legales
+
+# Performance et SEO
+Allow: /api/health
+Allow: /_next/static/
+Allow: /uploads/
+
+# Bloque les pages d'administration
+Disallow: /admin/
+Disallow: /api/auth/
+Disallow: /api/upload
+
+# Bloque les fichiers système et temporaires
+Disallow: /.env
+Disallow: /package.json
+Disallow: /docker-compose.yml
+Disallow: /*.log
+
+# Priorité des sitemaps
+Sitemap: https://solodesign.fr/sitemap.xml
+
+# Instructions spéciales pour les robots
+Crawl-delay: 1
+
+# Optimisations pour Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Optimisations pour Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Optimisations pour autres moteurs
+User-agent: Yandex
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+# Social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /

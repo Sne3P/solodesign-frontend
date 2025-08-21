@@ -57,22 +57,6 @@ export default function OptimizedImage({
     onError?.()
   }
 
-  // Générer un placeholder de couleur basé sur le nom de l'image
-  const generatePlaceholder = (imageName: string) => {
-    const colors = [
-      'from-blue-100 to-blue-200',
-      'from-purple-100 to-purple-200', 
-      'from-green-100 to-green-200',
-      'from-orange-100 to-orange-200',
-      'from-pink-100 to-pink-200'
-    ]
-    const hash = imageName.split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0)
-      return a & a
-    }, 0)
-    return colors[Math.abs(hash) % colors.length]
-  }
-
   const containerClass = cn(
     'relative overflow-hidden',
     {
@@ -90,22 +74,19 @@ export default function OptimizedImage({
     }
   )
 
-  const placeholderClass = cn(
-    'absolute inset-0 bg-gradient-to-br',
-    generatePlaceholder(src),
-    {
-      'opacity-100': isLoading,
-      'opacity-0': !isLoading,
-    }
-  )
-
   if (hasError) {
     return (
       <div 
         className={cn(containerClass, 'flex items-center justify-center bg-gray-100')}
         style={{ aspectRatio }}
       >
-        <div className="text-gray-400 text-sm">Image non disponible</div>
+        <Image 
+          src="/placeholder.svg" 
+          alt={alt || "Image non disponible"}
+          width={width || 400}
+          height={height || 300}
+          className="w-full h-full object-contain opacity-50"
+        />
       </div>
     )
   }
@@ -113,7 +94,10 @@ export default function OptimizedImage({
   return (
     <div className={containerClass} style={{ aspectRatio }}>
       {/* Placeholder pendant le chargement */}
-      <div className={cn('absolute inset-0 transition-opacity duration-300', placeholderClass)} />
+      <div className={cn('absolute inset-0 bg-gray-200 transition-opacity duration-300', {
+        'opacity-100': isLoading,
+        'opacity-0': !isLoading,
+      })} />
       
       {/* Image optimisée */}
       <Image

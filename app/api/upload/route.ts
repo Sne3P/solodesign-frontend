@@ -4,7 +4,8 @@ import { mediaService } from '../../../lib/mediaService'
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                 request.cookies.get('admin_token')?.value
 
     if (!token || !AuthService.verifyToken(token)) {
       return NextResponse.json(
@@ -60,7 +61,8 @@ export async function POST(request: NextRequest) {
 // Supprimer un fichier média
 export async function DELETE(request: NextRequest) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                 request.cookies.get('admin_token')?.value
 
     if (!token || !AuthService.verifyToken(token)) {
       return NextResponse.json(

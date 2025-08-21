@@ -2,9 +2,18 @@ import { Project } from './types'
 import { mediaService } from './mediaService'
 // import dataPersistence from './dataPersistence'
 
-// Stockage en mémoire pour la démonstration
+// Utiliser globalThis pour persister les données entre les requêtes
 // En production, vous devriez utiliser une vraie base de données
-const projects: Project[] = []
+declare global {
+  // eslint-disable-next-line no-var
+  var __projectsStore: Project[] | undefined
+}
+
+// Stockage global persistant pour la démonstration
+const projects: Project[] = globalThis.__projectsStore || []
+if (!globalThis.__projectsStore) {
+  globalThis.__projectsStore = projects
+}
 
 // Charger les projets au démarrage
 function loadProjects(): void {
@@ -36,24 +45,9 @@ function generateNextId(): string {
   return (maxId + 1).toString()
 }
 
-// Réorganiser les IDs pour éviter les trous
-function reorganizeIds(): void {
-  projects.forEach((project, index) => {
-    const oldId = project.id
-    const newId = (index + 1).toString()
-    
-    if (oldId !== newId) {
-      // Migrer les médias si l'ID change
-      // Note: Dans un système réel, il faudrait migrer physiquement les fichiers
-      project.id = newId
-    }
-    
-    project.updatedAt = new Date().toISOString()
-  })
-}
-
 export class ProjectService {
   static getAllProjects(): Project[] {
+    console.log(`📋 ProjectService: Récupération de ${projects.length} projets`);
     // Ajouter les médias en temps réel pour chaque projet
     return projects.map(project => ({
       ...project,
@@ -95,6 +89,10 @@ export class ProjectService {
       updatedAt: new Date().toISOString()
     }
     projects.push(newProject)
+    globalThis.__projectsStore = projects // Synchroniser avec le store global
+    console.log(`✅ ProjectService: Projet créé avec ID ${newProject.id}. Total: ${projects.length} projets`);
+    console.log(`📝 ProjectService: Projets actuels:`, projects.map(p => ({ id: p.id, title: p.title })));
+    console.log(`🌐 ProjectService: Store global:`, globalThis.__projectsStore?.map(p => ({ id: p.id, title: p.title })));
     saveProjects() // Sauvegarder après création
     return newProject
   }
@@ -110,6 +108,7 @@ export class ProjectService {
       updatedAt: new Date().toISOString()
     }
     
+    globalThis.__projectsStore = projects // Synchroniser avec le store global
     saveProjects() // Sauvegarder après mise à jour
     
     // Retourner avec les médias actuels
@@ -128,9 +127,7 @@ export class ProjectService {
     mediaService.deleteAllProjectMedia(id)
 
     projects.splice(index, 1)
-    
-    // Réorganiser les IDs après suppression
-    reorganizeIds()
+    globalThis.__projectsStore = projects // Synchroniser avec le store global
     
     saveProjects() // Sauvegarder après suppression
     
@@ -144,6 +141,7 @@ export class ProjectService {
 
     project.coverImage = imageUrl
     project.updatedAt = new Date().toISOString()
+    globalThis.__projectsStore = projects // Synchroniser avec le store global
 
     saveProjects() // Sauvegarder après mise à jour image de couverture
 

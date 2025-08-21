@@ -43,7 +43,8 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                 request.cookies.get('admin_token')?.value
 
     if (!token || !AuthService.verifyToken(token)) {
       return NextResponse.json(
@@ -79,7 +80,11 @@ export async function PUT(
       )
     }
 
-    return NextResponse.json(updatedProject)
+    return NextResponse.json({
+      success: true,
+      project: updatedProject,
+      message: 'Projet mis à jour avec succès'
+    })
 
   } catch (error) {
     console.error('Erreur lors de la mise à jour du projet:', error)
@@ -96,7 +101,8 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                 request.cookies.get('admin_token')?.value
 
     if (!token || !AuthService.verifyToken(token)) {
       return NextResponse.json(

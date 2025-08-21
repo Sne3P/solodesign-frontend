@@ -36,6 +36,15 @@ export default function MediaManager({
 
   const handleFileSelect = async (files: FileList) => {
     if (files.length === 0) return
+    
+    if (!projectId || projectId === 'undefined') {
+      toast({
+        title: "Erreur",
+        description: "ID de projet manquant. Veuillez d'abord sauvegarder le projet.",
+        variant: "destructive"
+      })
+      return
+    }
 
     setUploading(true)
 
@@ -44,6 +53,8 @@ export default function MediaManager({
         const formData = new FormData()
         formData.append('file', file)
         formData.append('projectId', projectId)
+
+        console.log('📤 MediaManager: Upload pour projet ID:', projectId)
 
         const response = await fetch('/api/upload', {
           method: 'POST',

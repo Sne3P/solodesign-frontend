@@ -7,7 +7,8 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const token = request.headers.get('authorization')?.replace('Bearer ', '')
+    const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
+                 request.cookies.get('admin_token')?.value
 
     if (!token || !AuthService.verifyToken(token)) {
       return NextResponse.json(

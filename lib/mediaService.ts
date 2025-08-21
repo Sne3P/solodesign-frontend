@@ -3,12 +3,32 @@ import { ProjectImage, ProjectVideo } from './types'
 import fs from 'fs'
 import path from 'path'
 
+// Déclarer les types globaux pour la persistance
+declare global {
+  // eslint-disable-next-line no-var
+  var __mediaStore: {
+    images: Map<string, ProjectImage[]>
+    videos: Map<string, ProjectVideo[]>
+  } | undefined
+}
+
 class MediaService {
   private uploadDir = path.join(process.cwd(), 'public', 'uploads')
-  private projectImages: Map<string, ProjectImage[]> = new Map()
-  private projectVideos: Map<string, ProjectVideo[]> = new Map()
+  private projectImages: Map<string, ProjectImage[]>
+  private projectVideos: Map<string, ProjectVideo[]>
 
   constructor() {
+    // Utiliser le store global pour persister entre les requêtes
+    if (!globalThis.__mediaStore) {
+      globalThis.__mediaStore = {
+        images: new Map(),
+        videos: new Map()
+      }
+    }
+    
+    this.projectImages = globalThis.__mediaStore.images
+    this.projectVideos = globalThis.__mediaStore.videos
+
     // Créer le dossier uploads s'il n'existe pas
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true })
@@ -32,6 +52,11 @@ class MediaService {
   // Sauvegarder les données dans le fichier
   private saveMediaData(): void {
     try {
+      // Synchroniser avec le store global
+      if (globalThis.__mediaStore) {
+        globalThis.__mediaStore.images = this.projectImages
+        globalThis.__mediaStore.videos = this.projectVideos
+      }
       // Sauvegarde désactivée temporairement
       console.log('💾 MediaService: Sauvegarde des médias (désactivée)')
     } catch (error) {
@@ -93,6 +118,12 @@ class MediaService {
         this.projectImages.set(projectId, [])
       }
       this.projectImages.get(projectId)!.push(imageInfo)
+      
+      // Synchroniser avec le store global
+      if (globalThis.__mediaStore) {
+        globalThis.__mediaStore.images = this.projectImages
+      }
+      
       this.saveMediaData() // Sauvegarder après ajout
       return imageInfo
     } else {
@@ -101,6 +132,12 @@ class MediaService {
         this.projectVideos.set(projectId, [])
       }
       this.projectVideos.get(projectId)!.push(videoInfo)
+      
+      // Synchroniser avec le store global
+      if (globalThis.__mediaStore) {
+        globalThis.__mediaStore.videos = this.projectVideos
+      }
+      
       this.saveMediaData() // Sauvegarder après ajout
       return videoInfo
     }
@@ -138,6 +175,12 @@ class MediaService {
         
         // Supprimer de la collection
         images.splice(imageIndex, 1)
+        
+        // Synchroniser avec le store global
+        if (globalThis.__mediaStore) {
+          globalThis.__mediaStore.images = this.projectImages
+        }
+        
         this.saveMediaData() // Sauvegarder après suppression
         return true
       }
@@ -157,6 +200,12 @@ class MediaService {
         
         // Supprimer de la collection
         videos.splice(videoIndex, 1)
+        
+        // Synchroniser avec le store global
+        if (globalThis.__mediaStore) {
+          globalThis.__mediaStore.videos = this.projectVideos
+        }
+        
         this.saveMediaData() // Sauvegarder après suppression
         return true
       }
@@ -190,6 +239,12 @@ class MediaService {
         }
       })
       this.projectVideos.delete(projectId)
+
+      // Synchroniser avec le store global
+      if (globalThis.__mediaStore) {
+        globalThis.__mediaStore.images = this.projectImages
+        globalThis.__mediaStore.videos = this.projectVideos
+      }
 
       // Sauvegarder après suppression en cascade
       this.saveMediaData()

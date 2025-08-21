@@ -64,7 +64,11 @@ export async function POST(request: NextRequest) {
     const newProject = ProjectService.createProject(validatedData.data!)
     console.log(`✅ API Projects: Projet créé avec succès - ID: ${newProject.id}`)
     
-    return NextResponse.json(newProject, { status: 201 })
+    return NextResponse.json({
+      success: true,
+      project: newProject,
+      message: 'Projet créé avec succès'
+    }, { status: 201 })
   } catch (error) {
     console.error('💥 API Projects: Erreur lors de la création:', error)
     return NextResponse.json(
@@ -131,7 +135,11 @@ export async function PUT(request: NextRequest) {
     }
 
     console.log(`✅ API Projects: Projet ${id} mis à jour avec succès`)
-    return NextResponse.json(updatedProject)
+    return NextResponse.json({
+      success: true,
+      project: updatedProject,
+      message: 'Projet mis à jour avec succès'
+    })
   } catch (error) {
     console.error('💥 API Projects: Erreur lors de la mise à jour:', error)
     return NextResponse.json(

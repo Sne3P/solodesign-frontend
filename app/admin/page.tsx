@@ -15,15 +15,20 @@ const AdminLogin = () => {
 
   // Vérifier si déjà connecté
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('admin_token') // fallback legacy
-      const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {}
-      fetch('/api/auth/verify', {
-        headers,
-        cache: 'no-store'
-      }).then(res => {
-        if (res.ok) router.push('/admin/dashboard')
-      }).catch(() => {})
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/verify', {
+          method: 'GET',
+          credentials: 'include', // Important pour envoyer les cookies httpOnly
+          cache: 'no-store'
+        })
+        
+        if (response.ok) {
+          router.push('/admin/dashboard')
+        }
+      } catch (error) {
+        console.log("Pas encore connecté:", error)
+      }
     }
     
     checkAuth()
@@ -44,16 +49,18 @@ const AdminLogin = () => {
 
       const data = await response.json()
       if (response.ok) {
-  // Optionnel: conserver token en fallback si on veut usage côté client (non nécessaire car cookie httpOnly)
-  localStorage.setItem('admin_token', data.token)
+        // Optionnel: conserver token en fallback si on veut usage côté client
+        if (data.token) {
+          localStorage.setItem('admin_token', data.token)
+        }
         
         toast({
           title: "Connexion réussie",
           description: "Redirection vers le dashboard...",
         })
         
-        // Attendre un peu pour que le cookie soit bien défini
-  setTimeout(() => router.push('/admin/dashboard'), 150)
+        // Redirection immédiate vers le dashboard
+        router.push('/admin/dashboard')
       } else {
         toast({
           title: "Erreur de connexion",

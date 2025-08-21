@@ -4,6 +4,7 @@ export interface Project {
   description: string
   technologies: string[]
   tags: string[]
+  status?: 'draft' | 'published' | 'archived'
   coverImage: string
   images: ProjectImage[]
   videos: ProjectVideo[]

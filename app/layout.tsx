@@ -5,23 +5,26 @@ import { Toaster } from "../components/ui/toaster";
 import { LoadingProvider } from "../contexts/LoadingContext";
 import LoaderGlobal from "../components/global/LoaderGlobal";
 import SEO from "../components/seo/SEO";
-import { GoogleAnalytics, Clarity, Hotjar } from "../components/analytics/Analytics";
+import DeferredAnalytics from "../components/analytics/DeferredAnalytics";
 import { generatePageMetadata, getStructuredData } from "../lib/seo-utils";
 
+// Configuration optimisée des fonts pour Performance
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
-  display: 'swap',
+  display: 'block', // Bloque le rendu jusqu'au chargement pour éviter FOUT
   preload: true,
+  fallback: ['system-ui', '-apple-system', 'sans-serif']
 });
 
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+  variable: "--font-geist-mono", 
   weight: "100 900",
-  display: 'swap',
-  preload: true,
+  display: 'swap', // Permet d'afficher la fallback plus rapidement
+  preload: false, // Pas critique pour FCP
+  fallback: ['ui-monospace', 'Monaco', 'monospace']
 });
 
 // Métadonnées générées automatiquement avec notre système SEO optimisé
@@ -50,6 +53,24 @@ export default function RootLayout({
   return (
     <html lang="fr" className={htmlClass}>
       <head>
+        {/* Preconnect pour les ressources externes critiques */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
+        
+        {/* DNS Prefetch pour les domaines tiers */}
+        <link rel="dns-prefetch" href="https://www.clarity.ms" />
+        <link rel="dns-prefetch" href="https://static.hotjar.com" />
+        
+        {/* Preload des ressources critiques pour LCP */}
+        <link 
+          rel="preload" 
+          href="/app/fonts/GeistVF.woff" 
+          as="font" 
+          type="font/woff" 
+          crossOrigin="anonymous" 
+        />
+        
         <SEO />
         <script
           type="application/ld+json"
@@ -69,9 +90,7 @@ export default function RootLayout({
           <LoaderGlobal />
           {children}
           <Toaster />
-          <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
-          <Clarity projectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
-          <Hotjar siteId={process.env.NEXT_PUBLIC_HOTJAR_ID} />
+          <DeferredAnalytics />
         </LoadingProvider>
       </body>
     </html>

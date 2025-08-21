@@ -3,11 +3,14 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
-import { Parallax } from 'react-scroll-parallax';
-import { ActionButton, Badge } from '@/components/ui';
+import { ActionButton, Badge } from '@/components/ui'
+import { useCriticalResource } from '@/hooks/usePerformance'
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+
+  // Préchargement critique des ressources pour améliorer LCP
+  useCriticalResource('/fonts/GeistVF.woff', 'font', { priority: 'high', preload: true })
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
@@ -50,13 +53,12 @@ const HeroSection = () => {
       ))}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <Parallax speed={-20}>
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
             {/* Premium Badge */}
             <Badge
               variant="premium"
@@ -157,7 +159,6 @@ const HeroSection = () => {
               </motion.div>
             </motion.div>
           </motion.div>
-        </Parallax>
       </div>
 
       {/* Scroll indicator */}

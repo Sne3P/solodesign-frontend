@@ -60,7 +60,7 @@ export function generatePageMetadata(
 
     // Verification
     verification: {
-      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+      google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || null,
       other: {
         ...(process.env.NEXT_PUBLIC_BING_VERIFICATION && {
           'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION
@@ -73,7 +73,7 @@ export function generatePageMetadata(
 
     // Canonical
     alternates: {
-      canonical: finalConfig.canonical,
+      canonical: finalConfig.canonical || `https://solodesign.fr/${page}`,
       languages: {
         'fr': finalConfig.canonical || 'https://solodesign.fr',
       },
@@ -98,7 +98,7 @@ export function getStructuredData(type: keyof typeof generateStructuredData, cus
 }
 
 /**
- * Générateur de sitemap XML dynamique
+ * Générateur de sitemap XML dynamique ultra-optimisé
  */
 export function generateSitemap() {
   const baseUrl = 'https://solodesign.fr';
@@ -106,13 +106,15 @@ export function generateSitemap() {
   
   const staticPages = [
     { url: '', changefreq: 'weekly', priority: '1.0' },
-    { url: '/services', changefreq: 'monthly', priority: '0.9' },
-    { url: '/projects', changefreq: 'weekly', priority: '0.8' },
-    { url: '/contact', changefreq: 'monthly', priority: '0.7' },
-    { url: '/about-us', changefreq: 'monthly', priority: '0.6' },
+    { url: '/services', changefreq: 'monthly', priority: '0.95' },
+    { url: '/projects', changefreq: 'weekly', priority: '0.9' },
+    { url: '/contact', changefreq: 'monthly', priority: '0.85' },
+    { url: '/about-us', changefreq: 'monthly', priority: '0.8' },
     { url: '/legal', changefreq: 'yearly', priority: '0.3' },
     { url: '/privacy', changefreq: 'yearly', priority: '0.3' },
     { url: '/terms', changefreq: 'yearly', priority: '0.3' },
+    { url: '/cookies', changefreq: 'yearly', priority: '0.3' },
+    { url: '/mentions-legales', changefreq: 'yearly', priority: '0.3' },
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -129,6 +131,12 @@ ${staticPages
     <lastmod>${currentDate}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
+    <mobile:mobile/>
+    <image:image>
+      <image:loc>${baseUrl}/og-solodesign-creation-site-web.jpg</image:loc>
+      <image:title>SoloDesign - ${page.url === '' ? 'Accueil' : page.url.replace('/', '').replace('-', ' ')}</image:title>
+      <image:caption>Expert en développement web et solutions digitales sur mesure</image:caption>
+    </image:image>
   </url>`
   )
   .join('\n')}

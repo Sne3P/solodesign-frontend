@@ -12,10 +12,8 @@ import {
   Calendar, 
   Users, 
   Code, 
-  Globe,
   X,
   Save,
-  Upload,
   Image as ImageIcon
 } from "lucide-react"
 import { Project, ProjectFormData } from "../../../lib/types"
@@ -101,7 +99,7 @@ const AdminDashboard = () => {
         const data = await response.json()
         setProjects(data)
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les projets",
@@ -176,7 +174,7 @@ const AdminDashboard = () => {
       } else {
         throw new Error('Erreur lors de la mise à jour')
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour l'image de couverture",

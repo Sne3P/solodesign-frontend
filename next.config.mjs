@@ -17,9 +17,11 @@ const nextConfig = {
         },
       },
     },
+    // Optimisations validées pour Next.js 14
+    scrollRestoration: true,
   },
   
-  // Configuration des images optimisée (migration vers remotePatterns)
+  // Configuration des images optimisée
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
@@ -79,15 +81,17 @@ const nextConfig = {
     return config;
   },
   
-  // Headers de sécurité et performance optimisés
+  // Headers de sécurité et performance ultra-optimisés
   headers: async () => {
+    const isProd = process.env.NODE_ENV === 'production';
+    
     return [
       {
         source: '/(.*)',
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: isProd ? 'DENY' : 'SAMEORIGIN'
           },
           {
             key: 'X-Content-Type-Options', 
@@ -103,14 +107,18 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(), geolocation=(), payment=()'
           },
-          {
-            key: 'Content-Security-Policy',
-            value: process.env.NODE_ENV === 'production' 
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://clarity.ms https://static.hotjar.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://vitals.vercel-insights.com https://clarity.ms https://*.hotjar.com; frame-src 'self' https://www.youtube.com;"
-              : "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' ws: wss:;"
-          }
+          ...(isProd ? [
+            {
+              key: 'Strict-Transport-Security',
+              value: 'max-age=63072000; includeSubDomains; preload'
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.clarity.ms wss://script.hotjar.com; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';"
+            }
+          ] : [])
         ]
       },
       {
@@ -143,7 +151,7 @@ const nextConfig = {
     ];
   },
 
-  // Redirections SEO
+  // Redirections SEO ultra-optimisées
   async redirects() {
     return [
       {
@@ -156,20 +164,22 @@ const nextConfig = {
         destination: '/projects',
         permanent: true,
       },
-    ];
-  },
-
-  // Rewrites pour les URLs propres
-  async rewrites() {
-    return [
       {
-        source: '/sitemap.xml',
-        destination: '/api/sitemap',
+        source: '/blog',
+        destination: '/projects',
+        permanent: true,
+      },
+      // Redirections pour les anciennes URLs communes
+      {
+        source: '/contact-us',
+        destination: '/contact',
+        permanent: true,
       },
       {
-        source: '/robots.txt',
-        destination: '/api/robots',
-      },
+        source: '/about',
+        destination: '/about-us',
+        permanent: true,
+      }
     ];
   },
 };

@@ -17,8 +17,9 @@ const AdminLogin = () => {
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('admin_token') // fallback legacy
+      const headers: HeadersInit = token ? { 'Authorization': `Bearer ${token}` } : {}
       fetch('/api/auth/verify', {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+        headers,
         cache: 'no-store'
       }).then(res => {
         if (res.ok) router.push('/admin/dashboard')

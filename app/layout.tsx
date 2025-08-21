@@ -71,7 +71,7 @@ export default function RootLayout({
           <Toaster />
           <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
           <Clarity projectId={process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID} />
-          <Hotjar hjid={process.env.NEXT_PUBLIC_HOTJAR_ID ? Number(process.env.NEXT_PUBLIC_HOTJAR_ID) : undefined} />
+          <Hotjar siteId={process.env.NEXT_PUBLIC_HOTJAR_ID} />
         </LoadingProvider>
       </body>
     </html>

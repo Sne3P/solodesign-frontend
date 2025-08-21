@@ -9,12 +9,16 @@ import CoverMedia from '../ui/CoverMedia';
 import { useRouter } from 'next/navigation';
 import { Project } from '../../lib/types';
 import ActionButton from '../ui/ActionButton';
+import { useProjectsWithCovers } from '../../hooks/useCoverMedia';
 
 const ProjectsSection = () => {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [rawProjects, setRawProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const refsProjets = useRef<React.RefObject<HTMLDivElement>[]>([])
   const router = useRouter();
+
+  // Utiliser le hook pour enrichir les projets avec les images de couverture
+  const projects = useProjectsWithCovers(rawProjects)
 
   useEffect(() => {
     fetchProjects()
@@ -27,7 +31,7 @@ const ProjectsSection = () => {
         const data = await response.json()
         // Limiter à 6 projets pour la section
         const limitedProjects = data.slice(0, 6)
-        setProjects(limitedProjects)
+        setRawProjects(limitedProjects)
         // Créer les refs pour chaque projet
         refsProjets.current = limitedProjects.map(() => createRef<HTMLDivElement>())
       }
@@ -169,10 +173,10 @@ const ProjectsSection = () => {
                       onClick={() => handleProjectClick(project.id)}
                     >
                       {(() => {
-                        const coverSrc = (project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.svg'
+                        // Utiliser directement coverImage du projet enrichi
                         return (
                           <CoverMedia
-                            src={coverSrc}
+                            src={project.coverImage || '/placeholder.svg'}
                             alt={project.title}
                             className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[480px] 
                                    object-cover rounded-3xl shadow-2xl"

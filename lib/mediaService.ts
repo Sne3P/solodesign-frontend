@@ -1,7 +1,10 @@
 import { ProjectImage, ProjectVideo } from './types'
-// import dataPersistence from './dataPersistence'
 import fs from 'fs'
 import path from 'path'
+
+// Fichiers de sauvegarde
+const DATA_DIR = path.join(process.cwd(), 'data')
+const MEDIA_FILE = path.join(DATA_DIR, 'media.json')
 
 // Déclarer les types globaux pour la persistance
 declare global {
@@ -41,9 +44,28 @@ class MediaService {
   // Charger les données depuis le fichier
   private loadMediaData(): void {
     try {
-      // Utilisation des données en mémoire seulement pour l'instant
-      console.log('� MediaService: Chargement des médias depuis fichier: { images: {}, videos: {} }')
-      console.log('✅ MediaService: Médias chargés avec succès')
+      if (fs.existsSync(MEDIA_FILE)) {
+        const data = fs.readFileSync(MEDIA_FILE, 'utf-8')
+        const mediaData = JSON.parse(data)
+        
+        // Restaurer les Maps depuis les objets JSON
+        if (mediaData.images) {
+          this.projectImages = new Map(Object.entries(mediaData.images))
+        }
+        if (mediaData.videos) {
+          this.projectVideos = new Map(Object.entries(mediaData.videos))
+        }
+        
+        // Synchroniser avec le store global
+        if (globalThis.__mediaStore) {
+          globalThis.__mediaStore.images = this.projectImages
+          globalThis.__mediaStore.videos = this.projectVideos
+        }
+        
+        console.log('📂 MediaService: Médias chargés depuis le fichier')
+      } else {
+        console.log('📂 MediaService: Aucun fichier média trouvé, démarrage avec 0 médias')
+      }
     } catch (error) {
       console.error('💥 MediaService: Erreur chargement médias:', error)
     }
@@ -52,15 +74,31 @@ class MediaService {
   // Sauvegarder les données dans le fichier
   private saveMediaData(): void {
     try {
+      // Créer le dossier si nécessaire
+      if (!fs.existsSync(DATA_DIR)) {
+        fs.mkdirSync(DATA_DIR, { recursive: true })
+      }
+      
+      // Convertir les Maps en objets pour la sérialisation JSON
+      const mediaData = {
+        images: Object.fromEntries(this.projectImages),
+        videos: Object.fromEntries(this.projectVideos)
+      }
+      
+      // Sauvegarder de manière atomique
+      const tempFile = MEDIA_FILE + '.tmp'
+      fs.writeFileSync(tempFile, JSON.stringify(mediaData, null, 2))
+      fs.renameSync(tempFile, MEDIA_FILE)
+      
       // Synchroniser avec le store global
       if (globalThis.__mediaStore) {
         globalThis.__mediaStore.images = this.projectImages
         globalThis.__mediaStore.videos = this.projectVideos
       }
-      // Sauvegarde désactivée temporairement
-      console.log('💾 MediaService: Sauvegarde des médias (désactivée)')
+      
+      console.log('💾 MediaService: Médias sauvegardés')
     } catch (error) {
-      console.error('Erreur sauvegarde médias:', error)
+      console.error('❌ Erreur sauvegarde médias:', error)
     }
   }
 

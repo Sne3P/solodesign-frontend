@@ -23,7 +23,10 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       setError(null)
       
       console.log('🔄 useProjects: Chargement des projets...')
-      const response = await fetch('/api/projects')
+      const response = await fetch('/api/projects', {
+        credentials: 'include',
+        cache: 'no-cache' // Toujours récupérer les données fraîches
+      })
       
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`)

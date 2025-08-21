@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -19,12 +22,20 @@ import {
 import { Project, ProjectFormData } from "../../../lib/types";
 import { useToast } from "../../../hooks/use-toast";
 import { useAuth } from "../../../hooks/useAuth";
+import { useProjects } from "../../../hooks/useProjects";
 import MediaManager from "../../../components/admin/MediaManager";
 import CoverMedia from "../../../components/ui/CoverMedia";
 
 const AdminDashboard = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Hook optimisé pour la gestion des projets
+  const {
+    projects,
+    loading: projectsLoading,
+    createProject: createProjectAPI,
+    updateProject: updateProjectAPI,
+    deleteProject: deleteProjectAPI
+  } = useProjects({ autoFetch: true });
+
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "media">("details");
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -54,35 +65,6 @@ const AdminDashboard = () => {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  const fetchProjects = useCallback(async () => {
-    if (!isAuthenticated) return;
-
-    try {
-      const response = await fetch("/api/projects", {
-        credentials: "include",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(data);
-      }
-    } catch (fetchError) {
-      console.error("Erreur lors du fetch des projets:", fetchError);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les projets",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [toast, isAuthenticated]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchProjects();
-    }
-  }, [isAuthenticated, fetchProjects]);
-
   const handleLogout = () => {
     logout();
     toast({
@@ -95,7 +77,6 @@ const AdminDashboard = () => {
     if (editingProject) {
       await handleRefreshProject();
     }
-    await fetchProjects();
   };
 
   const handleRefreshProject = async () => {
@@ -110,7 +91,6 @@ const AdminDashboard = () => {
       if (response.ok) {
         const updatedProject = await response.json();
         setEditingProject(updatedProject);
-        fetchProjects();
       }
     } catch (error) {
       console.error("Erreur refresh projet:", error);
@@ -160,38 +140,40 @@ const AdminDashboard = () => {
     e.preventDefault();
 
     try {
-      const url = editingProject
-        ? `/api/projects/${editingProject.id}`
-        : "/api/projects";
-
-      const method = editingProject ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        const newProject = result.project || result;
+      // Formatage des données pour l'API
+      const projectData = {
+        title: formData.title,
+        description: formData.description,
+        technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
+        tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+        duration: formData.duration,
+        teamSize: formData.teamSize,
+        scope: formData.scope,
+        coverImage: '',
+        images: [],
+        videos: [],
+        status: 'draft' as const,
+      };
+      
+      if (editingProject) {
+        // Mise à jour d'un projet existant
+        const updatedProject = await updateProjectAPI(editingProject.id, projectData);
         
-        console.log('📝 Dashboard: Résultat API:', result);
-        console.log('📝 Dashboard: Nouveau projet:', newProject);
-        console.log('📝 Dashboard: ID du projet:', newProject?.id);
-
-        toast({
-          title: "Succès",
-          description: editingProject
-            ? "Projet mis à jour avec succès"
-            : "Projet créé avec succès",
-        });
-
-        // Si c'est une création, passer au mode édition avec onglet médias
-        if (!editingProject && newProject?.id) {
+        if (updatedProject) {
+          setEditingProject(updatedProject);
+          setShowModal(false);
+          
+          toast({
+            title: "Succès",
+            description: "Projet mis à jour avec succès",
+          });
+        }
+      } else {
+        // Création d'un nouveau projet
+        const newProject = await createProjectAPI(projectData);
+        
+        if (newProject) {
+          // Passer automatiquement en mode édition avec onglet médias
           setEditingProject(newProject);
           setActiveTab("media");
           setFormData({
@@ -207,18 +189,12 @@ const AdminDashboard = () => {
             teamSize: newProject.teamSize,
             scope: newProject.scope,
           });
-        } else {
-          setShowModal(false);
+          
+          toast({
+            title: "Succès",
+            description: "Projet créé avec succès",
+          });
         }
-
-        fetchProjects();
-      } else {
-        const errorData = await response.json();
-        toast({
-          title: "Erreur",
-          description: errorData.error || "Erreur lors de la sauvegarde",
-          variant: "destructive",
-        });
       }
     } catch (error) {
       console.error("Erreur:", error);
@@ -236,22 +212,12 @@ const AdminDashboard = () => {
     }
 
     try {
-      const response = await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (response.ok) {
+      const success = await deleteProjectAPI(id);
+      
+      if (success) {
         toast({
           title: "Succès",
           description: "Projet supprimé avec succès",
-        });
-        fetchProjects();
-      } else {
-        toast({
-          title: "Erreur",
-          description: "Impossible de supprimer le projet",
-          variant: "destructive",
         });
       }
     } catch (error) {
@@ -280,7 +246,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (isLoading) {
+  if (projectsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

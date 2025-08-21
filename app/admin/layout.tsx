@@ -1,6 +1,7 @@
 "use client"
 
 import { Toaster } from "../../components/ui/toaster"
+import { NotificationProvider } from "../../contexts/NotificationContext"
 
 export default function AdminLayout({
   children,
@@ -9,8 +10,10 @@ export default function AdminLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      {children}
-      <Toaster />
+      <NotificationProvider>
+        {children}
+        <Toaster />
+      </NotificationProvider>
     </div>
   )
 }

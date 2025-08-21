@@ -174,7 +174,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
           <AnimatedSection>
             <div className="mb-16">
               <CoverMedia
-                src={(project.videos && project.videos[0]?.url) || project.coverImage || '/placeholder.svg'}
+                src={project.coverImage || '/placeholder.svg'}
                 alt={`Image de couverture - ${project.title}`}
                 className="w-full h-[600px] object-cover rounded-lg"
                 priority

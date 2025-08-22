@@ -78,27 +78,29 @@ export default function CoverMedia({
     setIsLoading(false)
   }
 
-  // Si erreur ou type inconnu, afficher l'image de fallback
+  // Si erreur ou type inconnu, afficher le vrai placeholder SVG centré et contenu
   if (hasError || (mediaType === 'unknown' && mediaSrc !== fallbackSrc)) {
     return (
-      <Image
-        src={fallbackSrc}
-        alt={alt}
-        width={800}
-        height={600}
-        className={className}
-        priority={priority}
-        onLoad={handleLoad}
-      />
+      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+        <Image
+          src={fallbackSrc}
+          alt={alt}
+          width={200}
+          height={150}
+          className="object-contain w-1/2 h-1/2"
+          priority={priority}
+          onLoad={handleLoad}
+        />
+      </div>
     )
   }
 
-  // Affichage vidéo
+  // Affichage vidéo paysage contenu dans le cadre
   if (mediaType === 'video') {
     return (
-      <div className="relative group video-container">
+      <div className="relative group video-container w-full h-full flex items-center justify-center overflow-hidden">
         <motion.video
-          className={`${className} cursor-pointer`}
+          className={`${className} w-full h-full object-cover rounded-lg cursor-pointer`}
           autoPlay={autoPlay}
           muted={muted}
           loop={loop}
@@ -154,15 +156,15 @@ export default function CoverMedia({
     )
   }
 
-  // Affichage image (par défaut)
+  // Affichage image (par défaut, bien contenue)
   return (
-    <div className="relative">
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
       <Image
         src={mediaSrc}
         alt={alt}
         width={800}
         height={600}
-        className={className}
+        className={`object-cover w-full h-full rounded-lg ${className}`}
         priority={priority}
         onClick={onClick}
         onError={handleError}

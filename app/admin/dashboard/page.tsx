@@ -12,6 +12,7 @@ import {
   X,
   Save,
   Image as ImageIcon,
+  RefreshCw,
 } from "lucide-react";
 import { Project, ProjectFormData } from "../../../lib/types";
 import { useToast } from "../../../hooks/use-toast";
@@ -19,6 +20,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useProjects } from "../../../hooks/useProjects";
 import MediaManager from "../../../components/admin/MediaManager";
 import ProjectGrid from "../../../components/admin/ProjectGrid";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 
 const AdminDashboard = () => {
   // Hook optimisé pour la gestion des projets
@@ -27,12 +29,14 @@ const AdminDashboard = () => {
     loading: projectsLoading,
     createProject: createProjectAPI,
     updateProject: updateProjectAPI,
-    deleteProject: deleteProjectAPI
+    deleteProject: deleteProjectAPI,
+    fetchProjects: refreshProjects
   } = useProjects({ autoFetch: true });
 
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "media">("details");
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -52,6 +56,28 @@ const AdminDashboard = () => {
       router.push("/admin");
     }
   }, [isAuthenticated, authLoading, router]);
+
+  // Écouter les événements de mise à jour temps réel
+  useEffect(() => {
+    const handleProjectUpdate = () => {
+      console.log("🔄 Dashboard: Rechargement des projets suite à une mise à jour");
+      refreshProjects();
+    };
+
+    const handleMediaUpdate = () => {
+      console.log("🔄 Dashboard: Rechargement des projets suite à un changement de média");
+      refreshProjects();
+    };
+
+    // Écouter les événements globaux
+    window.addEventListener("projectUpdated", handleProjectUpdate);
+    window.addEventListener("mediaUpdated", handleMediaUpdate);
+
+    return () => {
+      window.removeEventListener("projectUpdated", handleProjectUpdate);
+      window.removeEventListener("mediaUpdated", handleMediaUpdate);
+    };
+  }, [refreshProjects]);
 
   const handleLogout = () => {
     logout();
@@ -89,6 +115,25 @@ const AdminDashboard = () => {
     setEditingProject((prev) =>
       prev ? { ...prev, coverImage: imageUrl } : null
     );
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshProjects();
+      toast({
+        title: "Succès",
+        description: "Projets actualisés avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de l'actualisation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const openModal = (project?: Project) => {
@@ -220,27 +265,11 @@ const AdminDashboard = () => {
 
   // Afficher le loader pendant la vérification d'authentification
   if (authLoading || (!isAuthenticated && !authLoading)) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black mx-auto"></div>
-          <p className="mt-4 text-gray-600">
-            Chargement du dashboard...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Vérification de l'authentification..." fullScreen />;
   }
 
   if (projectsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement des projets...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Chargement des projets..." fullScreen />;
   }
 
   return (
@@ -278,10 +307,27 @@ const AdminDashboard = () => {
 
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Projets ({projects.length})
-          </h2>
+        {/* En-tête de la section avec compteur et bouton reload */}
+        <div className="mb-6 flex justify-between items-center">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Projets ({projects.length})
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Gérez vos projets et leurs médias
+            </p>
+          </div>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'Actualisation...' : 'Actualiser'}</span>
+          </motion.button>
         </div>
 
         {/* Projects Grid */}

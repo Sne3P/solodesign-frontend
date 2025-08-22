@@ -81,7 +81,7 @@ export default function CoverMedia({
   // Si erreur ou type inconnu, afficher le vrai placeholder SVG centré et contenu
   if (hasError || (mediaType === 'unknown' && mediaSrc !== fallbackSrc)) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100">
+      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
         <Image
           src={fallbackSrc}
           alt={alt}
@@ -95,12 +95,12 @@ export default function CoverMedia({
     )
   }
 
-  // Affichage vidéo paysage contenu dans le cadre
+  // Affichage vidéo avec bords arrondis sur le container
   if (mediaType === 'video') {
     return (
-      <div className="relative group video-container w-full h-full flex items-center justify-center overflow-hidden">
+      <div className="relative group w-full h-full overflow-hidden rounded-lg">
         <motion.video
-          className={`${className} w-full h-full object-cover rounded-lg cursor-pointer`}
+          className={`${className} w-full h-full object-cover cursor-pointer`}
           autoPlay={autoPlay}
           muted={muted}
           loop={loop}
@@ -156,15 +156,15 @@ export default function CoverMedia({
     )
   }
 
-  // Affichage image (par défaut, bien contenue)
+  // Affichage image avec bords arrondis sur le container
   return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+    <div className="relative w-full h-full overflow-hidden rounded-lg">
       <Image
         src={mediaSrc}
         alt={alt}
         width={800}
         height={600}
-        className={`object-cover w-full h-full rounded-lg ${className}`}
+        className={`object-cover w-full h-full ${className}`}
         priority={priority}
         onClick={onClick}
         onError={handleError}
@@ -173,7 +173,7 @@ export default function CoverMedia({
 
       {/* Indicateur de chargement */}
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
+        <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
           <div className="w-8 h-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}

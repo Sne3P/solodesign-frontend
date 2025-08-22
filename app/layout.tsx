@@ -15,7 +15,7 @@ const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
-  display: 'block', // Bloque le rendu jusqu'au chargement pour éviter FOUT
+  display: 'swap',
   preload: true,
   fallback: ['system-ui', '-apple-system', 'sans-serif']
 });
@@ -24,8 +24,8 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono", 
   weight: "100 900",
-  display: 'swap', // Permet d'afficher la fallback plus rapidement
-  preload: false, // Pas critique pour FCP
+  display: 'swap',
+  preload: false,
   fallback: ['ui-monospace', 'Monaco', 'monospace']
 });
 

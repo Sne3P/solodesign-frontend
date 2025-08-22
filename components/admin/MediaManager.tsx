@@ -46,6 +46,23 @@ export default function MediaManager({
       return
     }
 
+    // Validation des fichiers
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/webm', 'video/mov']
+    const maxSize = 50 * 1024 * 1024 // 50MB
+    
+    const invalidFiles = Array.from(files).filter(file => 
+      !allowedTypes.includes(file.type) || file.size > maxSize
+    )
+    
+    if (invalidFiles.length > 0) {
+      toast({
+        title: "Fichiers invalides",
+        description: `${invalidFiles.length} fichier(s) non supporté(s) ou trop volumineux (max 50MB)`,
+        variant: "destructive"
+      })
+      return
+    }
+
     setUploading(true)
 
     try {
@@ -263,11 +280,11 @@ export default function MediaManager({
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {images.map((image) => (
               <div key={image.id} className="relative group">
-                <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                   <Image
                     src={image.url}
                     alt={image.originalName}
-                    width={200}
+                    width={300}
                     height={200}
                     className="w-full h-full object-cover"
                   />

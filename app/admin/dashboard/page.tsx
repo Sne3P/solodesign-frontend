@@ -225,9 +225,7 @@ const AdminDashboard = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            {authLoading
-              ? "Vérification de l'authentification..."
-              : "Redirection..."}
+            Chargement du dashboard...
           </p>
         </div>
       </div>

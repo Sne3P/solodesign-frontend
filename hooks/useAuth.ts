@@ -4,13 +4,7 @@ import { useRouter } from 'next/navigation'
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
-
-  // S'assurer qu'on est côté client pour éviter l'erreur d'hydratation
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   const checkAuth = useCallback(async () => {
     try {
@@ -52,10 +46,8 @@ export function useAuth() {
   }, [router])
 
   useEffect(() => {
-    if (isClient) {
-      checkAuth()
-    }
-  }, [checkAuth, isClient])
+    checkAuth()
+  }, [checkAuth])
 
   return {
     isAuthenticated,

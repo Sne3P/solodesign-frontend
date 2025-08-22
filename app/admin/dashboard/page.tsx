@@ -8,13 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Plus,
-  Edit,
-  Trash2,
   LogOut,
-  Eye,
-  Calendar,
-  Users,
-  Code,
   X,
   Save,
   Image as ImageIcon,
@@ -24,7 +18,7 @@ import { useToast } from "../../../hooks/use-toast";
 import { useAuth } from "../../../hooks/useAuth";
 import { useProjects } from "../../../hooks/useProjects";
 import MediaManager from "../../../components/admin/MediaManager";
-import CoverMedia from "../../../components/ui/CoverMedia";
+import ProjectGrid from "../../../components/admin/ProjectGrid";
 
 const AdminDashboard = () => {
   // Hook optimisé pour la gestion des projets
@@ -39,7 +33,6 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"details" | "media">("details");
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [isClient, setIsClient] = useState(false);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -52,11 +45,6 @@ const AdminDashboard = () => {
   const router = useRouter();
   const { toast } = useToast();
   const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
-
-  // S'assurer qu'on est côté client pour éviter l'erreur d'hydratation
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // Rediriger si non authentifié
   useEffect(() => {
@@ -231,13 +219,13 @@ const AdminDashboard = () => {
   };
 
   // Afficher le loader pendant la vérification d'authentification
-  if (!isClient || authLoading || (!isAuthenticated && !authLoading)) {
+  if (authLoading || (!isAuthenticated && !authLoading)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            {!isClient ? "Initialisation..." : authLoading
+            {authLoading
               ? "Vérification de l'authentification..."
               : "Redirection..."}
           </p>
@@ -299,117 +287,13 @@ const AdminDashboard = () => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <motion.div
-              key={project.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              whileHover={{ y: -5 }}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
-            >
-              {/* Project Image */}
-              <div className="h-48 bg-gray-200 relative">
-                {project.coverImage ? (
-                  <CoverMedia
-                    src={project.coverImage}
-                    alt={project.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="w-12 h-12 text-gray-400" />
-                  </div>
-                )}
-              </div>
-
-              {/* Project Info */}
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {project.title}
-                  </h3>
-                  <div className="flex space-x-2 ml-2">
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() =>
-                        window.open(`/projet/${project.id}`, "_blank")
-                      }
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => openModal(project)}
-                      className="text-green-600 hover:text-green-800"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
-                      onClick={() => handleDelete(project.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </motion.button>
-                  </div>
-                </div>
-
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {project.description}
-                </p>
-
-                {/* Technologies */}
-                <div className="flex flex-wrap gap-1 mb-3">
-                  {Array.isArray(project.technologies) ? (
-                    project.technologies.slice(0, 3).map((tech, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                      >
-                        {tech}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                      {project.technologies}
-                    </span>
-                  )}
-                  {Array.isArray(project.technologies) &&
-                    project.technologies.length > 3 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                        +{project.technologies.length - 3}
-                      </span>
-                    )}
-                </div>
-
-                {/* Project Stats */}
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {project.duration}
-                    </div>
-                    <div className="flex items-center">
-                      <Users className="w-3 h-3 mr-1" />
-                      {project.teamSize}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Code className="w-3 h-3 mr-1" />
-                    ID: {project.id}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <ProjectGrid 
+          projects={projects}
+          onEdit={openModal}
+          onDelete={handleDelete}
+          onView={(projectId) => window.open(`/projet/${projectId}`, "_blank")}
+          columns="lg"
+        />
 
         {projects.length === 0 && (
           <div className="text-center py-12">

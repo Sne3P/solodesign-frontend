@@ -4,10 +4,11 @@ import { ArrowRight } from "lucide-react"
 import { Project } from "../lib/types"
 import ActionButton from "./ui/ActionButton"
 import CoverMedia from "./ui/CoverMedia"
-import { getProjectCoverMediaWithFallback } from "../lib/coverUtils"
+import { useCoverMedia } from "../hooks/useCoverMedia"
 
 export default function ProjectCard({ project }: { project: Project }) {
   const router = useRouter()
+  const { coverUrl } = useCoverMedia(project, "/placeholder.svg")
 
   return (
     <motion.div
@@ -30,7 +31,7 @@ export default function ProjectCard({ project }: { project: Project }) {
       >
         <div className="relative group overflow-hidden rounded-xl shadow-2xl">
           <CoverMedia
-            src={getProjectCoverMediaWithFallback(project)}
+            src={coverUrl}
             alt={project.title}
             className="w-full h-[200px] sm:h-[250px] md:h-[350px] lg:h-[450px] object-cover transition-transform duration-500 group-hover:scale-[1.02]"
             priority

@@ -107,6 +107,11 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       // Mettre à jour la liste des projets
       setProjects(prev => [...prev, newProject])
       
+      // Dispatch event pour mise à jour temps réel
+      window.dispatchEvent(new CustomEvent('projectUpdated', { 
+        detail: { projectId: newProject.id, action: 'created' } 
+      }))
+      
       addNotification({
         type: 'success',
         title: 'Projet créé',
@@ -158,6 +163,11 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       // Mettre à jour la liste des projets
       setProjects(prev => prev.map(p => p.id === id ? updatedProject : p))
       
+      // Dispatch event pour mise à jour temps réel
+      window.dispatchEvent(new CustomEvent('projectUpdated', { 
+        detail: { projectId: id, action: 'updated' } 
+      }))
+      
       addNotification({
         type: 'success',
         title: 'Projet mis à jour',
@@ -205,6 +215,11 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       
       // Mettre à jour la liste des projets
       setProjects(prev => prev.filter(p => p.id !== id))
+      
+      // Dispatch event pour mise à jour temps réel
+      window.dispatchEvent(new CustomEvent('projectUpdated', { 
+        detail: { projectId: id, action: 'deleted' } 
+      }))
       
       addNotification({
         type: 'success',

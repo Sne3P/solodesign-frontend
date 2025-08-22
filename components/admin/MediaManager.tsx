@@ -84,6 +84,11 @@ export default function MediaManager({
       onRefreshProject()
       onMediaUpdate()
 
+      // Dispatch event pour mise à jour temps réel des covers
+      window.dispatchEvent(new CustomEvent('mediaUpdated', { 
+        detail: { projectId } 
+      }))
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'upload'
       toast({
@@ -121,6 +126,11 @@ export default function MediaManager({
       onRefreshProject()
       onMediaUpdate()
 
+      // Dispatch event pour mise à jour temps réel des covers
+      window.dispatchEvent(new CustomEvent('mediaUpdated', { 
+        detail: { projectId } 
+      }))
+
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression'
       toast({
@@ -149,6 +159,11 @@ export default function MediaManager({
 
       onCoverImageChange(imageUrl)
       onRefreshProject()
+      
+      // Dispatch event pour mise à jour temps réel des covers
+      window.dispatchEvent(new CustomEvent('mediaUpdated', { 
+        detail: { projectId } 
+      }))
       
       toast({
         title: "Succès",

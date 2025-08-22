@@ -27,6 +27,25 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     fetchProjects()
+
+    // Écouter les événements de mise à jour de projets et médias
+    const handleProjectUpdate = () => {
+      console.log("🔄 ProjectsPage: Rechargement des projets");
+      fetchProjects();
+    };
+
+    const handleMediaUpdate = () => {
+      console.log("🔄 ProjectsPage: Rechargement des projets après changement de média");
+      fetchProjects();
+    };
+
+    window.addEventListener("projectUpdated", handleProjectUpdate);
+    window.addEventListener("mediaUpdated", handleMediaUpdate);
+
+    return () => {
+      window.removeEventListener("projectUpdated", handleProjectUpdate);
+      window.removeEventListener("mediaUpdated", handleMediaUpdate);
+    };
   }, [])
 
   const fetchProjects = async () => {

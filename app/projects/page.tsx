@@ -30,12 +30,16 @@ export default function ProjectsPage() {
 
     // Écouter les événements de mise à jour de projets et médias
     const handleProjectUpdate = () => {
-      console.log("🔄 ProjectsPage: Rechargement des projets");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔄 ProjectsPage: Rechargement des projets");
+      }
       fetchProjects();
     };
 
     const handleMediaUpdate = () => {
-      console.log("🔄 ProjectsPage: Rechargement des projets après changement de média");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔄 ProjectsPage: Rechargement des projets après changement de média");
+      }
       fetchProjects();
     };
 
@@ -56,7 +60,9 @@ export default function ProjectsPage() {
         setProjects(data)
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des projets:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Erreur lors du chargement des projets:', error)
+      }
     } finally {
       setLoading(false)
     }

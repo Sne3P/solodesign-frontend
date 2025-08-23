@@ -14,7 +14,9 @@ export default function ServiceWorkerRegistration() {
         try {
           const registration = await navigator.serviceWorker.register('/sw.js')
           
-          console.log('✅ Service Worker enregistré:', registration.scope)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Service Worker enregistré:', registration.scope)
+          }
           
           // Écouter les mises à jour
           registration.addEventListener('updatefound', () => {
@@ -23,14 +25,18 @@ export default function ServiceWorkerRegistration() {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // Nouvelle version disponible
-                  console.log('🔄 Nouvelle version du Service Worker disponible')
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('🔄 Nouvelle version du Service Worker disponible')
+                  }
                 }
               })
             }
           })
           
         } catch (error) {
-          console.log('❌ Erreur Service Worker:', error)
+          if (process.env.NODE_ENV === 'development') {
+            console.log('❌ Erreur Service Worker:', error)
+          }
         }
       }
       

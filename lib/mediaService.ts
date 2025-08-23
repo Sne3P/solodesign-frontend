@@ -62,9 +62,13 @@ class MediaService {
           globalThis.__mediaStore.videos = this.projectVideos
         }
         
-        console.log('📂 MediaService: Médias chargés depuis le fichier')
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📂 MediaService: Médias chargés depuis le fichier')
+        }
       } else {
-        console.log('📂 MediaService: Aucun fichier média trouvé, démarrage avec 0 médias')
+        if (process.env.NODE_ENV === 'development') {
+          console.log('📂 MediaService: Aucun fichier média trouvé, démarrage avec 0 médias')
+        }
       }
     } catch (error) {
       console.error('💥 MediaService: Erreur chargement médias:', error)
@@ -96,7 +100,9 @@ class MediaService {
         globalThis.__mediaStore.videos = this.projectVideos
       }
       
-      console.log('💾 MediaService: Médias sauvegardés')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('💾 MediaService: Médias sauvegardés')
+      }
     } catch (error) {
       console.error('❌ Erreur sauvegarde médias:', error)
     }
@@ -315,7 +321,9 @@ class MediaService {
         if (!usedFiles.has(filename)) {
           const filePath = path.join(this.uploadDir, filename)
           fs.unlinkSync(filePath)
-          console.log(`Fichier orphelin supprimé: ${filename}`)
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Fichier orphelin supprimé: ${filename}`)
+          }
         }
       })
     } catch (error) {

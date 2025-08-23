@@ -27,7 +27,9 @@ const AdminLogin = () => {
           router.push('/admin/dashboard')
         }
       } catch (error) {
-        console.log("Pas encore connecté:", error)
+        if (process.env.NODE_ENV === 'development') {
+          console.log("Pas encore connecté:", error)
+        }
       }
     }
     

@@ -44,12 +44,14 @@ export default function CoverMedia({
   const mediaType = getMediaType(mediaSrc)
 
   // Debug: Log pour voir ce qui se passe
-  console.log('CoverMedia Debug:', {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('CoverMedia Debug:', {
     originalSrc: src,
     mediaSrc,
     mediaType,
     fallbackSrc
-  })
+      })
+    }
 
   const handleVideoToggle = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -60,7 +62,9 @@ export default function CoverMedia({
         video.play().then(() => {
           setIsPlaying(true)
         }).catch(error => {
-          console.error('Erreur lors de la lecture de la vidéo:', error)
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Erreur lors de la lecture de la vidéo:', error)
+              }
         })
       } else {
         video.pause()

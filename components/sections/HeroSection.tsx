@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
 import { ActionButton, Badge } from '@/components/ui'
-import { useCriticalResource } from '@/hooks/usePerformance'
 
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })

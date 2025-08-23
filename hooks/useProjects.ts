@@ -22,7 +22,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       setLoading(true)
       setError(null)
       
-      console.log('🔄 useProjects: Chargement des projets...')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 useProjects: Chargement des projets...')
+      }
       const response = await fetch('/api/projects', {
         credentials: 'include',
         cache: 'no-cache' // Toujours récupérer les données fraîches
@@ -34,11 +36,15 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
 
       const data = await response.json()
       setProjects(data)
-      console.log(`✅ useProjects: ${data.length} projets chargés`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: ${data.length} projets chargés`)
+      }
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors du chargement des projets'
-      console.error('💥 useProjects: Erreur chargement:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur chargement:', error)
+      }
       setError(errorMessage)
       
       addNotification({
@@ -54,7 +60,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   // Récupérer un projet par ID
   const fetchProject = useCallback(async (id: string): Promise<Project | null> => {
     try {
-      console.log(`🔍 useProjects: Récupération du projet ${id}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🔍 useProjects: Récupération du projet ${id}`)
+      }
       const response = await fetch(`/api/projects/${id}`)
       
       if (!response.ok) {
@@ -65,12 +73,16 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       }
 
       const project = await response.json()
-      console.log(`✅ useProjects: Projet récupéré - ${project.title}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: Projet récupéré - ${project.title}`)
+      }
       return project
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la récupération du projet'
-      console.error('💥 useProjects: Erreur récupération projet:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur récupération projet:', error)
+      }
       addNotification({
         type: 'error',
         title: 'Erreur',
@@ -83,7 +95,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   // Créer un nouveau projet
   const createProject = useCallback(async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project | null> => {
     try {
-      console.log('➕ useProjects: Création d\'un nouveau projet')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('➕ useProjects: Création d\'un nouveau projet')
+      }
       const token = localStorage.getItem('admin_token')
       
       const response = await fetch('/api/projects', {
@@ -102,7 +116,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       }
 
       const newProject = await response.json()
-      console.log(`✅ useProjects: Projet créé - ${newProject.title}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: Projet créé - ${newProject.title}`)
+      }
       
       // Mettre à jour la liste des projets
       setProjects(prev => [...prev, newProject])
@@ -126,7 +142,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la création du projet'
-      console.error('💥 useProjects: Erreur création:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur création:', error)
+      }
       addNotification({
         type: 'error',
         title: 'Erreur de création',
@@ -139,7 +157,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   // Mettre à jour un projet
   const updateProject = useCallback(async (id: string, updateData: Partial<Project>): Promise<Project | null> => {
     try {
-      console.log(`📝 useProjects: Mise à jour du projet ${id}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`📝 useProjects: Mise à jour du projet ${id}`)
+      }
       const token = localStorage.getItem('admin_token')
       
       const response = await fetch(`/api/projects/${id}`, {
@@ -158,7 +178,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       }
 
       const updatedProject = await response.json()
-      console.log(`✅ useProjects: Projet mis à jour - ${updatedProject.title}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: Projet mis à jour - ${updatedProject.title}`)
+      }
       
       // Mettre à jour la liste des projets
       setProjects(prev => prev.map(p => p.id === id ? updatedProject : p))
@@ -182,7 +204,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du projet'
-      console.error('💥 useProjects: Erreur mise à jour:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur mise à jour:', error)
+      }
       addNotification({
         type: 'error',
         title: 'Erreur de mise à jour',
@@ -195,7 +219,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   // Supprimer un projet
   const deleteProject = useCallback(async (id: string): Promise<boolean> => {
     try {
-      console.log(`🗑️ useProjects: Suppression du projet ${id}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🗑️ useProjects: Suppression du projet ${id}`)
+      }
       const token = localStorage.getItem('admin_token')
       
       const response = await fetch(`/api/projects/${id}`, {
@@ -211,7 +237,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`)
       }
 
-      console.log(`✅ useProjects: Projet supprimé - ID: ${id}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: Projet supprimé - ID: ${id}`)
+      }
       
       // Mettre à jour la liste des projets
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -235,7 +263,9 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression du projet'
-      console.error('💥 useProjects: Erreur suppression:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur suppression:', error)
+      }
       addNotification({
         type: 'error',
         title: 'Erreur de suppression',

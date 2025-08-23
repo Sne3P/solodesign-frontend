@@ -60,12 +60,16 @@ const AdminDashboard = () => {
   // Écouter les événements de mise à jour temps réel
   useEffect(() => {
     const handleProjectUpdate = () => {
-      console.log("🔄 Dashboard: Rechargement des projets suite à une mise à jour");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔄 Dashboard: Rechargement des projets suite à une mise à jour");
+      }
       refreshProjects();
     };
 
     const handleMediaUpdate = () => {
-      console.log("🔄 Dashboard: Rechargement des projets suite à un changement de média");
+      if (process.env.NODE_ENV === 'development') {
+        console.log("🔄 Dashboard: Rechargement des projets suite à un changement de média");
+      }
       refreshProjects();
     };
 
@@ -107,7 +111,9 @@ const AdminDashboard = () => {
         setEditingProject(updatedProject);
       }
     } catch (error) {
-      console.error("Erreur refresh projet:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Erreur refresh projet:", error);
+      }
     }
   };
 
@@ -125,7 +131,7 @@ const AdminDashboard = () => {
         title: "Succès",
         description: "Projets actualisés avec succès",
       });
-    } catch (error) {
+  } catch {
       toast({
         title: "Erreur",
         description: "Erreur lors de l'actualisation",
@@ -230,7 +236,9 @@ const AdminDashboard = () => {
         }
       }
     } catch (error) {
-      console.error("Erreur:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Erreur:", error);
+      }
       toast({
         title: "Erreur",
         description: "Une erreur est survenue",
@@ -254,7 +262,9 @@ const AdminDashboard = () => {
         });
       }
     } catch (error) {
-      console.error("Erreur:", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Erreur:", error);
+      }
       toast({
         title: "Erreur",
         description: "Une erreur est survenue",

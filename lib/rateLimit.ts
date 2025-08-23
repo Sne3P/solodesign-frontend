@@ -158,9 +158,11 @@ export function logRateLimit(
   const status = allowed ? '✅' : '❌'
   const action = allowed ? 'Autorisée' : 'BLOQUÉE'
   
-  console.log(
-    `${status} Rate Limit ${action}: ${identifier} -> ${endpoint} (${remaining} restantes)`
-  )
+  if (process.env.NODE_ENV === 'development') {
+    console.log(
+      `${status} Rate Limit ${action}: ${identifier} -> ${endpoint} (${remaining} restantes)`
+    )
+  }
   
   if (!allowed) {
     console.warn(`🚨 Rate limit dépassé pour ${identifier} sur ${endpoint}`)

@@ -22,7 +22,9 @@ export const useMedia = (projectId: string) => {
   const uploadFile = useCallback(async (file: File): Promise<MediaFile | null> => {
     try {
       setUploading(true)
-      console.log(`📤 useMedia: Upload de ${file.name} pour le projet ${projectId}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`📤 useMedia: Upload de ${file.name} pour le projet ${projectId}`)
+      }
 
       // Validation côté client
       const maxSize = 50 * 1024 * 1024 // 50MB
@@ -55,7 +57,9 @@ export const useMedia = (projectId: string) => {
       }
 
       const result = await response.json()
-      console.log('✅ useMedia: Upload réussi:', result)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ useMedia: Upload réussi:', result)
+      }
 
       addNotification({
         type: 'success',
@@ -68,7 +72,9 @@ export const useMedia = (projectId: string) => {
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'upload'
-      console.error('💥 useMedia: Erreur upload:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useMedia: Erreur upload:', error)
+      }
       
       addNotification({
         type: 'error',
@@ -102,7 +108,9 @@ export const useMedia = (projectId: string) => {
       const id = fileId || filename
       setDeletingIds(prev => new Set(prev).add(id))
       
-      console.log(`🗑️ useMedia: Suppression de ${filename}`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`🗑️ useMedia: Suppression de ${filename}`)
+      }
 
       const response = await fetch(`/api/upload?filename=${encodeURIComponent(filename)}`, {
         method: 'DELETE',
@@ -114,7 +122,9 @@ export const useMedia = (projectId: string) => {
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`)
       }
 
-      console.log('✅ useMedia: Suppression réussie')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('✅ useMedia: Suppression réussie')
+      }
 
       addNotification({
         type: 'success',
@@ -127,7 +137,9 @@ export const useMedia = (projectId: string) => {
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la suppression'
-      console.error('💥 useMedia: Erreur suppression:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useMedia: Erreur suppression:', error)
+      }
       
       addNotification({
         type: 'error',

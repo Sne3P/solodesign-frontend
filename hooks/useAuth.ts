@@ -22,7 +22,9 @@ export function useAuth() {
         return false
       }
     } catch (error) {
-      console.error('Erreur vérification auth:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Erreur vérification auth:', error)
+      }
       setIsAuthenticated(false)
       return false
     } finally {
@@ -37,7 +39,9 @@ export function useAuth() {
         credentials: 'include'
       })
     } catch (error) {
-      console.error('Erreur logout:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Erreur logout:', error)
+      }
     }
     
     localStorage.removeItem('admin_token')

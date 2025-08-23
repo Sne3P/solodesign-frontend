@@ -78,7 +78,9 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
         setError('Erreur lors du chargement du projet')
       }
     } catch (fetchError) {
-      console.error("Erreur lors du fetch du projet:", fetchError)
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Erreur lors du fetch du projet:", fetchError)
+      }
       setError('Erreur lors du chargement du projet')
     } finally {
       setLoading(false)

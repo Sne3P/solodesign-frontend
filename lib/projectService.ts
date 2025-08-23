@@ -36,9 +36,13 @@ function loadProjects(): void {
       projects.splice(0, projects.length, ...loadedProjects)
       globalThis.__projectsStore = projects
       
-      console.log(`📂 ProjectService: ${projects.length} projets chargés depuis le fichier`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`📂 ProjectService: ${projects.length} projets chargés depuis le fichier`)
+      }
     } else {
-      console.log('� ProjectService: Aucun fichier trouvé, démarrage avec 0 projets')
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📁 ProjectService: Aucun fichier trouvé, démarrage avec 0 projets')
+      }
     }
   } catch (error) {
     console.error('❌ Erreur lors du chargement des projets:', error)
@@ -60,7 +64,9 @@ function saveProjects(): void {
     fs.writeFileSync(tempFile, JSON.stringify(projects, null, 2))
     fs.renameSync(tempFile, PROJECTS_FILE)
     
-    console.log(`💾 ProjectService: ${projects.length} projets sauvegardés`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`💾 ProjectService: ${projects.length} projets sauvegardés`)
+    }
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error)
   }
@@ -135,7 +141,9 @@ export class ProjectService {
   static getProjectById(id: string): Project | undefined {
     const project = projects.find(project => project.id === id)
     if (!project) {
-      console.log(`❌ ProjectService: Projet ${id} non trouvé`) // Debug
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`❌ ProjectService: Projet ${id} non trouvé`)
+      }
       return undefined
     }
     
@@ -186,8 +194,10 @@ export class ProjectService {
     // Sauvegarder immédiatement
     saveProjects()
     
-    console.log(`✅ ProjectService: Projet créé avec ID ${newProject.id}. Total: ${projects.length} projets`);
-    console.log(`📝 ProjectService: Projets actuels:`, projects.map(p => ({ id: p.id, title: p.title })));
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ ProjectService: Projet créé avec ID ${newProject.id}. Total: ${projects.length} projets`);
+      console.log(`📝 ProjectService: Projets actuels:`, projects.map(p => ({ id: p.id, title: p.title })));
+    }
     
     return newProject
   }
@@ -234,7 +244,9 @@ export class ProjectService {
     
     const index = projects.findIndex(project => project.id === id)
     if (index === -1) {
-      console.log(`❌ ProjectService: Projet ${id} non trouvé pour suppression`)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`❌ ProjectService: Projet ${id} non trouvé pour suppression`)
+      }
       return false
     }
 
@@ -250,7 +262,9 @@ export class ProjectService {
     // Sauvegarder immédiatement
     saveProjects()
     
-    console.log(`🗑️ ProjectService: Projet "${projectTitle}" (ID: ${id}) supprimé. Reste ${projects.length} projets`)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🗑️ ProjectService: Projet "${projectTitle}" (ID: ${id}) supprimé. Reste ${projects.length} projets`)
+    }
     
     return true
   }

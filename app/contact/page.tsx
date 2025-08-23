@@ -323,7 +323,9 @@ const ContactPage = () => {
         alert("Erreur lors de l'envoi du message. Veuillez réessayer.")
       }
     } catch (error) {
-      console.error("Error:", error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error:", error)
+      }
       alert("Une erreur s'est produite. Veuillez réessayer.")
     }
 
@@ -434,7 +436,9 @@ const ContactPage = () => {
       return pdfBlob
       
     } catch (error) {
-      console.error('Error generating PDF:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error generating PDF:', error)
+      }
       throw error
     } finally {
       setIsGeneratingPdf(false)
@@ -503,7 +507,9 @@ Un PDF détaillé est joint à cette demande.`,
         throw new Error("Failed to send email")
       }
     } catch (error) {
-      console.error("Error:", error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Error:", error)
+      }
       alert("Une erreur s'est produite. Veuillez réessayer.")
     }
 

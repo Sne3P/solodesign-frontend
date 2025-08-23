@@ -16,19 +16,25 @@ const STATIC_ASSETS = [
 
 // Installation du Service Worker
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker: Installation')
+  if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+    console.log('🔧 Service Worker: Installation')
+  }
   
   event.waitUntil(
     Promise.all([
       // Cache statique
       caches.open(STATIC_CACHE).then(cache => {
-        console.log('📦 Service Worker: Cache des assets statiques')
+        if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+          console.log('📦 Service Worker: Cache des assets statiques')
+        }
         return cache.addAll(STATIC_ASSETS)
       }),
       
       // Préchargement des ressources critiques
       caches.open(DYNAMIC_CACHE).then(() => {
-        console.log('⚡ Service Worker: Préparation du cache dynamique')
+        if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+          console.log('⚡ Service Worker: Préparation du cache dynamique')
+        }
         return Promise.resolve()
       })
     ])
@@ -40,7 +46,9 @@ self.addEventListener('install', event => {
 
 // Activation du Service Worker
 self.addEventListener('activate', event => {
-  console.log('✅ Service Worker: Activation')
+  if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+    console.log('✅ Service Worker: Activation')
+  }
   
   event.waitUntil(
     Promise.all([
@@ -49,7 +57,9 @@ self.addEventListener('activate', event => {
         return Promise.all(
           cacheNames.map(cacheName => {
             if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-              console.log('🗑️ Service Worker: Suppression ancien cache', cacheName)
+              if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+                console.log('🗑️ Service Worker: Suppression ancien cache', cacheName)
+              }
               return caches.delete(cacheName)
             }
           })
@@ -112,7 +122,9 @@ async function cacheFirst(request) {
     
     return networkResponse
   } catch (error) {
-    console.log('❌ Service Worker: Cache First failed', error)
+    if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+      console.log('❌ Service Worker: Cache First failed', error)
+    }
     return new Response('Offline', { status: 503 })
   }
 }
@@ -129,7 +141,9 @@ async function networkFirst(request) {
     
     return networkResponse
   } catch (error) {
-    console.log('🔄 Service Worker: Network failed, trying cache')
+    if (self && 'ENV' in self ? self.ENV === 'development' : false) {
+      console.log('🔄 Service Worker: Network failed, trying cache')
+    }
     const cachedResponse = await caches.match(request)
     
     if (cachedResponse) {

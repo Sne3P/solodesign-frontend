@@ -2,13 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import des styles utilitaires centralisés */
-@import '../styles/utilities.css';
+/**
+ * Styles utilitaires centralisés pour la cohérence visuelle
+ * Glassmorphism, backgrounds, border-radius, etc.
+ */
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+/* Variables CSS personnalisées pour la cohérence */
+@layer base {
+  :root {
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-blur: 10px;
+    --accent-color: #ffffff;
+    --accent-alpha: 0.1;
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+    --border-radius-full: 9999px;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --transition-fast: 150ms;
+    --transition-normal: 300ms;
+    --transition-slow: 500ms;
+  }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }
-
 
 @layer utilities {
   .text-balance {
@@ -144,13 +168,21 @@ body {
 
   /* Animations optimisées pour BackgroundPattern */
   @keyframes backgroundMove-30 {
-    0% { background-position: 0px 0px; }
-    100% { background-position: 0px -30px; }
+    0% {
+      background-position: 0px 0px;
+    }
+    100% {
+      background-position: 0px -30px;
+    }
   }
 
   @keyframes backgroundMove-40 {
-    0% { background-position: 0px 0px; }
-    100% { background-position: 0px -40px; }
+    0% {
+      background-position: 0px 0px;
+    }
+    100% {
+      background-position: 0px -40px;
+    }
   }
 
   .animate-pulse-slow {
@@ -162,17 +194,17 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Smooth scroll pour mobile */
   .mobile-slider {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Amélioration des performances du slider */
   .slider-item {
     will-change: transform;

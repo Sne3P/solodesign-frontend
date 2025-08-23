@@ -3,6 +3,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: !isDev, // Désactivé en dev pour de meilleures performances
   
   // Configuration différente selon l'environnement
   ...(isDev ? {
@@ -25,17 +26,16 @@ const nextConfig = {
     }
   }),
   
-  // Packages externes pour server components (mise à jour pour Next.js 15)
-  serverExternalPackages: ['sharp'],
-  
   // Optimisations expérimentales compatibles Next 15
   experimental: {
     optimizePackageImports: ['framer-motion', 'lucide-react', '@radix-ui/react-toast'],
+    serverComponentsExternalPackages: ['sharp'],
     optimizeCss: !isDev, // Seulement en production
     
     // Hot reload optimisé pour le développement
     ...(isDev ? {
       webpackBuildWorker: true,
+      useWasmBinary: false,
     } : {}),
   },
   
@@ -57,6 +57,69 @@ const nextConfig = {
   compress: !isDev, // Compression seulement en prod
   poweredByHeader: false,
   generateEtags: !isDev, // ETags seulement en prod
+  
+  // Webpack configuration optimisée
+  webpack: (config, { dev, isServer }) => {
+    // Optimisations spécifiques au développement
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+      }
+      
+      // Fast Refresh optimisé
+      config.module.rules.push({
+        test: /\.(tsx|ts|jsx|js)$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['next/babel'],
+            plugins: [
+              ['react-refresh/babel', { skipEnvCheck: true }]
+            ]
+          }
+        }
+      })
+    }
+    
+    // Optimisations pour la production seulement
+    if (!dev && !isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            animations: {
+              name: 'animations',
+              test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+              priority: 20,
+              reuseExistingChunk: true
+            },
+            icons: {
+              name: 'icons', 
+              test: /[\\/]node_modules[\\/](lucide-react)[\\/]/,
+              priority: 20,
+              reuseExistingChunk: true
+            },
+            ui: {
+              name: 'ui',
+              test: /[\\/]node_modules[\\/](@radix-ui)[\\/]/,
+              priority: 15,
+              reuseExistingChunk: true
+            }
+          }
+        }
+      }
+    }
+
+    // Optimisation des SVG
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ['@svgr/webpack']
+    })
+
+    return config
+  },
   
   // Headers conditionnels
   headers: async () => {
@@ -162,7 +225,6 @@ const nextConfig = {
         destination: '/projects',
         permanent: true,
       },
-      // Redirections pour les anciennes URLs communes
       {
         source: '/contact-us',
         destination: '/contact',

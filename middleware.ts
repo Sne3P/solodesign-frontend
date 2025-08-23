@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const isDev = process.env.NODE_ENV === 'development'
+
 // Fonction simple pour vérifier le JWT sans crypto
 function isValidJWTFormat(token: string): boolean {
   const parts = token.split('.')
@@ -8,25 +10,28 @@ function isValidJWTFormat(token: string): boolean {
   
   try {
     // Vérifier que c'est un JWT valide en décodant le payload
-    const payload = JSON.parse(atob(parts[1]))
+    const payloadPart = parts[1]
+    if (!payloadPart) return false
+    
+    const payload = JSON.parse(atob(payloadPart))
     const now = Math.floor(Date.now() / 1000)
     
     // Vérifier l'expiration
     if (payload.exp && payload.exp < now) {
-      console.log("❌ Middleware: Token expiré")
+      if (isDev) console.log("❌ Middleware: Token expiré")
       return false
     }
     
     // Vérifier que c'est bien un token admin
     if (payload.user !== 'admin' || payload.role !== 'admin') {
-      console.log("❌ Middleware: Token non-admin")
+      if (isDev) console.log("❌ Middleware: Token non-admin")
       return false
     }
     
-    console.log("✅ Middleware: Token valide (format et expiration OK)")
+    if (isDev) console.log("✅ Middleware: Token valide (format et expiration OK)")
     return true
   } catch (error) {
-    console.log("❌ Middleware: Erreur décodage token:", error)
+    if (isDev) console.log("❌ Middleware: Erreur décodage token:", error)
     return false
   }
 }

@@ -773,7 +773,7 @@ const ExpertiseModal = ({ expertise, isOpen, onClose }: {
         <div className="flex items-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-br from-white to-gray-200 rounded-xl flex items-center justify-center mr-6 shadow-lg">
             <span className="text-black font-bold text-2xl">
-              {expertise.category.split(' ')[0].charAt(0)}
+              {expertise?.category?.split(' ')[0]?.charAt(0) ?? ''}
             </span>
           </div>
           <div>
@@ -1238,6 +1238,7 @@ const AdditionalServicesSection = () => {
       }, 4000)
       return () => clearInterval(interval)
     }
+    return () => {}
   }, [isPaused, isInView, additionalServices.length])
 
   const nextSlide = () => {

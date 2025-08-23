@@ -100,14 +100,31 @@ class DataPersistence {
   }
 
   updateProject(id: string, updatedProject: Partial<Project>): Project | null {
-    const projects = this.getProjects()
-    const index = projects.findIndex(p => p.id === id)
-    
+    const projectsArr = this.getProjects()
+    const index = projectsArr.findIndex(p => p.id === id)
     if (index === -1) return null
-    
-    projects[index] = { ...projects[index], ...updatedProject, updatedAt: new Date().toISOString() }
-    this.saveProjects(projects)
-    return projects[index]
+
+  const prev = projectsArr[index]!
+    const updated: Project = {
+      ...prev,
+      ...updatedProject,
+      id: prev.id,
+      title: updatedProject.title ?? prev.title,
+      description: updatedProject.description ?? prev.description,
+      technologies: updatedProject.technologies ?? prev.technologies,
+      tags: updatedProject.tags ?? prev.tags,
+      coverImage: updatedProject.coverImage ?? prev.coverImage,
+      images: updatedProject.images ?? prev.images,
+      videos: updatedProject.videos ?? prev.videos,
+      duration: updatedProject.duration ?? prev.duration,
+      teamSize: updatedProject.teamSize ?? prev.teamSize,
+      scope: updatedProject.scope ?? prev.scope,
+      createdAt: prev.createdAt,
+      updatedAt: new Date().toISOString(),
+    }
+    projectsArr[index] = updated
+    this.saveProjects(projectsArr)
+    return updated
   }
 
   deleteProject(id: string): boolean {

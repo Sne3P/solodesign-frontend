@@ -106,7 +106,7 @@ const TestimonialsSection = () => {
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.4 }}
               >
-                &ldquo;{testimonials[currentTestimonial].text}&rdquo;
+                &ldquo;{testimonials[currentTestimonial]?.text ?? ''}&rdquo;
               </motion.blockquote>
 
               {/* Rating */}
@@ -116,7 +116,7 @@ const TestimonialsSection = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                {[...Array(testimonials[currentTestimonial]?.rating ?? 0)].map((_, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0 }}
@@ -137,16 +137,16 @@ const TestimonialsSection = () => {
               >
                 <div className="text-center">
                   <p className="text-gray-400 text-lg">
-                    {testimonials[currentTestimonial].position}
+                    {testimonials[currentTestimonial]?.position ?? ''}
                   </p>
                   <p className="text-gray-500">
-                    {testimonials[currentTestimonial].company}
+                    {testimonials[currentTestimonial]?.company ?? ''}
                   </p>
                 </div>
                 
                 <div className="bg-white/10 px-4 py-2 rounded-full">
                   <span className="text-sm text-white font-medium">
-                    {testimonials[currentTestimonial].project}
+                    {testimonials[currentTestimonial]?.project ?? ''}
                   </span>
                 </div>
               </motion.div>

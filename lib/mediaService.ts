@@ -184,14 +184,18 @@ class MediaService {
   // Obtenir toutes les images d'un projet
   getProjectImages(projectId: string): ProjectImage[] {
     const images = this.projectImages.get(projectId) || []
-    console.log(`📸 MediaService: Images pour projet ${projectId}:`, images.length) // Debug
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📸 MediaService: Images pour projet ${projectId}:`, images.length)
+    }
     return images
   }
 
   // Obtenir toutes les vidéos d'un projet
   getProjectVideos(projectId: string): ProjectVideo[] {
     const videos = this.projectVideos.get(projectId) || []
-    console.log(`🎥 MediaService: Vidéos pour projet ${projectId}:`, videos.length) // Debug
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎥 MediaService: Vidéos pour projet ${projectId}:`, videos.length)
+    }
     return videos
   }
 
@@ -203,7 +207,7 @@ class MediaService {
       const imageIndex = images.findIndex(img => img.id === mediaId)
       
       if (imageIndex !== -1) {
-        const image = images[imageIndex]
+        const image = images[imageIndex]!
         const filePath = path.join(this.uploadDir, image.filename)
         
         // Supprimer le fichier physique
@@ -228,7 +232,7 @@ class MediaService {
       const videoIndex = videos.findIndex(vid => vid.id === mediaId)
       
       if (videoIndex !== -1) {
-        const video = videos[videoIndex]
+        const video = videos[videoIndex]!
         const filePath = path.join(this.uploadDir, video.filename)
         
         // Supprimer le fichier physique

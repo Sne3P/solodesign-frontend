@@ -97,7 +97,9 @@ export class ProjectService {
   static getAllProjects(): Project[] {
     this.initialize()
     
-    console.log(`📋 ProjectService: Récupération de ${projects.length} projets`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📋 ProjectService: Récupération de ${projects.length} projets`);
+    }
     
     // Ajouter les médias en temps réel pour chaque projet
     const enrichedProjects = projects.map(project => {
@@ -106,12 +108,12 @@ export class ProjectService {
       
       // Auto-définir l'image de couverture si aucune n'est définie
       let coverImage = project.coverImage
-      if (!coverImage && images.length > 0) {
-        coverImage = images[0].url
+      if (!coverImage && images && images.length > 0 && images[0]) {
+        coverImage = images[0]!.url
         // Mettre à jour le projet avec la nouvelle coverImage
         project.coverImage = coverImage
-      } else if (!coverImage && videos.length > 0) {
-        coverImage = videos[0].url
+      } else if (!coverImage && videos && videos.length > 0 && videos[0]) {
+        coverImage = videos[0]!.url
         // Mettre à jour le projet avec la nouvelle coverImage
         project.coverImage = coverImage
       }
@@ -137,7 +139,9 @@ export class ProjectService {
       return undefined
     }
     
-    console.log(`📋 ProjectService: Récupération projet ${id}`) // Debug
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📋 ProjectService: Récupération projet ${id}`) // Debug
+    }
     
     // Ajouter les médias en temps réel
     const images = mediaService.getProjectImages(project.id)
@@ -145,10 +149,10 @@ export class ProjectService {
     
     // Auto-définir l'image de couverture si aucune n'est définie
     let coverImage = project.coverImage
-    if (!coverImage && images.length > 0) {
-      coverImage = images[0].url
-    } else if (!coverImage && videos.length > 0) {
-      coverImage = videos[0].url
+    if (!coverImage && images && images.length > 0 && images[0]) {
+      coverImage = images[0]!.url
+    } else if (!coverImage && videos && videos.length > 0 && videos[0]) {
+      coverImage = videos[0]!.url
     }
     
     const fullProject = {
@@ -158,7 +162,9 @@ export class ProjectService {
       coverImage
     }
     
-    console.log(`✅ ProjectService: Projet ${id} avec ${images.length} images et ${videos.length} vidéos`) // Debug
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`✅ ProjectService: Projet ${id} avec ${images.length} images et ${videos.length} vidéos`)
+    }
     return fullProject
   }
 
@@ -190,19 +196,34 @@ export class ProjectService {
     const index = projects.findIndex(project => project.id === id)
     if (index === -1) return null
 
-    projects[index] = {
-      ...projects[index],
+    const prev = projects[index]!
+    const updated: Project = {
+      ...prev,
       ...projectData,
       id, // Garder l'ID original
+      title: projectData.title ?? prev.title,
+      description: projectData.description ?? prev.description,
+      technologies: projectData.technologies ?? prev.technologies,
+      tags: projectData.tags ?? prev.tags,
+      status: projectData.status ?? prev.status,
+      coverImage: projectData.coverImage ?? prev.coverImage,
+      images: prev.images,
+      videos: prev.videos,
+      duration: projectData.duration ?? prev.duration,
+      teamSize: projectData.teamSize ?? prev.teamSize,
+      scope: projectData.scope ?? prev.scope,
+      createdAt: prev.createdAt,
       updatedAt: new Date().toISOString()
     }
+    projects[index] = updated
     
     globalThis.__projectsStore = projects // Synchroniser avec le store global
     saveProjects() // Sauvegarder après mise à jour
     
     // Retourner avec les médias actuels
+    const updatedAfter = projects[index]!
     return {
-      ...projects[index],
+      ...updatedAfter,
       images: mediaService.getProjectImages(id),
       videos: mediaService.getProjectVideos(id)
     }
@@ -217,7 +238,7 @@ export class ProjectService {
       return false
     }
 
-    const projectTitle = projects[index].title
+  const projectTitle = projects[index] ? projects[index]!.title : ''
     
     // Supprimer tous les médias associés (suppression en cascade)
     mediaService.deleteAllProjectMedia(id)

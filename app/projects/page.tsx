@@ -208,7 +208,9 @@ export default function ProjectsPage() {
                       duration: 0.8
                     }}
                   >
-                    <ProjectCard project={projects[currentProject]} />
+                    {projects[currentProject] && (
+                      <ProjectCard project={projects[currentProject]} />
+                    )}
                   </motion.div>
                 </AnimatePresence>
               </motion.div>

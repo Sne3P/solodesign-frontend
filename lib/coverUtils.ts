@@ -11,13 +11,13 @@ export function getProjectCoverMedia(project: Project): string | null {
   }
 
   // 2. Sinon, prendre la première vidéo s'il y en a
-  if (project.videos && project.videos.length > 0) {
-    return project.videos[0].url
+  if (project.videos && project.videos.length > 0 && project.videos[0]) {
+    return project.videos[0]!.url
   }
 
   // 3. Sinon, prendre la première image s'il y en a
-  if (project.images && project.images.length > 0) {
-    return project.images[0].url
+  if (project.images && project.images.length > 0 && project.images[0]) {
+    return project.images[0]!.url
   }
 
   // 4. Aucun média trouvé
@@ -65,13 +65,13 @@ export function autoSetCoverImage(project: Project): string | null {
   }
 
   // Prioriser les images pour la couverture
-  if (project.images && project.images.length > 0) {
-    return project.images[0].url
+  if (project.images && project.images.length > 0 && project.images[0]) {
+    return project.images[0]!.url
   }
 
   // Utiliser la première vidéo comme fallback
-  if (project.videos && project.videos.length > 0) {
-    return project.videos[0].url
+  if (project.videos && project.videos.length > 0 && project.videos[0]) {
+    return project.videos[0]!.url
   }
 
   return null

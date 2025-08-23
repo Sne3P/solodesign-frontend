@@ -248,9 +248,9 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                   )}
                 </div>
                 <div>
-                  {project.images.length > 0 && (
+                  {project.images && project.images.length > 0 && (
                     <CoverMedia
-                      src={project.images[0].url || '/placeholder.svg'}
+                      src={(project.images[0] && project.images[0].url) || '/placeholder.svg'}
                       alt="Détail du projet"
                       className="w-full h-80 object-cover rounded-lg"
                       fallbackSrc="/placeholder.svg"
@@ -262,7 +262,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
           </AnimatedSection>
 
           {/* Galerie d'Images */}
-          {project.images.length > 0 && (
+          {project.images && project.images.length > 0 && (
             <AnimatedSection>
               <div className="mb-16">
                 <h2 className="text-4xl font-bold mb-8">Galerie d&apos;Images</h2>
@@ -289,7 +289,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
           )}
 
           {/* Vidéos */}
-          {project.videos.length > 0 && (
+          {project.videos && project.videos.length > 0 && (
             <AnimatedSection>
               <div className="mb-16">
                 <h2 className="text-4xl font-bold mb-8">Vidéos du Projet</h2>

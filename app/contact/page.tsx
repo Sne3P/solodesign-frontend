@@ -334,8 +334,9 @@ const ContactPage = () => {
     setQuizAnswers(prev => ({ ...prev, [stepId]: answer }))
     
     // Only auto-advance for single-select questions
-    const currentStep = quizSteps[currentQuizStep]
-    if (!currentStep.multiSelect && currentQuizStep < quizSteps.length - 1) {
+  const currentStep = quizSteps[currentQuizStep]
+  if (!currentStep) return
+  if (!currentStep.multiSelect && currentQuizStep < quizSteps.length - 1) {
       setTimeout(() => setCurrentQuizStep(prev => prev + 1), 300)
     }
   }
@@ -1081,88 +1082,93 @@ const QuoteSection: React.FC<QuoteSectionProps> = ({
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-3xl font-bold mb-8 text-center">
-                {quizSteps[currentStep].question}
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quizSteps[currentStep].options.map((option) => {
-                  const isMultiSelect = quizSteps[currentStep].multiSelect
-                  const currentAnswers = answers[quizSteps[currentStep].id]
-                  const isSelected = isMultiSelect 
-                    ? Array.isArray(currentAnswers) && currentAnswers.includes(option.value)
-                    : currentAnswers === option.value
+              {(() => {
+                const step = quizSteps[currentStep]
+                if (!step) return null
+                return (
+                  <>
+                    <h2 className="text-3xl font-bold mb-8 text-center">
+                      {step.question}
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {step.options.map((option) => {
+                        const isMultiSelect = !!step.multiSelect
+                        const currentAnswers = answers[step.id]
+                        const isSelected = isMultiSelect 
+                          ? Array.isArray(currentAnswers) && currentAnswers.includes(option.value)
+                          : currentAnswers === option.value
 
-                  return (
-                    <motion.button
-                      key={option.id}
-                      className={`p-6 rounded-lg border transition-all text-left group ${
-                        isSelected 
-                          ? 'border-white bg-white/15' 
-                          : 'border-white/20 hover:border-white/50 bg-white/5 hover:bg-white/10'
-                      }`}
-                      onClick={() => {
-                        if (isMultiSelect) {
-                          handleMultiSelectToggle(quizSteps[currentStep].id, option.value)
-                        } else {
-                          onAnswer(quizSteps[currentStep].id, option.value)
-                        }
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.1 }}
-                    >
-                      <div className="flex items-start space-x-4">
-                        <div className={`p-3 rounded-full transition-all ${
-                          isSelected ? 'bg-white/30' : 'bg-white/10 group-hover:bg-white/20'
-                        }`}>
-                          {option.icon && <option.icon className="w-6 h-6" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-lg mb-2">{option.label}</h3>
-                            {isSelected && (
-                              <CheckCircle className="w-5 h-5 text-white" />
-                            )}
-                          </div>
-                          {option.description && (
-                            <p className="text-gray-300 text-sm">{option.description}</p>
-                          )}
-                        </div>
+                        return (
+                          <motion.button
+                            key={option.id}
+                            className={`p-6 rounded-lg border transition-all text-left group ${
+                              isSelected 
+                                ? 'border-white bg-white/15' 
+                                : 'border-white/20 hover:border-white/50 bg-white/5 hover:bg-white/10'
+                            }`}
+                            onClick={() => {
+                              if (isMultiSelect) {
+                                handleMultiSelectToggle(step.id, option.value)
+                              } else {
+                                onAnswer(step.id, option.value)
+                              }
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.1 }}
+                          >
+                            <div className="flex items-start space-x-4">
+                              <div className={`p-3 rounded-full transition-all ${
+                                isSelected ? 'bg-white/30' : 'bg-white/10 group-hover:bg-white/20'
+                              }`}>
+                                {option.icon && <option.icon className="w-6 h-6" />}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <h3 className="font-semibold text-lg mb-2">{option.label}</h3>
+                                  {isSelected && (
+                                    <CheckCircle className="w-5 h-5 text-white" />
+                                  )}
+                                </div>
+                                {option.description && (
+                                  <p className="text-gray-300 text-sm">{option.description}</p>
+                                )}
+                              </div>
+                            </div>
+                          </motion.button>
+                        )
+                      })}
+                    </div>
+                    {/* Navigation buttons for multi-select questions */}
+                    {step.multiSelect && (
+                      <div className="flex gap-4 justify-center mt-8">
+                        {currentStep > 0 && (
+                          <motion.button
+                            className="bg-gray-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2"
+                            onClick={prevQuizStep}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <ArrowLeftIcon className="w-4 h-4" />
+                            Précédent
+                          </motion.button>
+                        )}
+                        <motion.button
+                          className="bg-gradient-to-r from-white to-gray-200 text-black px-6 py-3 rounded-full font-bold flex items-center gap-2"
+                          onClick={nextQuizStep}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Suivant
+                          <ArrowRight className="w-4 h-4" />
+                        </motion.button>
                       </div>
-                    </motion.button>
-                  )
-                })}
-              </div>
-              
-              {/* Navigation buttons for multi-select questions */}
-              {quizSteps[currentStep].multiSelect && (
-                <div className="flex gap-4 justify-center mt-8">
-                  {currentStep > 0 && (
-                    <motion.button
-                      className="bg-gray-600 text-white px-6 py-3 rounded-full font-medium flex items-center gap-2"
-                      onClick={prevQuizStep}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <ArrowLeftIcon className="w-4 h-4" />
-                      Précédent
-                    </motion.button>
-                  )}
-                  
-                  <motion.button
-                    className="bg-gradient-to-r from-white to-gray-200 text-black px-6 py-3 rounded-full font-bold flex items-center gap-2"
-                    onClick={nextQuizStep}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Suivant
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                </div>
-              )}
+                    )}
+                  </>
+                )
+              })()}
             </motion.div>
           ) : (
             <motion.div

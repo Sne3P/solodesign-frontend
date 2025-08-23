@@ -11,6 +11,7 @@ import MenuButton from '@/components/layout/MenuButton';
 import FooterMinimal from '@/components/sections/FooterMinimal';
 import BackgroundPattern from '@/components/layout/BackgroundPattern';
 import Cursor from '@/components/layout/Cursor';
+import legalData from '@/lib/legal-data';
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -29,6 +30,7 @@ const staggerContainer = {
 
 const TermsPage = () => {
   const router = useRouter();
+  const { company, legal } = legalData;
 
   const sections = [
     {
@@ -43,14 +45,14 @@ const TermsPage = () => {
       icon: Shield,
       title: "2. Mentions légales",
       content: [
-        "Éditeur du site : Solo Design",
-        "Forme juridique : [À compléter]",
-        "Adresse : Paris, France",
-        "Email : contact@solodesign.fr",
-        "Téléphone : +33 06 60 94 98 79",
-        "Numéro SIRET : [À compléter]",
-        "Directeur de la publication : [À compléter]",
-        "Hébergeur : [À compléter selon l'hébergeur utilisé]"
+  `Éditeur du site : ${company.name}`,
+  `Forme juridique : ${company.legalForm}`,
+  `Adresse : ${company.address}, ${company.postalCode} ${company.city}, ${company.country}`,
+  `Email : ${company.email}`,
+  `Téléphone : ${company.phone}`,
+  `Numéro SIRET : ${company.siret}`,
+  `Directeur de la publication : ${legal.director}`,
+  `Hébergeur : ${legal.hosting.provider}`
       ]
     },
     {

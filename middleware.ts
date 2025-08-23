@@ -39,36 +39,36 @@ function isValidJWTFormat(token: string): boolean {
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
-  console.log("🛡️ Middleware: Requête sur:", pathname)
+  if (isDev) console.log("🛡️ Middleware: Requête sur:", pathname)
 
   // Protection des routes dashboard admin
   if (pathname.startsWith('/admin/dashboard')) {
-    console.log("🛡️ Middleware: Vérification de l'accès au dashboard")
-    console.log("🛡️ Middleware: Tous les cookies:", request.cookies.toString())
+    if (isDev) console.log("🛡️ Middleware: Vérification de l'accès au dashboard")
+    if (isDev) console.log("🛡️ Middleware: Tous les cookies:", request.cookies.toString())
     
     const cookieToken = request.cookies.get('admin_token')?.value
     const headerToken = request.headers.get('authorization')?.replace('Bearer ', '')
     const token = cookieToken || headerToken
 
-    console.log("🛡️ Middleware: Cookie admin_token:", cookieToken ? `${cookieToken.substring(0, 20)}...` : 'non trouvé')
-    console.log("🛡️ Middleware: Header token:", !!headerToken)
-    console.log("🛡️ Middleware: Token final trouvé:", !!token)
+  if (isDev) console.log("🛡️ Middleware: Cookie admin_token:", cookieToken ? `${cookieToken.substring(0, 20)}...` : 'non trouvé')
+  if (isDev) console.log("🛡️ Middleware: Header token:", !!headerToken)
+  if (isDev) console.log("🛡️ Middleware: Token final trouvé:", !!token)
 
     if (!token) {
-      console.log("❌ Middleware: Pas de token, redirection vers /admin")
+      if (isDev) console.log("❌ Middleware: Pas de token, redirection vers /admin")
       return NextResponse.redirect(new URL('/admin', request.url))
     }
 
     // Vérifier le format JWT et l'expiration (compatible Edge Runtime)
     if (!isValidJWTFormat(token)) {
-      console.log("❌ Middleware: Token invalide, redirection vers /admin")
+      if (isDev) console.log("❌ Middleware: Token invalide, redirection vers /admin")
       const response = NextResponse.redirect(new URL('/admin', request.url))
       response.cookies.delete('admin_token')
       return response
     }
   }
 
-  console.log("🛡️ Middleware: Accès autorisé")
+  if (isDev) console.log("🛡️ Middleware: Accès autorisé")
   return NextResponse.next()
 }
 

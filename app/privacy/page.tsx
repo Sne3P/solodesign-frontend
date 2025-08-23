@@ -11,6 +11,7 @@ import MenuButton from '@/components/layout/MenuButton';
 import FooterMinimal from '@/components/sections/FooterMinimal';
 import BackgroundPattern from '@/components/layout/BackgroundPattern';
 import Cursor from '@/components/layout/Cursor';
+import legalData from '@/lib/legal-data';
 
 const fadeInVariants = {
   hidden: { opacity: 0, y: 30 },
@@ -29,14 +30,15 @@ const staggerContainer = {
 
 const PrivacyPage = () => {
   const router = useRouter();
+  const { company } = legalData;
 
   const sections = [
     {
       icon: Shield,
       title: "1. Responsable du traitement",
       content: [
-        "Solo Design, dont le siège social est situé à Paris, France, est responsable du traitement de vos données personnelles.",
-        "Contact : contact@solodesign.fr - +33 06 60 94 98 79"
+        `${company.name}, dont le siège social est situé à ${company.address}, ${company.postalCode} ${company.city}, ${company.country}, est responsable du traitement de vos données personnelles.`,
+        `Contact : ${company.email} - ${company.phone}`
       ]
     },
     {

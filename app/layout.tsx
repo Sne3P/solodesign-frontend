@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "../components/ui/toaster";
 import { LoadingProvider } from "../contexts/LoadingContext";
@@ -10,22 +10,18 @@ import { generatePageMetadata, getStructuredData } from "../lib/seo-utils";
 import PerformanceMonitor from "../components/performance/PerformanceMonitor";
 import ServiceWorkerRegistration from "../components/performance/ServiceWorkerRegistration";
 
-// Configuration optimisée des fonts pour Performance
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+// Configuration optimisée des fonts (auto-hosted par Next, no 3rd-party requests)
+const geistSans = Inter({
+  subsets: ['latin'],
   display: 'swap',
-  preload: true,
+  variable: '--font-geist-sans',
   fallback: ['system-ui', '-apple-system', 'sans-serif']
 });
 
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono", 
-  weight: "100 900",
+const geistMono = JetBrains_Mono({
+  subsets: ['latin'],
   display: 'swap',
-  preload: false,
+  variable: '--font-geist-mono',
   fallback: ['ui-monospace', 'Monaco', 'monospace']
 });
 
@@ -55,8 +51,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={htmlClass}>
       <head>
-        {/* Preconnect pour les ressources externes critiques */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+  {/* Preconnect pour les ressources externes critiques */}
         <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         
@@ -64,14 +59,7 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
         
-        {/* Preload des ressources critiques pour LCP */}
-        <link 
-          rel="preload" 
-          href="/app/fonts/GeistVF.woff" 
-          as="font" 
-          type="font/woff" 
-          crossOrigin="anonymous" 
-        />
+  {/* Les polices Next/font sont préchargées automatiquement */}
         
         <SEO />
         <script

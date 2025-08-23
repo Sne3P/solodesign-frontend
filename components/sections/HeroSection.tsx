@@ -9,8 +9,7 @@ import { useCriticalResource } from '@/hooks/usePerformance'
 const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  // Préchargement critique des ressources pour améliorer LCP
-  useCriticalResource('/fonts/GeistVF.woff', 'font', { priority: 'high', preload: true })
+  // Les polices sont gérées par next/font; pas besoin de preload manuel
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {

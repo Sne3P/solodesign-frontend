@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "type": "module",
-  "description": "SoloDesign - Portfolio & Agence Web Moderne avec Next.js 14",
+  "description": "SoloDesign - Portfolio & Agence Web moderne avec Next.js 15",
   "author": "SoloDesign",
   "homepage": "https://solodesign.fr",
   "scripts": {
@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.5.0",
-    "@svgr/webpack": "^8.1.0",
     "@types/node": "^22.10.7",
     "@types/nodemailer": "^6.4.19",
     "@types/react": "^18.3.24",
@@ -76,7 +75,7 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=18.17.0",
     "npm": ">=8.0.0"
   }
 }

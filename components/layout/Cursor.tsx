@@ -1,14 +1,18 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const Cursor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [hover, setHover] = useState(false);
+  const isMobile = useIsMobile();
   const lastUpdate = useRef<number>(0);
 
   useEffect(() => {
     const updatePosition = (e: MouseEvent) => {
+      if (isMobile) return;
+      
       // Optimisation: limiter les mises à jour
       const now = Date.now();
       if (now - lastUpdate.current < 16) return; // 60fps max
@@ -18,21 +22,33 @@ const Cursor = () => {
     };
 
     const handleHover = (e: MouseEvent) => {
+      if (isMobile) return;
+      
       const target = e.target as HTMLElement | null;
-      const clickable = target?.closest?.('a, button, .social-icon, .menu-item, .service-card, input, textarea, .clickable');
+      const clickable = target?.closest?.('a, button, .social-icon, .menu-item, .service-card, input, textarea, .clickable, [role="button"]');
       setHover(!!clickable);
     };
 
-    window.addEventListener('mousemove', updatePosition, { passive: true });
-    document.addEventListener('mouseover', handleHover, { passive: true });
-    document.addEventListener('mouseout', handleHover, { passive: true });
+    // Ajout d'event listeners seulement sur desktop
+    if (!isMobile) {
+      window.addEventListener('mousemove', updatePosition, { passive: true });
+      document.addEventListener('mouseover', handleHover, { passive: true });
+      document.addEventListener('mouseout', handleHover, { passive: true });
+    }
 
     return () => {
-      window.removeEventListener('mousemove', updatePosition);
-      document.removeEventListener('mouseover', handleHover);
-      document.removeEventListener('mouseout', handleHover);
+      if (!isMobile) {
+        window.removeEventListener('mousemove', updatePosition);
+        document.removeEventListener('mouseover', handleHover);
+        document.removeEventListener('mouseout', handleHover);
+      }
     };
-  }, []);
+  }, [isMobile]);
+
+  // Ne pas afficher le curseur sur mobile
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <motion.div

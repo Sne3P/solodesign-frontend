@@ -557,7 +557,7 @@ Un PDF détaillé est joint à cette demande.`,
           >
             <Link href="/" onClick={(e) => handleExit(e, "/")}>
               <motion.span
-                className="bg-white text-black p-2 rounded-full inline-block cursor-pointer"
+                className="bg-white text-black p-2 rounded-full inline-block"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
@@ -904,7 +904,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({
         {contactInfo.map((info, index) => (
           <motion.div
             key={index}
-            className="flex items-start space-x-3 md:space-x-4 p-3 md:p-4 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group"
+            className="flex items-start space-x-3 md:space-x-4 p-3 md:p-4 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all group"
             whileHover={{ scale: 1.02, x: 10 }}
             onClick={() => info.action && window.open(info.action)}
             initial={{ opacity: 0, y: 20 }}
@@ -975,7 +975,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => (
       {services.map((service, index) => (
         <motion.div
           key={index}
-          className="p-4 md:p-6 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/30 transition-all group cursor-pointer"
+          className="p-4 md:p-6 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/30 transition-all group"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}

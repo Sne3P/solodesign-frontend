@@ -13,6 +13,7 @@ import {
   Save,
   Image as ImageIcon,
   RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { Project, ProjectFormData } from "../../../lib/types";
 import { useToast } from "../../../hooks/use-toast";
@@ -20,7 +21,8 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useProjects } from "../../../hooks/useProjects";
 import MediaManager from "../../../components/admin/MediaManager";
 import ProjectGrid from "../../../components/admin/ProjectGrid";
-import LoadingSpinner from "../../../components/ui/LoadingSpinner";
+import LoadingGrid from "../../../components/ui/LoadingGrid";
+import CustomFieldsManager from "../../../components/ui/CustomFieldsManager";
 
 const AdminDashboard = () => {
   // Hook optimisé pour la gestion des projets
@@ -39,8 +41,6 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState<{[key: string]: boolean}>({});
-  const [newCustomField, setNewCustomField] = useState({ key: '', value: '', type: 'string' as 'string' | 'number' | 'boolean' });
-  const [editingCustomField, setEditingCustomField] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -95,51 +95,6 @@ const AdminDashboard = () => {
       title: "Déconnexion réussie",
       description: "À bientôt !",
     });
-  };
-
-  // Fonctions pour gérer les champs personnalisés
-  const addCustomField = () => {
-    if (newCustomField.key.trim() && !formData.customFields[newCustomField.key]) {
-      let value: string | number | boolean = newCustomField.value;
-      
-      if (newCustomField.type === 'number') {
-        value = parseFloat(newCustomField.value) || 0;
-      } else if (newCustomField.type === 'boolean') {
-        value = newCustomField.value.toLowerCase() === 'true';
-      }
-      
-      setFormData(prev => ({
-        ...prev,
-        customFields: {
-          ...prev.customFields,
-          [newCustomField.key]: value
-        }
-      }));
-      
-      setNewCustomField({ key: '', value: '', type: 'string' });
-    }
-  };
-
-  const updateCustomField = (key: string, newValue: string | number | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      customFields: {
-        ...prev.customFields,
-        [key]: newValue
-      }
-    }));
-  };
-
-  const removeCustomField = (key: string) => {
-    setFormData(prev => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [key]: _removed, ...rest } = prev.customFields;
-      return {
-        ...prev,
-        customFields: rest
-      };
-    });
-    setEditingCustomField(null);
   };
 
   const handleMediaUpdate = async () => {
@@ -302,6 +257,9 @@ const AdminDashboard = () => {
         const newProject = await createProjectAPI(projectData);
         
         if (newProject) {
+          // Actualiser la liste des projets pour refléter le nouveau projet
+          await refreshProjects();
+          
           // Passer automatiquement en mode édition avec onglet médias
           setEditingProject(newProject);
           setActiveTab("media");
@@ -372,11 +330,14 @@ const AdminDashboard = () => {
 
   // Afficher le loader pendant la vérification d'authentification
   if (authLoading || (!isAuthenticated && !authLoading)) {
-    return <LoadingSpinner message="Vérification de l'authentification..." fullScreen />;
-  }
-
-  if (projectsLoading) {
-    return <LoadingSpinner message="Chargement des projets..." fullScreen />;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-600">Vérification de l&apos;authentification...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -437,18 +398,24 @@ const AdminDashboard = () => {
           </motion.button>
         </div>
 
-        {/* Projects Grid */}
-        <ProjectGrid 
-          projects={projects}
-          onEdit={openModal}
-          onDelete={handleDelete}
-          onView={(projectId) => window.open(`/projet/${projectId}`, "_blank")}
-          onToggleFeatured={handleToggleFeatured}
-          actionLoading={actionLoading}
-          columns="lg"
-        />
-
-        {projects.length === 0 && (
+        {/* Projects Grid avec état de chargement */}
+        {projectsLoading || isRefreshing ? (
+          <LoadingGrid 
+            message={isRefreshing ? "Actualisation des projets..." : "Chargement des projets..."} 
+            itemCount={6}
+            columns="lg"
+          />
+        ) : projects.length > 0 ? (
+          <ProjectGrid 
+            projects={projects}
+            onEdit={openModal}
+            onDelete={handleDelete}
+            onView={(projectId) => window.open(`/projet/${projectId}`, "_blank")}
+            onToggleFeatured={handleToggleFeatured}
+            actionLoading={actionLoading}
+            columns="lg"
+          />
+        ) : (
           <div className="text-center py-12">
             <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -461,8 +428,9 @@ const AdminDashboard = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => openModal()}
-              className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800"
+              className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 flex items-center justify-center"
             >
+              <Plus className="w-4 h-4 mr-2" />
               Créer un projet
             </motion.button>
           </div>
@@ -678,105 +646,10 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Champs personnalisés */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Champs personnalisés
-                      </label>
-                      
-                      {/* Champs personnalisés existants */}
-                      {Object.entries(formData.customFields).length > 0 && (
-                        <div className="mb-4 space-y-2">
-                          {Object.entries(formData.customFields).map(([key, value]) => (
-                            <div key={key} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                              {editingCustomField === key ? (
-                                <>
-                                  <span className="font-medium text-sm text-gray-700 min-w-fit">{key}:</span>
-                                  <input
-                                    type={typeof value === 'number' ? 'number' : 'text'}
-                                    value={String(value)}
-                                    onChange={(e) => {
-                                      let newValue: string | number | boolean = e.target.value;
-                                      if (typeof value === 'number') {
-                                        newValue = parseFloat(e.target.value) || 0;
-                                      } else if (typeof value === 'boolean') {
-                                        newValue = e.target.value.toLowerCase() === 'true';
-                                      }
-                                      updateCustomField(key, newValue);
-                                    }}
-                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingCustomField(null)}
-                                    className="text-green-500 hover:text-green-700 text-sm px-2"
-                                  >
-                                    ✓
-                                  </button>
-                                </>
-                              ) : (
-                                <>
-                                  <span className="font-medium text-sm text-gray-700">{key}:</span>
-                                  <span className="text-sm text-gray-600 flex-1">{String(value)}</span>
-                                  <span className="text-xs text-gray-400">({typeof value})</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => setEditingCustomField(key)}
-                                    className="text-blue-500 hover:text-blue-700 text-sm px-1"
-                                  >
-                                    ✏️
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => removeCustomField(key)}
-                                    className="text-red-500 hover:text-red-700 text-sm px-1"
-                                  >
-                                    ✕
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Ajouter un nouveau champ personnalisé */}
-                      <div className="space-y-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                        <h4 className="text-sm font-medium text-gray-700">Ajouter un champ</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                          <input
-                            type="text"
-                            placeholder="Nom du champ"
-                            value={newCustomField.key}
-                            onChange={(e) => setNewCustomField({ ...newCustomField, key: e.target.value })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
-                          />
-                          <select
-                            value={newCustomField.type}
-                            onChange={(e) => setNewCustomField({ ...newCustomField, type: e.target.value as 'string' | 'number' | 'boolean' })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
-                          >
-                            <option value="string">Texte</option>
-                            <option value="number">Nombre</option>
-                            <option value="boolean">Booléen</option>
-                          </select>
-                          <input
-                            type={newCustomField.type === 'number' ? 'number' : 'text'}
-                            placeholder={newCustomField.type === 'boolean' ? 'true/false' : 'Valeur'}
-                            value={newCustomField.value}
-                            onChange={(e) => setNewCustomField({ ...newCustomField, value: e.target.value })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
-                          />
-                          <button
-                            type="button"
-                            onClick={addCustomField}
-                            disabled={!newCustomField.key.trim() || Boolean(formData.customFields[newCustomField.key])}
-                            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                          >
-                            {Boolean(formData.customFields[newCustomField.key]) ? 'Clé existe' : 'Ajouter'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                    <CustomFieldsManager
+                      customFields={formData.customFields}
+                      onUpdateFields={(fields) => setFormData({ ...formData, customFields: fields })}
+                    />
 
                     <div className="flex justify-end space-x-4 pt-6">
                       <motion.button

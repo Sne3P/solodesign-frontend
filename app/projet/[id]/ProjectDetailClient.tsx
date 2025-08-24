@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { motion, AnimatePresence, useSpring, useScroll, useInView } from "framer-motion"
-import { ArrowLeft, Calendar, Users, Code, Globe, X } from "lucide-react"
+import { ArrowLeft, Calendar, Users, Code, Globe, X, Star, FileText } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import LogoTitle from "../../../components/layout/LogoTitle"
@@ -12,6 +12,7 @@ import Footer from "../../../components/sections/Footer"
 import ScrollArrow from "../../../components/layout/ScrollArrow"
 import ActionButton from "../../../components/ui/ActionButton"
 import CoverMedia from "../../../components/ui/CoverMedia"
+import CustomFieldDisplay from "../../../components/ui/CustomFieldDisplay"
 import dynamic from 'next/dynamic';
 const Cursor = dynamic(() => import('../../../components/layout/Cursor'), { ssr: false });
 import { Project } from "../../../lib/types"
@@ -215,7 +216,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
               >
-                <span className="text-lg">⭐</span>
+                <Star className="w-4 h-4 fill-current" />
                 Projet mis en avant
               </motion.div>
             )}
@@ -228,7 +229,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
               >
-                <span className="text-lg">📝</span>
+                <FileText className="w-4 h-4" />
                 Brouillon (Admin)
               </motion.div>
             )}
@@ -312,21 +313,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
                   {/* Champs personnalisés */}
                   {project.customFields && Object.keys(project.customFields).length > 0 && (
-                    <div>
-                      <h3 className="text-xl font-semibold mb-3">Informations Supplémentaires</h3>
-                      <div className="space-y-3">
-                        {Object.entries(project.customFields).map(([key, value]) => (
-                          <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="font-medium text-gray-800 capitalize">
-                              {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                            </span>
-                            <span className="text-gray-600 text-sm">
-                              {typeof value === 'boolean' ? (value ? '✅ Oui' : '❌ Non') : String(value)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <CustomFieldDisplay customFields={project.customFields} />
                   )}
                 </div>
                 <div>

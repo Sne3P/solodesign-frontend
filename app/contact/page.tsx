@@ -567,11 +567,12 @@ Un PDF détaillé est joint à cette demande.`,
           </motion.div>
 
           {/* Navigation des onglets */}
+          {/* Navigation tabs - Desktop */}
           <motion.div
-            className="fixed top-24 right-8 z-40 flex space-x-4"
+            className="hidden md:flex fixed top-24 right-8 z-40 space-x-3"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 100, damping: 15 }}
           >
             {[
               { id: "contact", label: "Contact" },
@@ -580,21 +581,81 @@ Un PDF détaillé est joint à cette demande.`,
             ].map((tab) => (
               <motion.button
                 key={tab.id}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`relative px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 overflow-hidden group ${
                   activeTab === tab.id
-                    ? "bg-white text-black"
-                    : "bg-white/10 backdrop-blur-sm text-white hover:bg-white/20"
+                    ? "bg-white text-black shadow-lg"
+                    : "bg-white/5 backdrop-blur-sm text-white border border-white/20 hover:border-white/40 hover:bg-white/10"
                 }`}
                 onClick={() => setActiveTab(tab.id)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                {tab.label}
+                {activeTab !== tab.id && (
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/20"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: "100%" }}
+                    transition={{ duration: 0.6 }}
+                  />
+                )}
+                <span className={`relative z-10 ${
+                  activeTab === tab.id ? "text-black" : "text-white group-hover:text-white"
+                }`}>
+                  {tab.label}
+                </span>
               </motion.button>
             ))}
           </motion.div>
 
-          <div className="pt-32 pb-20">
+          {/* Navigation tabs - Mobile */}
+          <motion.div
+            className="md:hidden sticky top-20 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10 px-4 py-3"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, type: "spring", stiffness: 100, damping: 15 }}
+          >
+            <div className="flex space-x-2 justify-center max-w-md mx-auto">
+              {[
+                { id: "contact", label: "Contact", icon: Mail },
+                { id: "services", label: "Services", icon: Globe },
+                { id: "devis", label: "Devis", icon: Zap }
+              ].map((tab) => (
+                <motion.button
+                  key={tab.id}
+                  className={`relative flex-1 px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center justify-center gap-1.5 overflow-hidden group ${
+                    activeTab === tab.id
+                      ? "bg-white text-black shadow-lg"
+                      : "bg-white/5 text-white border border-white/20 hover:border-white/40 hover:bg-white/10"
+                  }`}
+                  onClick={() => setActiveTab(tab.id)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                  {activeTab !== tab.id && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/20"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: "100%" }}
+                      transition={{ duration: 0.6 }}
+                    />
+                  )}
+                  <tab.icon className={`w-3.5 h-3.5 relative z-10 ${
+                    activeTab === tab.id ? "text-black" : "text-white group-hover:text-white"
+                  }`} />
+                  <span className={`relative z-10 ${
+                    activeTab === tab.id ? "text-black" : "text-white group-hover:text-white"
+                  }`}>
+                    {tab.label}
+                  </span>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+
+          <div className="pt-32 pb-20 md:pt-32 md:pb-20">
             <AnimatePresence mode="wait">
               {activeTab === "contact" && (
                 <ContactSection
@@ -752,7 +813,7 @@ const ContactSection: React.FC<ContactSectionProps> = ({
       </motion.p>
     </Parallax>
 
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-12 mb-16">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 md:gap-12 mb-12 md:mb-16">
       {/* Formulaire de contact principal */}
       <motion.div
         className="xl:col-span-2"
@@ -760,18 +821,18 @@ const ContactSection: React.FC<ContactSectionProps> = ({
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+        <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
           Envoyez-nous un message
         </h2>
         
         {/* Sélection des services */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-4">Services qui vous intéressent :</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="mb-6 md:mb-8">
+          <h3 className="text-lg md:text-xl font-semibold mb-3 md:mb-4">Services qui vous intéressent :</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-2 md:gap-3">
             {services.slice(0, 6).map((service, index) => (
               <motion.button
                 key={index}
-                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
+                className={`p-2 md:p-3 rounded-lg border text-xs md:text-sm font-medium transition-all ${
                   selectedServices.includes(service.title)
                     ? "bg-white text-black border-white"
                     : "bg-white/5 border-white/20 hover:border-white/50 hover:bg-white/10"
@@ -783,17 +844,17 @@ const ContactSection: React.FC<ContactSectionProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                <service.icon className={`w-5 h-5 mx-auto mb-2 ${
+                <service.icon className={`w-4 h-4 md:w-5 md:h-5 mx-auto mb-1 md:mb-2 ${
                   selectedServices.includes(service.title) ? "text-black" : "text-white"
                 }`} />
-                {service.title}
+                <span className="text-xs md:text-sm">{service.title}</span>
               </motion.button>
             ))}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <InputField type="text" name="name" placeholder="Votre nom *" required />
             <InputField type="email" name="email" placeholder="Votre email *" required />
           </div>
@@ -837,46 +898,46 @@ const ContactSection: React.FC<ContactSectionProps> = ({
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="space-y-6"
+        className="space-y-4 md:space-y-6"
       >
-        <h2 className="text-2xl font-bold mb-8">Nos coordonnées</h2>
+        <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8">Nos coordonnées</h2>
         {contactInfo.map((info, index) => (
           <motion.div
             key={index}
-            className="flex items-start space-x-4 p-4 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group"
+            className="flex items-start space-x-3 md:space-x-4 p-3 md:p-4 rounded-lg bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all cursor-pointer group"
             whileHover={{ scale: 1.02, x: 10 }}
             onClick={() => info.action && window.open(info.action)}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
           >
-            <div className="bg-white/10 p-3 rounded-full group-hover:bg-white/20 transition-all">
-              <info.icon className="w-6 h-6" />
+            <div className="bg-white/10 p-2 md:p-3 rounded-full group-hover:bg-white/20 transition-all">
+              <info.icon className="w-5 h-5 md:w-6 md:h-6" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">{info.title}</h3>
-              <p className="text-gray-300">{info.value}</p>
+              <h3 className="font-semibold text-base md:text-lg">{info.title}</h3>
+              <p className="text-gray-300 text-sm md:text-base">{info.value}</p>
             </div>
           </motion.div>
         ))}
 
         {/* Témoignage */}
         <motion.div
-          className="mt-8 p-6 rounded-lg bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm border border-white/10"
+          className="mt-6 md:mt-8 p-4 md:p-6 rounded-lg bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm border border-white/10"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-3 md:mb-4">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+              <Star key={i} className="w-4 h-4 md:w-5 md:h-5 text-yellow-400 fill-current" />
             ))}
           </div>
-          <p className="text-sm italic text-gray-300 mb-3">
+          <p className="text-xs md:text-sm italic text-gray-300 mb-2 md:mb-3">
             &quot;Solo Design a transformé notre vision en une réalité digitale époustouflante. 
             Leur expertise technique et leur sens du design ont dépassé nos attentes.&quot;
           </p>
-          <p className="text-sm font-semibold">— Client satisfait</p>
+          <p className="text-xs md:text-sm font-semibold">— Client satisfait</p>
         </motion.div>
       </motion.div>
     </div>
@@ -893,7 +954,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => (
     className="max-w-7xl mx-auto px-4"
   >
     <motion.h1
-      className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-center"
+      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 text-center"
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -901,7 +962,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => (
       Nos Services
     </motion.h1>
     <motion.p
-      className="text-xl text-center max-w-4xl mx-auto mb-16 text-gray-300"
+      className="text-base md:text-xl text-center max-w-4xl mx-auto mb-12 md:mb-16 text-gray-300"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1 }}
@@ -910,33 +971,33 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => (
       créativité et technologies de pointe pour vous démarquer dans l&apos;univers numérique.
     </motion.p>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
       {services.map((service, index) => (
         <motion.div
           key={index}
-          className="p-6 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/30 transition-all group cursor-pointer"
+          className="p-4 md:p-6 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/30 transition-all group cursor-pointer"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
           whileHover={{ scale: 1.05, y: -10 }}
         >
-          <div className="bg-white/10 p-4 rounded-full w-fit mb-4 group-hover:bg-white/20 transition-all">
-            <service.icon className="w-8 h-8" />
+          <div className="bg-white/10 p-3 md:p-4 rounded-full w-fit mb-3 md:mb-4 group-hover:bg-white/20 transition-all">
+            <service.icon className="w-6 h-6 md:w-8 md:h-8" />
           </div>
-          <h3 className="text-xl font-bold mb-4">{service.title}</h3>
-          <p className="text-gray-300 leading-relaxed text-sm">{service.description}</p>
+          <h3 className="text-lg md:text-xl font-bold mb-3 md:mb-4">{service.title}</h3>
+          <p className="text-gray-300 leading-relaxed text-xs md:text-sm">{service.description}</p>
         </motion.div>
       ))}
     </div>
 
     {/* Section pourquoi nous choisir */}
     <motion.div
-      className="mt-20"
+      className="mt-16 md:mt-20"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.5 }}
     >
-      <h2 className="text-3xl font-bold text-center mb-12">Pourquoi choisir Solo Design ?</h2>
+      <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-12">Pourquoi choisir Solo Design ?</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {[
           {
@@ -957,16 +1018,16 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ services }) => (
         ].map((advantage, index) => (
           <motion.div
             key={index}
-            className="text-center p-6"
+            className="text-center p-4 md:p-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
           >
-            <div className="bg-white/10 p-4 rounded-full w-fit mx-auto mb-4">
-              <advantage.icon className="w-8 h-8" />
+            <div className="bg-white/10 p-3 md:p-4 rounded-full w-fit mx-auto mb-3 md:mb-4">
+              <advantage.icon className="w-6 h-6 md:w-8 md:h-8" />
             </div>
-            <h3 className="text-xl font-bold mb-3">{advantage.title}</h3>
-            <p className="text-gray-300">{advantage.description}</p>
+            <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-3">{advantage.title}</h3>
+            <p className="text-gray-300 text-sm md:text-base">{advantage.description}</p>
           </motion.div>
         ))}
       </div>

@@ -216,6 +216,7 @@ export class ProjectService {
       technologies: projectData.technologies ?? prev.technologies,
       tags: projectData.tags ?? prev.tags,
       status: projectData.status ?? prev.status,
+      featured: projectData.featured ?? prev.featured,
       coverImage: projectData.coverImage ?? prev.coverImage,
       images: prev.images,
       videos: prev.videos,

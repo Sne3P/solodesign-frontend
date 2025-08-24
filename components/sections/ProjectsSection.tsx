@@ -3,7 +3,7 @@
 import React, { useRef, createRef, useState, useEffect } from "react";
 import { Parallax } from "react-scroll-parallax";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import SectionTitle from "../ui/SectionTitle";
 import CoverMedia from "../ui/CoverMedia";
 import { useRouter } from "next/navigation";
@@ -52,8 +52,10 @@ const ProjectsSection = () => {
       const response = await fetch("/api/projects");
       if (response.ok) {
         const data = await response.json();
-        // Limiter à 6 projets pour la section
-        const limitedProjects = data.slice(0, 6);
+        // Filtrer uniquement les projets mis en avant pour la page d'accueil
+        const featuredProjects = data.filter((project: Project) => project.featured === true);
+        // Limiter à 6 projets mis en avant maximum
+        const limitedProjects = featuredProjects.slice(0, 6);
         setRawProjects(limitedProjects);
         // Créer les refs pour chaque projet
         refsProjets.current = limitedProjects.map(() =>
@@ -116,10 +118,10 @@ const ProjectsSection = () => {
       >
         <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-28 xl:mb-32">
-            <SectionTitle>Projets Phares</SectionTitle>
+            <SectionTitle>Projets Mis en Avant</SectionTitle>
           </div>
           <div className="text-center py-24">
-            <motion.p
+            <motion.div
               className="text-gray-400 text-xl sm:text-2xl max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -130,8 +132,14 @@ const ProjectsSection = () => {
                 damping: 20,
               }}
             >
-              Aucun projet disponible pour le moment.
-            </motion.p>
+              <div className="mb-4">
+                <Star className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+              </div>
+              <p className="mb-4">Aucun projet mis en avant pour le moment.</p>
+              <p className="text-sm text-gray-500">
+                Les projets sélectionnés apparaîtront ici pour mettre en valeur le meilleur travail.
+              </p>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -145,7 +153,7 @@ const ProjectsSection = () => {
     >
       <div className="w-full max-w-8xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
         <div className="text-center mb-16 sm:mb-20 md:mb-24 lg:mb-28 xl:mb-32">
-          <SectionTitle>Projets Phares</SectionTitle>
+          <SectionTitle>Projets Mis en Avant</SectionTitle>
         </div>
 
         <div className="space-y-24 sm:space-y-28 md:space-y-32 lg:space-y-36 xl:space-y-40">

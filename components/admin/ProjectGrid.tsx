@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import { Project } from "../../lib/types";
-import { Eye, Edit, Trash2, Image as ImageIcon, Play } from "lucide-react";
+import { Eye, Edit, Trash2, Image as ImageIcon, Play, Star } from "lucide-react";
 import CoverMedia from "../ui/CoverMedia";
+import InlineLoader from "../ui/InlineLoader";
 
 interface ProjectGridProps {
   projects: Project[];
   onEdit?: (project: Project) => void;
   onDelete?: (projectId: string) => void;
   onView?: (projectId: string) => void;
+  onToggleFeatured?: (projectId: string, featured: boolean) => void;
+  actionLoading?: {[key: string]: boolean};
   columns?: "sm" | "md" | "lg";
 }
 
@@ -20,6 +23,8 @@ export default function ProjectGrid({
   onEdit,
   onDelete,
   onView,
+  onToggleFeatured,
+  actionLoading = {},
   columns = "md",
 }: ProjectGridProps) {
   const getGridCols = () => {
@@ -42,17 +47,38 @@ export default function ProjectGrid({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          whileHover={{ y: -5 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-100"
+          whileHover={{ 
+            y: -8,
+            transition: { 
+              duration: 0.15,
+              ease: "easeOut"
+            }
+          }}
+          className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-200 border border-gray-100"
         >
           {/* Image Container - Aspect Video pour cohérence */}
           <div className="aspect-video bg-gray-200 relative overflow-hidden group rounded-lg">
             <CoverMedia
               src={project.coverImage || "/placeholder.svg"}
               alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
               fallbackSrc="/placeholder.svg"
             />
+
+            {/* Badge pour le statut "Mis en avant" */}
+            {project.featured && (
+              <motion.div 
+                className="absolute top-2 left-2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.3, type: "spring" }}
+              >
+                <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 font-medium shadow-lg">
+                  <Star className="w-3 h-3 fill-current" />
+                  Mis en avant
+                </span>
+              </motion.div>
+            )}
 
             {/* Badge avec nombre d'images et vidéos */}
             {(project.images?.length > 0 || project.videos?.length > 0) && (
@@ -73,7 +99,7 @@ export default function ProjectGrid({
             )}
 
             {/* Overlay subtil sur hover pour indiquer l'interactivité */}
-            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-lg" />
           </div>
 
           {/* Informations du projet */}
@@ -112,10 +138,31 @@ export default function ProjectGrid({
 
             {/* Actions en bas avec style modernisé */}
             <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-              <div className="flex items-center text-xs text-gray-500">
-                <span className="capitalize bg-green-50 text-green-600 px-2 py-1 rounded-full">
+              <div className="flex items-center gap-2">
+                <span className="capitalize bg-green-50 text-green-600 px-2 py-1 rounded-full text-xs">
                   {project.status || 'draft'}
                 </span>
+                {/* Bouton toggle "Mis en avant" */}
+                {onToggleFeatured && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onToggleFeatured(project.id, !project.featured)}
+                    disabled={actionLoading[`featured-${project.id}`]}
+                    className={`p-1.5 rounded-lg transition-all relative ${
+                      project.featured
+                        ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200'
+                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    } ${actionLoading[`featured-${project.id}`] ? 'opacity-50' : ''}`}
+                    title={project.featured ? "Retirer de la mise en avant" : "Mettre en avant"}
+                  >
+                    {actionLoading[`featured-${project.id}`] ? (
+                      <InlineLoader size="sm" />
+                    ) : (
+                      <Star className={`w-3.5 h-3.5 ${project.featured ? 'fill-current' : ''}`} />
+                    )}
+                  </motion.button>
+                )}
               </div>
 
               <div className="flex space-x-1.5">
@@ -124,7 +171,7 @@ export default function ProjectGrid({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onView(project.id)}
-                    className="p-2.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-xl transition-all shadow-sm hover:shadow-md"
+                    className="p-2.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-xl transition-all duration-150 shadow-sm hover:shadow-md"
                     title="Voir le projet"
                   >
                     <Eye className="w-4 h-4" />
@@ -136,7 +183,7 @@ export default function ProjectGrid({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onEdit(project)}
-                    className="p-2.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-xl transition-all shadow-sm hover:shadow-md"
+                    className="p-2.5 text-amber-600 hover:text-amber-800 hover:bg-amber-50 rounded-xl transition-all duration-150 shadow-sm hover:shadow-md"
                     title="Modifier le projet"
                   >
                     <Edit className="w-4 h-4" />
@@ -148,10 +195,17 @@ export default function ProjectGrid({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onDelete(project.id)}
-                    className="p-2.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-xl transition-all shadow-sm hover:shadow-md"
+                    disabled={actionLoading[`delete-${project.id}`]}
+                    className={`p-2.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-xl transition-all duration-150 shadow-sm hover:shadow-md ${
+                      actionLoading[`delete-${project.id}`] ? 'opacity-50' : ''
+                    }`}
                     title="Supprimer le projet"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    {actionLoading[`delete-${project.id}`] ? (
+                      <InlineLoader size="sm" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
                   </motion.button>
                 )}
               </div>

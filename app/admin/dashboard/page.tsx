@@ -30,6 +30,7 @@ const AdminDashboard = () => {
     createProject: createProjectAPI,
     updateProject: updateProjectAPI,
     deleteProject: deleteProjectAPI,
+    toggleFeatured: toggleFeaturedAPI,
     fetchProjects: refreshProjects
   } = useProjects({ autoFetch: true });
 
@@ -37,6 +38,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<"details" | "media">("details");
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [actionLoading, setActionLoading] = useState<{[key: string]: boolean}>({});
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -175,6 +177,29 @@ const AdminDashboard = () => {
     setShowModal(true);
   };
 
+  const setActionLoadingState = (actionId: string, loading: boolean) => {
+    setActionLoading(prev => ({
+      ...prev,
+      [actionId]: loading
+    }));
+  };
+
+  const handleToggleFeatured = async (projectId: string, featured: boolean) => {
+    const actionId = `featured-${projectId}`;
+    setActionLoadingState(actionId, true);
+    
+    try {
+      await toggleFeaturedAPI(projectId, featured);
+      // Pas besoin de loader ou refresh manuel, le hook gère tout
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Erreur toggle featured:", error);
+      }
+    } finally {
+      setActionLoadingState(actionId, false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -188,6 +213,7 @@ const AdminDashboard = () => {
         duration: formData.duration,
         teamSize: formData.teamSize,
         scope: formData.scope,
+        featured: false, // Par défaut, les nouveaux projets ne sont pas mis en avant
         coverImage: '',
         images: [],
         videos: [],
@@ -195,8 +221,23 @@ const AdminDashboard = () => {
       };
       
       if (editingProject) {
-        // Mise à jour d'un projet existant
-        const updatedProject = await updateProjectAPI(editingProject.id, projectData);
+        // Mise à jour d'un projet existant - conserve les médias existants
+        const updateData = {
+          title: formData.title,
+          description: formData.description,
+          technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
+          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+          duration: formData.duration,
+          teamSize: formData.teamSize,
+          scope: formData.scope,
+          // Conserver les médias existants
+          coverImage: editingProject.coverImage,
+          images: editingProject.images,
+          videos: editingProject.videos,
+          featured: editingProject.featured, // Conserver le statut featured
+        };
+        
+        const updatedProject = await updateProjectAPI(editingProject.id, updateData);
         
         if (updatedProject) {
           setEditingProject(updatedProject);
@@ -252,6 +293,9 @@ const AdminDashboard = () => {
       return;
     }
 
+    const actionId = `delete-${id}`;
+    setActionLoadingState(actionId, true);
+
     try {
       const success = await deleteProjectAPI(id);
       
@@ -270,6 +314,8 @@ const AdminDashboard = () => {
         description: "Une erreur est survenue",
         variant: "destructive",
       });
+    } finally {
+      setActionLoadingState(actionId, false);
     }
   };
 
@@ -346,6 +392,8 @@ const AdminDashboard = () => {
           onEdit={openModal}
           onDelete={handleDelete}
           onView={(projectId) => window.open(`/projet/${projectId}`, "_blank")}
+          onToggleFeatured={handleToggleFeatured}
+          actionLoading={actionLoading}
           columns="lg"
         />
 

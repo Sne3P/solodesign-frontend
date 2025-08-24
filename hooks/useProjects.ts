@@ -275,6 +275,68 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
     }
   }, [addNotification, onProjectDelete])
 
+  // Basculer le statut "mis en avant" d'un projet
+  const toggleFeatured = useCallback(async (id: string, featured: boolean): Promise<boolean> => {
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`⭐ useProjects: ${featured ? 'Mise en avant' : 'Retrait de la mise en avant'} du projet ${id}`)
+      }
+      const token = localStorage.getItem('admin_token')
+      
+      const response = await fetch(`/api/projects/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include',
+        body: JSON.stringify({ featured })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`)
+      }
+
+      const updatedProject = await response.json()
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ useProjects: Statut featured mis à jour - ${updatedProject.title}`)
+      }
+      
+      // Mettre à jour la liste des projets sans rechargement
+      setProjects(prev => prev.map(p => p.id === id ? updatedProject : p))
+      
+      // Dispatch event pour mise à jour temps réel
+      window.dispatchEvent(new CustomEvent('projectUpdated', { 
+        detail: { projectId: id, action: 'featured_toggled' } 
+      }))
+      
+      addNotification({
+        type: 'success',
+        title: featured ? 'Projet mis en avant' : 'Projet retiré de la mise en avant',
+        message: `Le projet "${updatedProject.title}" a été mis à jour`
+      })
+
+      if (onProjectChange) {
+        onProjectChange(updatedProject)
+      }
+
+      return true
+      
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de la mise à jour du statut'
+      if (process.env.NODE_ENV === 'development') {
+        console.error('💥 useProjects: Erreur toggle featured:', error)
+      }
+      addNotification({
+        type: 'error',
+        title: 'Erreur de mise à jour',
+        message: errorMessage
+      })
+      return false
+    }
+  }, [addNotification, onProjectChange])
+
   // Charger automatiquement les projets au montage
   useEffect(() => {
     if (autoFetch) {
@@ -294,6 +356,7 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
     createProject,
     updateProject,
     deleteProject,
+    toggleFeatured,
     
     // Utilitaires
     refreshProjects: fetchProjects,

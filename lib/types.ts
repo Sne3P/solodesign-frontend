@@ -5,6 +5,7 @@ export interface Project {
   technologies: string[]
   tags: string[]
   status?: 'draft' | 'published' | 'archived'
+  featured?: boolean
   coverImage: string
   images: ProjectImage[]
   videos: ProjectVideo[]

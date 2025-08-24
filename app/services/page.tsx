@@ -215,17 +215,33 @@ const ServiceSlider = ({ services }: { services: typeof mainServices }) => {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % services.length)
+  const scrollToSlide = (index: number) => {
+    if (containerRef.current) {
+      const slideWidth = containerRef.current.offsetWidth
+      containerRef.current.scrollTo({
+        left: index * slideWidth,
+        behavior: 'smooth'
+      })
+      setCurrentIndex(index)
+    }
   }
 
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + services.length) % services.length)
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const slideWidth = containerRef.current.offsetWidth
+      const newIndex = Math.round(containerRef.current.scrollLeft / slideWidth)
+      setCurrentIndex(newIndex)
+    }
   }
 
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index)
-  }
+  useEffect(() => {
+    const container = containerRef.current
+    if (container && isMobile) {
+      container.addEventListener('scroll', handleScroll, { passive: true })
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
+    return () => {} // Return empty cleanup function for consistency
+  }, [isMobile])
 
   if (!isMobile) {
     return (
@@ -239,37 +255,36 @@ const ServiceSlider = ({ services }: { services: typeof mainServices }) => {
 
   return (
     <div className="relative w-full">
-      {/* Slider Container */}
+      {/* Native Scroll Container */}
       <motion.div
         ref={containerRef}
-        className="overflow-hidden rounded-2xl"
+        className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+        style={{
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
       >
-        <motion.div
-          className="flex"
-          animate={{ x: -currentIndex * 100 + "%" }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          drag="x"
-          dragConstraints={{ left: -(services.length - 1) * 100, right: 0 }}
-          onDragEnd={(_, info) => {
-            if (Math.abs(info.offset.x) > 100) {
-              if (info.offset.x > 0) {
-                prevSlide()
-              } else {
-                nextSlide()
-              }
-            }
-          }}
-        >
-          {services.map((service, index) => (
-            <motion.div
-              key={index}
-              className="w-full flex-shrink-0 px-2"
-              style={{ minWidth: "100%" }}
-            >
-              <ServiceCard service={service} index={index} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {services.map((service, index) => (
+          <motion.div
+            key={index}
+            className="w-full flex-shrink-0 px-2 snap-center"
+            style={{ 
+              minWidth: "100%",
+              scrollSnapAlign: 'center',
+              scrollSnapStop: 'always'
+            }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <ServiceCard service={service} index={index} />
+          </motion.div>
+        ))}
       </motion.div>
 
       {/* Navigation Dots */}
@@ -280,31 +295,17 @@ const ServiceSlider = ({ services }: { services: typeof mainServices }) => {
             className={`w-3 h-3 rounded-full transition-all duration-200 ${
               index === currentIndex ? 'bg-white' : 'bg-white/30'
             }`}
-            onClick={() => goToSlide(index)}
+            onClick={() => scrollToSlide(index)}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
           />
         ))}
       </div>
 
-      {/* Navigation Arrows */}
-      <motion.button
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20"
-        onClick={prevSlide}
-        whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <ArrowLeft size={20} className="text-white" />
-      </motion.button>
-
-      <motion.button
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20"
-        onClick={nextSlide}
-        whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <ArrowLeft size={20} className="text-white rotate-180" />
-      </motion.button>
+      {/* Hint Text */}
+      <div className="flex justify-center mt-2 opacity-60">
+        <p className="text-xs text-white/70">← Glissez pour naviguer →</p>
+      </div>
     </div>
   )
 }
@@ -1190,6 +1191,46 @@ const AdditionalServicesSection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.1 })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // Détection mobile
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Gestion scroll mobile
+  const handleScroll = () => {
+    if (scrollRef.current && isMobile) {
+      const slideWidth = scrollRef.current.offsetWidth
+      const newIndex = Math.round(scrollRef.current.scrollLeft / slideWidth)
+      setCurrentIndex(newIndex)
+    }
+  }
+
+  const scrollToSlide = (index: number) => {
+    if (scrollRef.current && isMobile) {
+      const slideWidth = scrollRef.current.offsetWidth
+      scrollRef.current.scrollTo({
+        left: index * slideWidth,
+        behavior: 'smooth'
+      })
+    } else {
+      setCurrentIndex(index)
+    }
+  }
+
+  useEffect(() => {
+    const container = scrollRef.current
+    if (container && isMobile) {
+      container.addEventListener('scroll', handleScroll, { passive: true })
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
+    return () => {}
+  }, [isMobile])
 
   const additionalServices = [
     {
@@ -1232,23 +1273,33 @@ const AdditionalServicesSection = () => {
 
   // Auto-scroll effect
   useEffect(() => {
-    if (!isPaused && isInView) {
+    if (!isPaused && isInView && !isMobile) {
       const interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % additionalServices.length)
       }, 4000)
       return () => clearInterval(interval)
     }
     return () => {}
-  }, [isPaused, isInView, additionalServices.length])
+  }, [isPaused, isInView, additionalServices.length, isMobile])
 
   const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % additionalServices.length)
+    if (isMobile) {
+      const nextIndex = (currentIndex + 1) % additionalServices.length
+      scrollToSlide(nextIndex)
+    } else {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % additionalServices.length)
+    }
   }
 
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? additionalServices.length - 1 : prevIndex - 1
-    )
+    if (isMobile) {
+      const prevIndex = currentIndex === 0 ? additionalServices.length - 1 : currentIndex - 1
+      scrollToSlide(prevIndex)
+    } else {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === 0 ? additionalServices.length - 1 : prevIndex - 1
+      )
+    }
   }
 
   return (
@@ -1320,48 +1371,144 @@ const AdditionalServicesSection = () => {
           </motion.p>
         </motion.div>
 
-        {/* Infinite Carousel */}
+        {/* Carousel - Desktop et Mobile */}
         <div 
           className="relative"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          <div className="overflow-hidden rounded-3xl">
+          {/* Version Desktop */}
+          {!isMobile && (
+            <div className="overflow-hidden rounded-3xl">
+              <motion.div
+                className="flex"
+                animate={{
+                  x: `${-currentIndex * (100 / 3)}%`
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 30,
+                  mass: 0.8
+                }}
+                style={{
+                  width: `${(additionalServices.length * 100) / 3}%`
+                }}
+              >
+                {additionalServices.map((service, index) => (
+                  <motion.div
+                    key={index}
+                    className="w-1/3 px-4 flex-shrink-0"
+                    style={{ minWidth: "calc(100% / 3)" }}
+                  >
+                    <motion.div
+                      className="group relative h-full"
+                      initial={{ opacity: 0, y: 50, rotateY: -15 }}
+                      animate={isInView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
+                      transition={{ 
+                        duration: 0.8, 
+                        delay: 0.6 + (index % 3) * 0.2,
+                        type: "spring",
+                        stiffness: 150,
+                        damping: 20
+                      }}
+                      whileHover={{ 
+                        y: -10,
+                        scale: 1.02,
+                        transition: { type: "spring", stiffness: 400, damping: 25 }
+                      }}
+                    >
+                      {/* Card Container */}
+                      <div className="relative h-full min-h-[350px]">
+                        {/* Glassmorphic Background */}
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 group-hover:border-white/20 transition-all duration-500" />
+                        
+                        {/* Content */}
+                        <div className="relative p-6 sm:p-8 h-full flex flex-col">
+                          {/* Icon */}
+                          <motion.div 
+                            className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+                            whileHover={{ rotate: 360 }}
+                            transition={{ duration: 0.6 }}
+                          >
+                            <div className="text-white text-2xl">
+                              {service.icon}
+                            </div>
+                          </motion.div>
+
+                          {/* Title */}
+                          <h3 className="text-lg sm:text-xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 transition-all duration-300">
+                            {service.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-white/70 mb-6 leading-relaxed flex-grow text-sm sm:text-base">
+                            {service.description}
+                          </p>
+
+                          {/* Features List */}
+                          <div className="space-y-2">
+                            {service.features.slice(0, 3).map((feature: string, featureIndex: number) => (
+                              <motion.div
+                                key={featureIndex}
+                                className="flex items-center gap-3"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={isInView ? { opacity: 1, x: 0 } : {}}
+                                transition={{ 
+                                  duration: 0.5, 
+                                  delay: 0.8 + (index % 3) * 0.2 + featureIndex * 0.1,
+                                  ease: [0.25, 0.25, 0, 1]
+                                }}
+                              >
+                                <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 group-hover:scale-125 transition-transform duration-300" />
+                                <span className="text-white/80 text-xs sm:text-sm group-hover:text-white transition-colors duration-300">
+                                  {feature}
+                                </span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          )}
+
+          {/* Version Mobile - Scroll Natif */}
+          {isMobile && (
             <motion.div
-              className="flex"
-              animate={{
-                x: `${-currentIndex * (100 / 3)}%`
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 200,
-                damping: 30,
-                mass: 0.8
-              }}
+              ref={scrollRef}
+              className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory rounded-3xl"
               style={{
-                width: `${(additionalServices.length * 100) / 3}%`
+                scrollSnapType: 'x mandatory',
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
               }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
               {additionalServices.map((service, index) => (
                 <motion.div
                   key={index}
-                  className="w-1/3 px-4 flex-shrink-0"
-                  style={{ minWidth: "calc(100% / 3)" }}
+                  className="w-full px-4 flex-shrink-0 snap-center"
+                  style={{ 
+                    minWidth: "100%",
+                    scrollSnapAlign: 'center',
+                    scrollSnapStop: 'always'
+                  }}
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
                 >
                   <motion.div
                     className="group relative h-full"
-                    initial={{ opacity: 0, y: 50, rotateY: -15 }}
-                    animate={isInView ? { opacity: 1, y: 0, rotateY: 0 } : {}}
-                    transition={{ 
-                      duration: 0.8, 
-                      delay: 0.6 + (index % 3) * 0.2,
-                      type: "spring",
-                      stiffness: 150,
-                      damping: 20
-                    }}
                     whileHover={{ 
-                      y: -10,
-                      scale: 1.02,
+                      y: -5,
+                      scale: 1.01,
                       transition: { type: "spring", stiffness: 400, damping: 25 }
                     }}
                   >
@@ -1370,51 +1517,37 @@ const AdditionalServicesSection = () => {
                       {/* Glassmorphic Background */}
                       <div className="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 group-hover:border-white/20 transition-all duration-500" />
                       
-                      {/* Gradient Border Effect */}
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      
                       {/* Content */}
-                      <div className="relative p-6 sm:p-8 h-full flex flex-col">
+                      <div className="relative p-6 h-full flex flex-col">
                         {/* Icon */}
                         <motion.div 
-                          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
-                          whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.6 }}
+                          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center mb-6"
                         >
                           <div className="text-white text-2xl">
-                            {typeof service.icon === 'string' ? service.icon : service.icon}
+                            {service.icon}
                           </div>
                         </motion.div>
 
                         {/* Title */}
-                        <h3 className="text-lg sm:text-xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-purple-200 transition-all duration-300">
+                        <h3 className="text-lg font-bold text-white mb-4">
                           {service.title}
                         </h3>
 
                         {/* Description */}
-                        <p className="text-white/70 mb-6 leading-relaxed flex-grow text-sm sm:text-base">
+                        <p className="text-white/70 mb-6 leading-relaxed flex-grow text-sm">
                           {service.description}
                         </p>
 
                         {/* Features List */}
                         <div className="space-y-2">
-                          {service.features.slice(0, 3).map((feature, featureIndex) => (
-                            <motion.div
+                          {service.features.slice(0, 3).map((feature: string, featureIndex: number) => (
+                            <div
                               key={featureIndex}
                               className="flex items-center gap-3"
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={isInView ? { opacity: 1, x: 0 } : {}}
-                              transition={{ 
-                                duration: 0.5, 
-                                delay: 0.8 + (index % 3) * 0.2 + featureIndex * 0.1,
-                                ease: [0.25, 0.25, 0, 1]
-                              }}
                             >
-                              <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 group-hover:scale-125 transition-transform duration-300" />
-                              <span className="text-white/80 text-xs sm:text-sm group-hover:text-white transition-colors duration-300">
-                                {feature}
-                              </span>
-                            </motion.div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-white/50 flex-shrink-0" />
+                              <span className="text-white/60 text-xs">{feature}</span>
+                            </div>
                           ))}
                         </div>
                       </div>
@@ -1423,32 +1556,30 @@ const AdditionalServicesSection = () => {
                 </motion.div>
               ))}
             </motion.div>
-          </div>
+          )}
 
-          {/* Navigation Arrows - Responsive positioning */}
-          <motion.button
-            className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 z-10"
-            onClick={prevSlide}
-            whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
-            whileTap={{ scale: 0.9 }}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1, duration: 0.5 }}
-          >
-            <ArrowLeft size={16} className="text-white sm:w-5 sm:h-5" />
-          </motion.button>
+          {/* Navigation Arrows - Masqués sur mobile car scroll natif */}
+          {!isMobile && (
+            <>
+              <motion.button
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20 z-10"
+                onClick={prevSlide}
+                whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <ArrowLeft size={20} className="text-white" />
+              </motion.button>
 
-          <motion.button
-            className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 z-10"
-            onClick={nextSlide}
-            whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
-            whileTap={{ scale: 0.9 }}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1, duration: 0.5 }}
-          >
-            <ArrowLeft size={16} className="text-white rotate-180 sm:w-5 sm:h-5" />
-          </motion.button>
+              <motion.button
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/10 backdrop-blur-sm rounded-full p-3 border border-white/20 z-10"
+                onClick={nextSlide}
+                whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.2)" }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <ArrowLeft size={20} className="text-white rotate-180" />
+              </motion.button>
+            </>
+          )}
 
           {/* Dots Indicator */}
           <div className="flex justify-center mt-8 gap-2">
@@ -1458,15 +1589,19 @@ const AdditionalServicesSection = () => {
                 className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                   index === currentIndex ? 'bg-white scale-125' : 'bg-white/30 hover:bg-white/50'
                 }`}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => scrollToSlide(index)}
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1 + index * 0.1, duration: 0.3 }}
               />
             ))}
           </div>
+
+          {/* Hint Text pour mobile */}
+          {isMobile && (
+            <div className="flex justify-center mt-4 opacity-60">
+              <p className="text-xs text-white/70">← Glissez pour naviguer →</p>
+            </div>
+          )}
         </div>
       </div>
     </section>

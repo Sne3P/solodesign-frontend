@@ -1,18 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram, Twitter, Linkedin, Dribbble } from 'lucide-react';
+import { Instagram, Linkedin, Github } from 'lucide-react';
 
 const socialLinks = [
-  { Icon: Twitter, href: '#', label: 'Twitter' },
+  { Icon: Github, href: 'https://github.com/Sne3P', label: 'GitHub' },
   { Icon: Instagram, href: '#', label: 'Instagram' },
   { Icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { Icon: Dribbble, href: '#', label: 'Dribbble' },
 ];
 
 const SocialLinks: React.FC = () => {
   return (
     <motion.div
-      className="fixed left-6 top-1/2 transform -translate-y-1/2 z-[9999] flex flex-col space-y-6 mix-blend-difference"
+      className="fixed left-6 top-1/2 transform -translate-y-1/2 z-[9999] flex-col space-y-6 mix-blend-difference hidden lg:flex"
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 1.5, duration: 0.5, type: "spring", stiffness: 100, damping: 10 }}

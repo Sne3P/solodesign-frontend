@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUp, Heart, Github, Linkedin, Twitter } from 'lucide-react';
+import { ArrowUp, Heart, Github, Linkedin, Instagram } from 'lucide-react';
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "Github" },
+  { icon: Github, href: "https://github.com/Sne3P", label: "Github" },
   { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" }
+  { icon: Instagram, href: "https://instagram.com", label: "Instagram" }
 ];
 
 const footerLinks = [

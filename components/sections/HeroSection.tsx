@@ -1,33 +1,15 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Sparkles, Timer } from 'lucide-react'
 import { ActionButton, Badge } from '@/components/ui'
 
 const HeroSection = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-
   // Les polices sont gérées par next/font; pas besoin de preload manuel
-
-  useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
-    window.addEventListener('mousemove', updateMousePosition)
-    return () => window.removeEventListener('mousemove', updateMousePosition)
-  }, [])
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* Geometric background elements */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{
-          background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.03) 0%, transparent 50%)`
-        }}
-      />
-
       {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div

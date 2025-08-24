@@ -52,8 +52,10 @@ const ProjectsSection = () => {
       const response = await fetch("/api/projects");
       if (response.ok) {
         const data = await response.json();
-        // Filtrer uniquement les projets mis en avant pour la page d'accueil
-        const featuredProjects = data.filter((project: Project) => project.featured === true);
+        // Filtrer uniquement les projets publiés et mis en avant pour la page d'accueil
+        const featuredProjects = data.filter((project: Project) => 
+          project.featured === true && project.status === 'published'
+        );
         // Limiter à 6 projets mis en avant maximum
         const limitedProjects = featuredProjects.slice(0, 6);
         setRawProjects(limitedProjects);

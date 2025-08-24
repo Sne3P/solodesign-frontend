@@ -39,12 +39,17 @@ export const projectSchema = z.object({
   teamSize: z.string().optional().default('Non spécifié'),
   scope: z.string().optional().default('Non spécifié'),
   
+  // Système de statut et mise en avant
+  status: z.enum(['draft', 'published', 'archived']).optional().default('draft'),
+  featured: z.boolean().optional().default(false),
+  
+  // Champs personnalisés
+  customFields: z.record(z.string(), z.union([z.string(), z.number(), z.boolean()])).optional().default({}),
+  
   // Champs hérités (rétrocompatibilité)
   category: z.string().optional(),
   client: z.string().optional(),
-  date: z.string().optional(),
-  featured: z.boolean().optional().default(false),
-  status: z.enum(['draft', 'published', 'archived']).optional().default('published')
+  date: z.string().optional()
 })
 
 export const mediaSchema = z.object({

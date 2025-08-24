@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import ProjectDetailClient from "./ProjectDetailClient";
-import { ParallaxProvider } from "react-scroll-parallax";
+import { use } from 'react';
+import { ParallaxProvider } from 'react-scroll-parallax';
+import ProjectDetailClient from './ProjectDetailClient';
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const ProjectPage = ({ params }: PageProps) => {
-  const { id } = params;
+  const { id } = use(params);
   return (
     <ParallaxProvider>
       <ProjectDetailClient id={id} />

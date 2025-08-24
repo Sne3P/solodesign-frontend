@@ -12,6 +12,7 @@ export interface Project {
   duration: string
   teamSize: string
   scope: string
+  customFields?: Record<string, string | number | boolean>
   createdAt: string
   updatedAt: string
 }
@@ -50,4 +51,6 @@ export interface ProjectFormData {
   duration: string
   teamSize: string
   scope: string
+  status: 'draft' | 'published' | 'archived'
+  customFields: Record<string, string | number | boolean>
 }

@@ -39,6 +39,8 @@ const AdminDashboard = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState<{[key: string]: boolean}>({});
+  const [newCustomField, setNewCustomField] = useState({ key: '', value: '', type: 'string' as 'string' | 'number' | 'boolean' });
+  const [editingCustomField, setEditingCustomField] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -47,6 +49,8 @@ const AdminDashboard = () => {
     duration: "",
     teamSize: "",
     scope: "",
+    status: "draft",
+    customFields: {},
   });
   const router = useRouter();
   const { toast } = useToast();
@@ -91,6 +95,51 @@ const AdminDashboard = () => {
       title: "Déconnexion réussie",
       description: "À bientôt !",
     });
+  };
+
+  // Fonctions pour gérer les champs personnalisés
+  const addCustomField = () => {
+    if (newCustomField.key.trim() && !formData.customFields[newCustomField.key]) {
+      let value: string | number | boolean = newCustomField.value;
+      
+      if (newCustomField.type === 'number') {
+        value = parseFloat(newCustomField.value) || 0;
+      } else if (newCustomField.type === 'boolean') {
+        value = newCustomField.value.toLowerCase() === 'true';
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        customFields: {
+          ...prev.customFields,
+          [newCustomField.key]: value
+        }
+      }));
+      
+      setNewCustomField({ key: '', value: '', type: 'string' });
+    }
+  };
+
+  const updateCustomField = (key: string, newValue: string | number | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      customFields: {
+        ...prev.customFields,
+        [key]: newValue
+      }
+    }));
+  };
+
+  const removeCustomField = (key: string) => {
+    setFormData(prev => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [key]: _removed, ...rest } = prev.customFields;
+      return {
+        ...prev,
+        customFields: rest
+      };
+    });
+    setEditingCustomField(null);
   };
 
   const handleMediaUpdate = async () => {
@@ -159,6 +208,8 @@ const AdminDashboard = () => {
         duration: project.duration,
         teamSize: project.teamSize,
         scope: project.scope,
+        status: project.status || "draft",
+        customFields: project.customFields || {},
       });
       setActiveTab("details");
     } else {
@@ -171,6 +222,8 @@ const AdminDashboard = () => {
         duration: "",
         teamSize: "",
         scope: "",
+        status: "draft",
+        customFields: {},
       });
       setActiveTab("details");
     }
@@ -213,28 +266,24 @@ const AdminDashboard = () => {
         duration: formData.duration,
         teamSize: formData.teamSize,
         scope: formData.scope,
-        featured: false, // Par défaut, les nouveaux projets ne sont pas mis en avant
-        coverImage: '',
-        images: [],
-        videos: [],
-        status: 'draft' as const,
+        status: formData.status,
+        customFields: formData.customFields,
+        featured: editingProject?.featured || false, // Conserver le statut featured existant
+        coverImage: editingProject?.coverImage || '',
+        images: editingProject?.images || [],
+        videos: editingProject?.videos || [],
       };
       
       if (editingProject) {
         // Mise à jour d'un projet existant - conserve les médias existants
         const updateData = {
-          title: formData.title,
-          description: formData.description,
-          technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
-          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-          duration: formData.duration,
-          teamSize: formData.teamSize,
-          scope: formData.scope,
-          // Conserver les médias existants
+          ...projectData, // Utiliser toutes les données du formulaire
+          // Conserver les médias et métadonnées existantes
           coverImage: editingProject.coverImage,
           images: editingProject.images,
           videos: editingProject.videos,
-          featured: editingProject.featured, // Conserver le statut featured
+          id: editingProject.id,
+          createdAt: editingProject.createdAt,
         };
         
         const updatedProject = await updateProjectAPI(editingProject.id, updateData);
@@ -268,6 +317,8 @@ const AdminDashboard = () => {
             duration: newProject.duration,
             teamSize: newProject.teamSize,
             scope: newProject.scope,
+            status: newProject.status || "draft",
+            customFields: newProject.customFields || {},
           });
           
           toast({
@@ -605,6 +656,125 @@ const AdminDashboard = () => {
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
                           placeholder="Internationale"
                         />
+                      </div>
+                    </div>
+
+                    {/* Statut du projet */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Statut du projet
+                      </label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.value as 'draft' | 'published' | 'archived' })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+                      >
+                        <option value="draft">Brouillon</option>
+                        <option value="published">Publié</option>
+                        <option value="archived">Archivé</option>
+                      </select>
+                    </div>
+
+                    {/* Champs personnalisés */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Champs personnalisés
+                      </label>
+                      
+                      {/* Champs personnalisés existants */}
+                      {Object.entries(formData.customFields).length > 0 && (
+                        <div className="mb-4 space-y-2">
+                          {Object.entries(formData.customFields).map(([key, value]) => (
+                            <div key={key} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                              {editingCustomField === key ? (
+                                <>
+                                  <span className="font-medium text-sm text-gray-700 min-w-fit">{key}:</span>
+                                  <input
+                                    type={typeof value === 'number' ? 'number' : 'text'}
+                                    value={String(value)}
+                                    onChange={(e) => {
+                                      let newValue: string | number | boolean = e.target.value;
+                                      if (typeof value === 'number') {
+                                        newValue = parseFloat(e.target.value) || 0;
+                                      } else if (typeof value === 'boolean') {
+                                        newValue = e.target.value.toLowerCase() === 'true';
+                                      }
+                                      updateCustomField(key, newValue);
+                                    }}
+                                    className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingCustomField(null)}
+                                    className="text-green-500 hover:text-green-700 text-sm px-2"
+                                  >
+                                    ✓
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="font-medium text-sm text-gray-700">{key}:</span>
+                                  <span className="text-sm text-gray-600 flex-1">{String(value)}</span>
+                                  <span className="text-xs text-gray-400">({typeof value})</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingCustomField(key)}
+                                    className="text-blue-500 hover:text-blue-700 text-sm px-1"
+                                  >
+                                    ✏️
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeCustomField(key)}
+                                    className="text-red-500 hover:text-red-700 text-sm px-1"
+                                  >
+                                    ✕
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Ajouter un nouveau champ personnalisé */}
+                      <div className="space-y-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                        <h4 className="text-sm font-medium text-gray-700">Ajouter un champ</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                          <input
+                            type="text"
+                            placeholder="Nom du champ"
+                            value={newCustomField.key}
+                            onChange={(e) => setNewCustomField({ ...newCustomField, key: e.target.value })}
+                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                          />
+                          <select
+                            value={newCustomField.type}
+                            onChange={(e) => setNewCustomField({ ...newCustomField, type: e.target.value as 'string' | 'number' | 'boolean' })}
+                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                          >
+                            <option value="string">Texte</option>
+                            <option value="number">Nombre</option>
+                            <option value="boolean">Booléen</option>
+                          </select>
+                          <input
+                            type={newCustomField.type === 'number' ? 'number' : 'text'}
+                            placeholder={newCustomField.type === 'boolean' ? 'true/false' : 'Valeur'}
+                            value={newCustomField.value}
+                            onChange={(e) => setNewCustomField({ ...newCustomField, value: e.target.value })}
+                            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                          />
+                          <button
+                            type="button"
+                            onClick={addCustomField}
+                            disabled={!newCustomField.key.trim() || Boolean(formData.customFields[newCustomField.key])}
+                            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                          >
+                            {Boolean(formData.customFields[newCustomField.key]) ? 'Clé existe' : 'Ajouter'}
+                          </button>
+                        </div>
                       </div>
                     </div>
 

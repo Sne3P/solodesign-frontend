@@ -57,7 +57,9 @@ export default function ProjectsPage() {
       const response = await fetch('/api/projects')
       if (response.ok) {
         const data = await response.json()
-        setProjects(data)
+        // Filtrer uniquement les projets publiés pour la page projets
+        const publishedProjects = data.filter((project: Project) => project.status === 'published')
+        setProjects(publishedProjects)
       }
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {

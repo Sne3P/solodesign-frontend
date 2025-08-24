@@ -61,12 +61,39 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  // Vérifier si l'utilisateur est admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const response = await fetch('/api/auth/verify', {
+          credentials: 'include',
+          cache: 'no-store'
+        })
+        setIsAdmin(response.ok)
+      } catch {
+        setIsAdmin(false)
+      }
+    }
+    checkAdminStatus()
+  }, [])
 
   const fetchProject = useCallback(async () => {
     try {
       const response = await fetch(`/api/projects/${id}`)
       if (response.ok) {
         const projectData = await response.json()
+        
+        // Vérifier si le projet est accessible
+        if (projectData.status === 'draft' && !isAdmin) {
+          setError('Ce projet n\'est pas encore disponible publiquement')
+          setTimeout(() => {
+            router.push('/projects')
+          }, 2000)
+          return
+        }
+        
         setProject(projectData)
       } else if (response.status === 404) {
         setError('Projet non trouvé')
@@ -85,18 +112,24 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
     } finally {
       setLoading(false)
     }
-  }, [id, router])
+  }, [id, router, isAdmin])
 
   useEffect(() => {
     document.body.classList.add("cursor-none")
     window.scrollTo(0, 0)
     setIsLoaded(true)
-    fetchProject()
     
     return () => {
       document.body.classList.remove("cursor-none")
     }
-  }, [fetchProject])
+  }, [])
+
+  // Charger le projet quand on connaît le statut admin
+  useEffect(() => {
+    if (isAdmin !== undefined) {
+      fetchProject()
+    }
+  }, [fetchProject, isAdmin])
 
   useEffect(() => {
     if (isLoaded) {
@@ -164,14 +197,42 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
       <main className="pt-32 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h1
-            className="text-6xl font-bold mb-16 text-center"
+          <motion.div
+            className="text-center mb-8"
             initial="hidden"
             animate="visible"
             variants={fadeInVariants}
           >
-            {project.title}
-          </motion.h1>
+            <h1 className="text-6xl font-bold mb-4">
+              {project.title}
+            </h1>
+            
+            {/* Badge mis en avant */}
+            {project.featured && (
+              <motion.div
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg mr-2"
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+              >
+                <span className="text-lg">⭐</span>
+                Projet mis en avant
+              </motion.div>
+            )}
+            
+            {/* Badge brouillon pour les admins */}
+            {project.status === 'draft' && isAdmin && (
+              <motion.div
+                className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg"
+                initial={{ scale: 0, rotate: 10 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
+              >
+                <span className="text-lg">📝</span>
+                Brouillon (Admin)
+              </motion.div>
+            )}
+          </motion.div>
 
           <AnimatedSection>
             <div className="mb-16">
@@ -234,7 +295,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
                   {/* Technologies */}
                   {project.technologies.length > 0 && (
-                    <div>
+                    <div className="mb-6">
                       <h3 className="text-xl font-semibold mb-3">Technologies Utilisées</h3>
                       <div className="flex flex-wrap gap-2">
                         {project.technologies.map((tech, index) => (
@@ -244,6 +305,25 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
                           >
                             {tech}
                           </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Champs personnalisés */}
+                  {project.customFields && Object.keys(project.customFields).length > 0 && (
+                    <div>
+                      <h3 className="text-xl font-semibold mb-3">Informations Supplémentaires</h3>
+                      <div className="space-y-3">
+                        {Object.entries(project.customFields).map(([key, value]) => (
+                          <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="font-medium text-gray-800 capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                            </span>
+                            <span className="text-gray-600 text-sm">
+                              {typeof value === 'boolean' ? (value ? '✅ Oui' : '❌ Non') : String(value)}
+                            </span>
+                          </div>
                         ))}
                       </div>
                     </div>

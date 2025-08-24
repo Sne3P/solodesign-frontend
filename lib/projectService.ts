@@ -217,6 +217,7 @@ export class ProjectService {
       tags: projectData.tags ?? prev.tags,
       status: projectData.status ?? prev.status,
       featured: projectData.featured ?? prev.featured,
+      customFields: projectData.customFields ?? prev.customFields,
       coverImage: projectData.coverImage ?? prev.coverImage,
       images: prev.images,
       videos: prev.videos,

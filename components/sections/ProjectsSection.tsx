@@ -26,14 +26,12 @@ const ProjectsSection = () => {
     // Écouter les événements de mise à jour de projets et médias
     const handleProjectUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 ProjectsSection: Rechargement des projets");
       }
       fetchProjects();
     };
 
     const handleMediaUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 ProjectsSection: Rechargement des projets après changement de média");
       }
       fetchProjects();
     };

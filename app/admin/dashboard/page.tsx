@@ -67,14 +67,12 @@ const AdminDashboard = () => {
   useEffect(() => {
     const handleProjectUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 Dashboard: Rechargement des projets suite à une mise à jour");
       }
       refreshProjects();
     };
 
     const handleMediaUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 Dashboard: Rechargement des projets suite à un changement de média");
       }
       refreshProjects();
     };

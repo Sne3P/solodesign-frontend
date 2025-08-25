@@ -23,7 +23,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       setError(null)
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 useProjects: Chargement des projets...')
       }
       const response = await fetch('/api/projects', {
         credentials: 'include',
@@ -37,7 +36,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       const data = await response.json()
       setProjects(data)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: ${data.length} projets chargés`)
       }
       
     } catch (error: unknown) {
@@ -61,7 +59,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   const fetchProject = useCallback(async (id: string): Promise<Project | null> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 useProjects: Récupération du projet ${id}`)
       }
       const response = await fetch(`/api/projects/${id}`)
       
@@ -74,7 +71,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
 
       const project = await response.json()
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: Projet récupéré - ${project.title}`)
       }
       return project
       
@@ -96,7 +92,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   const createProject = useCallback(async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project | null> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log('➕ useProjects: Création d\'un nouveau projet')
       }
       const token = localStorage.getItem('admin_token')
       
@@ -117,7 +112,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
 
       const newProject = await response.json()
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: Projet créé - ${newProject.title}`)
       }
       
       // Mettre à jour la liste des projets
@@ -158,7 +152,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   const updateProject = useCallback(async (id: string, updateData: Partial<Project>): Promise<Project | null> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`📝 useProjects: Mise à jour du projet ${id}`)
       }
       const token = localStorage.getItem('admin_token')
       
@@ -179,7 +172,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
 
       const updatedProject = await response.json()
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: Projet mis à jour - ${updatedProject.title}`)
       }
       
       // Mettre à jour la liste des projets
@@ -220,7 +212,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   const deleteProject = useCallback(async (id: string): Promise<boolean> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🗑️ useProjects: Suppression du projet ${id}`)
       }
       const token = localStorage.getItem('admin_token')
       
@@ -238,7 +229,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
       }
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: Projet supprimé - ID: ${id}`)
       }
       
       // Mettre à jour la liste des projets
@@ -279,7 +269,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
   const toggleFeatured = useCallback(async (id: string, featured: boolean): Promise<boolean> => {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`⭐ useProjects: ${featured ? 'Mise en avant' : 'Retrait de la mise en avant'} du projet ${id}`)
       }
       const token = localStorage.getItem('admin_token')
       
@@ -300,7 +289,6 @@ export const useProjects = (options: UseProjectsOptions = {}) => {
 
       const updatedProject = await response.json()
       if (process.env.NODE_ENV === 'development') {
-        console.log(`✅ useProjects: Statut featured mis à jour - ${updatedProject.title}`)
       }
       
       // Mettre à jour la liste des projets sans rechargement

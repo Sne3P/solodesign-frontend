@@ -51,7 +51,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={htmlClass}>
       <head>
-  {/* Preconnect pour les ressources externes critiques */}
+        {/* Preconnect pour les ressources externes critiques */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         
@@ -59,7 +60,9 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.clarity.ms" />
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
         
-  {/* Les polices Next/font sont préchargées automatiquement */}
+        {/* Préchargement des polices critiques pour optimiser les performances */}
+        <link rel="preload" href="/fonts/GeistVF.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/GeistMonoVF.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         
         <SEO />
         <script

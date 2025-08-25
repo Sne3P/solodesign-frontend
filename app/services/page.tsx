@@ -1202,14 +1202,22 @@ const AdditionalServicesSection = () => {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Gestion scroll mobile
-  const handleScroll = () => {
-    if (scrollRef.current && isMobile) {
-      const slideWidth = scrollRef.current.offsetWidth
-      const newIndex = Math.round(scrollRef.current.scrollLeft / slideWidth)
-      setCurrentIndex(newIndex)
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current && isMobile) {
+        const slideWidth = scrollRef.current.offsetWidth
+        const newIndex = Math.round(scrollRef.current.scrollLeft / slideWidth)
+        setCurrentIndex(newIndex)
+      }
     }
-  }
+
+    const container = scrollRef.current
+    if (container && isMobile) {
+      container.addEventListener('scroll', handleScroll, { passive: true })
+      return () => container.removeEventListener('scroll', handleScroll)
+    }
+    return () => {}
+  }, [isMobile])
 
   const scrollToSlide = (index: number) => {
     if (scrollRef.current && isMobile) {
@@ -1222,15 +1230,6 @@ const AdditionalServicesSection = () => {
       setCurrentIndex(index)
     }
   }
-
-  useEffect(() => {
-    const container = scrollRef.current
-    if (container && isMobile) {
-      container.addEventListener('scroll', handleScroll, { passive: true })
-      return () => container.removeEventListener('scroll', handleScroll)
-    }
-    return () => {}
-  }, [isMobile])
 
   const additionalServices = [
     {

@@ -37,11 +37,9 @@ function loadProjects(): void {
       globalThis.__projectsStore = projects
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`📂 ProjectService: ${projects.length} projets chargés depuis le fichier`)
       }
     } else {
       if (process.env.NODE_ENV === 'development') {
-        console.log('📁 ProjectService: Aucun fichier trouvé, démarrage avec 0 projets')
       }
     }
   } catch (error) {
@@ -65,7 +63,6 @@ function saveProjects(): void {
     fs.renameSync(tempFile, PROJECTS_FILE)
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`💾 ProjectService: ${projects.length} projets sauvegardés`)
     }
   } catch (error) {
     console.error('❌ Erreur lors de la sauvegarde:', error)
@@ -104,7 +101,6 @@ export class ProjectService {
     this.initialize()
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📋 ProjectService: Récupération de ${projects.length} projets`);
     }
     
     // Ajouter les médias en temps réel pour chaque projet
@@ -142,7 +138,6 @@ export class ProjectService {
     const project = projects.find(project => project.id === id)
     if (!project) {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`❌ ProjectService: Projet ${id} non trouvé`)
       }
       return undefined
     }
@@ -171,7 +166,6 @@ export class ProjectService {
     }
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ ProjectService: Projet ${id} avec ${images.length} images et ${videos.length} vidéos`)
     }
     return fullProject
   }
@@ -195,8 +189,6 @@ export class ProjectService {
     saveProjects()
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`✅ ProjectService: Projet créé avec ID ${newProject.id}. Total: ${projects.length} projets`);
-      console.log(`📝 ProjectService: Projets actuels:`, projects.map(p => ({ id: p.id, title: p.title })));
     }
     
     return newProject
@@ -247,12 +239,15 @@ export class ProjectService {
     const index = projects.findIndex(project => project.id === id)
     if (index === -1) {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`❌ ProjectService: Projet ${id} non trouvé pour suppression`)
+        console.warn('Project not found for deletion:', id)
       }
       return false
     }
 
-  const projectTitle = projects[index] ? projects[index]!.title : ''
+    if (process.env.NODE_ENV === 'development') {
+      const projectTitle = projects[index] ? projects[index]!.title : 'Unknown'
+      console.log('Deleting project:', projectTitle)
+    }
     
     // Supprimer tous les médias associés (suppression en cascade)
     mediaService.deleteAllProjectMedia(id)
@@ -265,7 +260,6 @@ export class ProjectService {
     saveProjects()
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🗑️ ProjectService: Projet "${projectTitle}" (ID: ${id}) supprimé. Reste ${projects.length} projets`)
     }
     
     return true

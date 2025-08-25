@@ -1,44 +1,54 @@
 /** @type {import('next').NextConfig} */
-const isDev = process.env.NODE_ENV === 'development'
+const isDev = process.env.NODE_ENV === 'development';
 
 const nextConfig = {
   reactStrictMode: true,
-  
+
   // Configuration différente selon l'environnement
-  ...(isDev ? {
-    // Configuration pour développement
-    output: undefined, // Pas de standalone en dev
-    typescript: {
-      ignoreBuildErrors: false, // Stricte en dev
-    },
-    eslint: {
-      ignoreDuringBuilds: false, // Stricte en dev
-    }
-  } : {
-    // Configuration pour production
-    output: 'standalone',
-    typescript: {
-      ignoreBuildErrors: false,
-    },
-    eslint: {
-      ignoreDuringBuilds: false,
-    }
-  }),
-  
+  ...(isDev
+    ? {
+        // Configuration pour développement
+        output: undefined, // Pas de standalone en dev
+        typescript: {
+          ignoreBuildErrors: false, // Stricte en dev
+        },
+        eslint: {
+          ignoreDuringBuilds: false, // Stricte en dev
+        },
+      }
+    : {
+        // Configuration pour production
+        output: 'standalone',
+        typescript: {
+          ignoreBuildErrors: false,
+        },
+        eslint: {
+          ignoreDuringBuilds: false,
+        },
+      }),
+
   // Packages externes pour server components (mise à jour pour Next.js 15)
   serverExternalPackages: ['sharp'],
-  
+
   // Optimisations expérimentales compatibles Next 15
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react', '@radix-ui/react-toast'],
-    optimizeCss: !isDev, // Seulement en production
-    
+    optimizePackageImports: [
+      'framer-motion',
+      'lucide-react',
+      '@radix-ui/react-toast',
+    ],
+    optimizeCss: !isDev, // CSS optimization en production
+    webVitalsAttribution: ['CLS', 'LCP'], // Attribution Core Web Vitals
+    scrollRestoration: true, // Restauration du scroll
+
     // Hot reload optimisé pour le développement
-    ...(isDev ? {
-      webpackBuildWorker: true,
-    } : {}),
+    ...(isDev
+      ? {
+          webpackBuildWorker: true,
+        }
+      : {}),
   },
-  
+
   // Configuration des images simplifiée
   images: {
     remotePatterns: [
@@ -52,12 +62,12 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  
+
   // Configuration de base
   compress: !isDev, // Compression seulement en prod
   poweredByHeader: false,
   generateEtags: !isDev, // ETags seulement en prod
-  
+
   // Headers conditionnels
   headers: async () => {
     if (isDev) {
@@ -68,17 +78,17 @@ const nextConfig = {
           headers: [
             {
               key: 'X-Frame-Options',
-              value: 'SAMEORIGIN'
+              value: 'SAMEORIGIN',
             },
             {
               key: 'Cache-Control',
-              value: 'no-cache, no-store, must-revalidate'
-            }
-          ]
-        }
-      ]
+              value: 'no-cache, no-store, must-revalidate',
+            },
+          ],
+        },
+      ];
     }
-    
+
     // Headers complets pour la production
     return [
       {
@@ -86,62 +96,64 @@ const nextConfig = {
         headers: [
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'DENY',
           },
           {
-            key: 'X-Content-Type-Options', 
-            value: 'nosniff'
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
           },
           {
             key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            value: '1; mode=block',
           },
           {
             key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), payment=()'
+            value: 'camera=(), microphone=(), geolocation=(), payment=()',
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.clarity.ms wss://script.hotjar.com; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';"
-          }
-        ]
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://static.hotjar.com https://script.hotjar.com https://www.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://www.clarity.ms wss://script.hotjar.com; frame-src https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';",
+          },
+        ],
       },
       {
         source: '/api/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=300, s-maxage=600, stale-while-revalidate=86400'
-          }
-        ]
+            value:
+              'public, max-age=300, s-maxage=600, stale-while-revalidate=86400',
+          },
+        ],
       },
       {
         source: '/_next/static/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable'
-          }
-        ]
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
       {
         source: '/uploads/(.*)',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000'
-          }
-        ]
-      }
-    ]
+            value: 'public, max-age=31536000',
+          },
+        ],
+      },
+    ];
   },
 
   // Redirections SEO
@@ -172,9 +184,9 @@ const nextConfig = {
         source: '/about',
         destination: '/about-us',
         permanent: true,
-      }
-    ]
+      },
+    ];
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

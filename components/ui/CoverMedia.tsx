@@ -41,9 +41,7 @@ export default function CoverMedia({
 
   // Utiliser le fallback si l'URL est vide ou invalide
   const mediaSrc = src && src.trim() ? src.trim() : fallbackSrc
-  const mediaType = getMediaType(mediaSrc)
-
-  // Debug: Log pour voir ce qui se passe
+  const mediaType = getMediaType(mediaSrc)
     if (process.env.NODE_ENV === 'development') {
       console.log('CoverMedia Debug:', {
     originalSrc: src,

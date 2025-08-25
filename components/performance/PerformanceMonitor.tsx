@@ -14,10 +14,6 @@ export default function PerformanceMonitor() {
     // Log des métriques pour le debug en développement
     if (process.env.NODE_ENV === 'development') {
       console.group('🚀 Web Vitals Performance')
-      console.log('LCP (Largest Contentful Paint):', metrics.LCP ? `${metrics.LCP.toFixed(2)}ms` : 'N/A')
-      console.log('FCP (First Contentful Paint):', metrics.FCP ? `${metrics.FCP.toFixed(2)}ms` : 'N/A')
-      console.log('CLS (Cumulative Layout Shift):', metrics.CLS ? metrics.CLS.toFixed(3) : 'N/A')
-      console.log('TTFB (Time to First Byte):', metrics.TTFB ? `${metrics.TTFB.toFixed(2)}ms` : 'N/A')
       console.groupEnd()
     }
 

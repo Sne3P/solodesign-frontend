@@ -63,11 +63,9 @@ class MediaService {
         }
         
         if (process.env.NODE_ENV === 'development') {
-          console.log('📂 MediaService: Médias chargés depuis le fichier')
         }
       } else {
         if (process.env.NODE_ENV === 'development') {
-          console.log('📂 MediaService: Aucun fichier média trouvé, démarrage avec 0 médias')
         }
       }
     } catch (error) {
@@ -101,7 +99,6 @@ class MediaService {
       }
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('💾 MediaService: Médias sauvegardés')
       }
     } catch (error) {
       console.error('❌ Erreur sauvegarde médias:', error)
@@ -191,7 +188,6 @@ class MediaService {
   getProjectImages(projectId: string): ProjectImage[] {
     const images = this.projectImages.get(projectId) || []
     if (process.env.NODE_ENV === 'development') {
-      console.log(`📸 MediaService: Images pour projet ${projectId}:`, images.length)
     }
     return images
   }
@@ -200,7 +196,6 @@ class MediaService {
   getProjectVideos(projectId: string): ProjectVideo[] {
     const videos = this.projectVideos.get(projectId) || []
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🎥 MediaService: Vidéos pour projet ${projectId}:`, videos.length)
     }
     return videos
   }
@@ -322,7 +317,6 @@ class MediaService {
           const filePath = path.join(this.uploadDir, filename)
           fs.unlinkSync(filePath)
           if (process.env.NODE_ENV === 'development') {
-            console.log(`Fichier orphelin supprimé: ${filename}`)
           }
         }
       })

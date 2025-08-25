@@ -45,7 +45,6 @@ export function useCoverMedia(
       const { projectId } = event.detail;
       if (projectId === project.id) {
         if (process.env.NODE_ENV === 'development') {
-          console.log(`🔄 useCoverMedia: Mise à jour cover pour ${project.id}`);
         }
         updateCoverMedia();
       }
@@ -100,7 +99,6 @@ export function useProjectsWithCovers(projects: Project[]) {
     // Écouter les événements de mise à jour de médias
     const handleUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 useProjectsWithCovers: Mise à jour des covers");
       }
       updateProjectsWithCovers();
     };

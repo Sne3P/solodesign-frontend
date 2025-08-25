@@ -30,7 +30,6 @@ class ProjectSyncManager {
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🔄 ProjectSync: ${type}`, data)
     }
     
     this.listeners.forEach(callback => {

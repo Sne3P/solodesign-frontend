@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server'
 
 export async function POST() {
   try {
-    console.log("🚪 API Logout: Déconnexion en cours...")
-    
     // Créer la réponse de succès
     const response = NextResponse.json({
       success: true,
@@ -20,8 +18,6 @@ export async function POST() {
       maxAge: 0, // Expire immédiatement
       path: '/'
     })
-
-    console.log("✅ API Logout: Cookie supprimé côté serveur")
     return response
   } catch (error) {
     console.error("💥 API Logout: Erreur lors de la déconnexion:", error)

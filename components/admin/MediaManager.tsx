@@ -72,7 +72,6 @@ export default function MediaManager({
         formData.append('projectId', projectId)
 
         if (process.env.NODE_ENV === 'development') {
-          console.log('📤 MediaManager: Upload pour projet ID:', projectId)
         }
 
         const response = await fetch('/api/upload', {

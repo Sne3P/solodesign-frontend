@@ -28,7 +28,7 @@ const AdminLogin = () => {
         }
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
-          console.log("Pas encore connecté:", error)
+          console.error('Auth check failed:', error)
         }
       }
     }

@@ -6,9 +6,7 @@ import { validateProjectData } from '../../../lib/validation-optimized'
 // GET - Récupérer tous les projets (public)
 export async function GET() {
   try {
-    console.log("📋 API Projects: Récupération des projets...")
     const projects = ProjectService.getAllProjects()
-    console.log(`✅ API Projects: ${projects.length} projets récupérés`)
     return NextResponse.json(projects)
   } catch (error) {
     console.error('💥 API Projects: Erreur lors de la récupération:', error)
@@ -22,14 +20,11 @@ export async function GET() {
 // POST - Créer un nouveau projet (nécessite authentification)
 export async function POST(request: NextRequest) {
   try {
-    console.log("🔐 API Projects: Tentative de création de projet...")
-    
     // Vérification de l'authentification
     const token = request.cookies.get('admin_token')?.value || 
                  request.headers.get('authorization')?.replace('Bearer ', '')
 
     if (!token) {
-      console.log("❌ API Projects: Pas de token d'authentification")
       return NextResponse.json(
         { error: 'Token d\'authentification requis' },
         { status: 401 }
@@ -37,7 +32,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (!AuthService.verifyToken(token)) {
-      console.log("❌ API Projects: Token invalide")
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -45,25 +39,17 @@ export async function POST(request: NextRequest) {
     }
 
     const projectData = await request.json()
-    console.log("📝 API Projects: Données reçues:", projectData.title)
-    console.log("🔍 API Projects: Technologies brutes:", projectData.technologies, typeof projectData.technologies)
-    console.log("🔍 API Projects: Tags bruts:", projectData.tags, typeof projectData.tags)
-    
     // Validation avec zod (preprocessing automatique intégré)
     const validatedData = validateProjectData(projectData)
     if (!validatedData.success) {
-      console.log("❌ API Projects: Données invalides:", validatedData.error)
       return NextResponse.json(
         { error: 'Données invalides', details: validatedData.error },
         { status: 400 }
       )
     }
 
-    
     // Création du projet avec données validées
     const newProject = ProjectService.createProject(validatedData.data!)
-    console.log(`✅ API Projects: Projet créé avec succès - ID: ${newProject.id}`)
-    
     return NextResponse.json({
       success: true,
       project: newProject,
@@ -81,14 +67,11 @@ export async function POST(request: NextRequest) {
 // PUT - Mettre à jour un projet (nécessite authentification)
 export async function PUT(request: NextRequest) {
   try {
-    console.log("🔐 API Projects: Tentative de mise à jour de projet...")
-    
     // Vérification de l'authentification
     const token = request.cookies.get('admin_token')?.value || 
                  request.headers.get('authorization')?.replace('Bearer ', '')
 
     if (!token) {
-      console.log("❌ API Projects: Pas de token d'authentification")
       return NextResponse.json(
         { error: 'Token d\'authentification requis' },
         { status: 401 }
@@ -96,7 +79,6 @@ export async function PUT(request: NextRequest) {
     }
 
     if (!AuthService.verifyToken(token)) {
-      console.log("❌ API Projects: Token invalide")
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -112,13 +94,9 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    console.log(`📝 API Projects: Mise à jour du projet ${id}`)
-    
     // Validation avec zod (preprocessing automatique intégré)
     const validatedData = validateProjectData(projectData)
     if (!validatedData.success) {
-      console.log("❌ API Projects: Données invalides:", validatedData.error)
       return NextResponse.json(
         { error: 'Données invalides', details: validatedData.error },
         { status: 400 }
@@ -133,8 +111,6 @@ export async function PUT(request: NextRequest) {
         { status: 404 }
       )
     }
-
-    console.log(`✅ API Projects: Projet ${id} mis à jour avec succès`)
     return NextResponse.json({
       success: true,
       project: updatedProject,
@@ -152,14 +128,11 @@ export async function PUT(request: NextRequest) {
 // DELETE - Supprimer un projet (nécessite authentification)
 export async function DELETE(request: NextRequest) {
   try {
-    console.log("🔐 API Projects: Tentative de suppression de projet...")
-    
     // Vérification de l'authentification
     const token = request.cookies.get('admin_token')?.value || 
                  request.headers.get('authorization')?.replace('Bearer ', '')
 
     if (!token) {
-      console.log("❌ API Projects: Pas de token d'authentification")
       return NextResponse.json(
         { error: 'Token d\'authentification requis' },
         { status: 401 }
@@ -167,7 +140,6 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (!AuthService.verifyToken(token)) {
-      console.log("❌ API Projects: Token invalide")
       return NextResponse.json(
         { error: 'Token invalide' },
         { status: 401 }
@@ -183,9 +155,6 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       )
     }
-
-    console.log(`🗑️ API Projects: Suppression du projet ${projectId}`)
-    
     const deleted = ProjectService.deleteProject(projectId)
     
     if (!deleted) {
@@ -194,8 +163,6 @@ export async function DELETE(request: NextRequest) {
         { status: 404 }
       )
     }
-
-    console.log(`✅ API Projects: Projet ${projectId} supprimé avec succès`)
     return NextResponse.json({ message: 'Projet supprimé avec succès' })
   } catch (error) {
     console.error('💥 API Projects: Erreur lors de la suppression:', error)

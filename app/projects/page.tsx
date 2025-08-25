@@ -31,14 +31,12 @@ export default function ProjectsPage() {
     // Écouter les événements de mise à jour de projets et médias
     const handleProjectUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 ProjectsPage: Rechargement des projets");
       }
       fetchProjects();
     };
 
     const handleMediaUpdate = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log("🔄 ProjectsPage: Rechargement des projets après changement de média");
       }
       fetchProjects();
     };

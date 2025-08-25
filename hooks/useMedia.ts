@@ -23,7 +23,6 @@ export const useMedia = (projectId: string) => {
     try {
       setUploading(true)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`📤 useMedia: Upload de ${file.name} pour le projet ${projectId}`)
       }
 
       // Validation côté client
@@ -58,7 +57,6 @@ export const useMedia = (projectId: string) => {
 
       const result = await response.json()
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ useMedia: Upload réussi:', result)
       }
 
       addNotification({
@@ -109,7 +107,6 @@ export const useMedia = (projectId: string) => {
       setDeletingIds(prev => new Set(prev).add(id))
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🗑️ useMedia: Suppression de ${filename}`)
       }
 
       const response = await fetch(`/api/upload?filename=${encodeURIComponent(filename)}`, {
@@ -123,7 +120,6 @@ export const useMedia = (projectId: string) => {
       }
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ useMedia: Suppression réussie')
       }
 
       addNotification({

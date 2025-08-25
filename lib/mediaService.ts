@@ -139,8 +139,30 @@ class MediaService {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // Sauvegarder le fichier
-    fs.writeFileSync(filePath, buffer)
+    // Créer le dossier d'upload s'il n'existe pas
+    try {
+      if (!fs.existsSync(this.uploadDir)) {
+        fs.mkdirSync(this.uploadDir, { recursive: true, mode: 0o755 })
+      }
+    } catch (error) {
+      console.error('Erreur création dossier uploads:', error)
+      throw new Error('Impossible de créer le dossier uploads')
+    }
+
+    // Sauvegarder le fichier avec gestion d'erreur
+    try {
+      fs.writeFileSync(filePath, buffer, { mode: 0o644 })
+    } catch (error) {
+      console.error('Erreur écriture fichier:', error)
+      if (error instanceof Error && 'code' in error) {
+        if (error.code === 'EACCES') {
+          throw new Error('Permissions insuffisantes pour écrire le fichier. Vérifiez les permissions du dossier uploads.')
+        } else if (error.code === 'ENOSPC') {
+          throw new Error('Espace disque insuffisant.')
+        }
+      }
+      throw new Error('Erreur lors de la sauvegarde du fichier')
+    }
 
     const mediaInfo = {
       id: mediaId,

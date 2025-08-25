@@ -52,6 +52,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 
+# Créer le dossier uploads avec les bonnes permissions AVANT de changer d'utilisateur
+RUN mkdir -p ./public/uploads ./logs && \
+    chown -R nextjs:nodejs ./public/uploads ./logs && \
+    chmod -R 755 ./public/uploads ./logs
+
 USER nextjs
 
 EXPOSE 3000

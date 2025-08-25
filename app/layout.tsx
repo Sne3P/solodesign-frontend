@@ -61,8 +61,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://static.hotjar.com" />
         
         {/* Préchargement des polices critiques pour optimiser les performances */}
-        <link rel="preload" href="/fonts/GeistVF.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-        <link rel="preload" href="/fonts/GeistMonoVF.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/GeistVF.woff" as="font" type="font/woff" crossOrigin="anonymous" />
+        <link rel="preload" href="/fonts/GeistMonoVF.woff" as="font" type="font/woff" crossOrigin="anonymous" />
         
         <SEO />
         <script

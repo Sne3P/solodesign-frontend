@@ -1,11 +1,9 @@
 "use client";
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
-
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import dynamicImport from "next/dynamic";
 import {
   Plus,
   LogOut,
@@ -23,6 +21,12 @@ import MediaManager from "../../../components/admin/MediaManager";
 import ProjectGrid from "../../../components/admin/ProjectGrid";
 import LoadingGrid from "../../../components/ui/LoadingGrid";
 import CustomFieldsManager from "../../../components/ui/CustomFieldsManager";
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
+// Import du curseur pour l'admin
+const Cursor = dynamicImport(() => import('../../../components/layout/Cursor'), { ssr: false });
 
 const AdminDashboard = () => {
   // Hook optimisé pour la gestion des projets
@@ -340,6 +344,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Cursor />
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

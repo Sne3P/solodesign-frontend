@@ -15,6 +15,8 @@ class DataPersistence {
   private dataDir = path.join(process.cwd(), 'data')
   private projectsFile = path.join(this.dataDir, 'projects.json')
   private mediaFile = path.join(this.dataDir, 'media.json')
+  private static readonly MAX_RETRIES = 3
+  private static readonly RETRY_DELAY = 100
 
   constructor() {
     this.ensureDataDirectory()
@@ -23,7 +25,73 @@ class DataPersistence {
 
   private ensureDataDirectory() {
     if (!fs.existsSync(this.dataDir)) {
-      fs.mkdirSync(this.dataDir, { recursive: true })
+      fs.mkdirSync(this.dataDir, { recursive: true, mode: 0o755 })
+    }
+  }
+
+  /**
+   * Attendre un délai
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  /**
+   * Sauvegarde JSON sécurisée pour éviter les erreurs EBUSY en Docker
+   */
+  async saveJsonSafely(filePath: string, data: any): Promise<void> {
+    const jsonContent = JSON.stringify(data, null, 2)
+    
+    // Stratégie 1: Sauvegarde atomique avec retry
+    for (let attempt = 1; attempt <= DataPersistence.MAX_RETRIES; attempt++) {
+      try {
+        const tempFile = `${filePath}.tmp.${Date.now()}.${process.pid}`
+        fs.writeFileSync(tempFile, jsonContent, { mode: 0o644 })
+        
+        // Forcer la synchronisation avant le rename
+        const fd = fs.openSync(tempFile, 'r+')
+        fs.fsyncSync(fd)
+        fs.closeSync(fd)
+        
+        // Rename atomique
+        fs.renameSync(tempFile, filePath)
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`✅ Sauvegarde réussie: ${path.basename(filePath)} (tentative ${attempt})`)
+        }
+        return
+        
+      } catch (error: any) {
+        if (error.code === 'EBUSY' && attempt < DataPersistence.MAX_RETRIES) {
+          console.warn(`⚠️ EBUSY détecté, retry ${attempt}/${DataPersistence.MAX_RETRIES} pour ${path.basename(filePath)}`)
+          await this.sleep(DataPersistence.RETRY_DELAY * attempt)
+          continue
+        }
+        
+        // Si échec atomique, essayer sauvegarde directe
+        console.warn(`❌ Échec sauvegarde atomique: ${error.message}`)
+        break
+      }
+    }
+    
+    // Stratégie 2: Sauvegarde directe (fallback pour Docker)
+    try {
+      console.log(`🔄 Fallback: sauvegarde directe pour ${path.basename(filePath)}`)
+      
+      // Backup l'ancien fichier si il existe
+      if (fs.existsSync(filePath)) {
+        const backupPath = `${filePath}.backup.${Date.now()}`
+        fs.copyFileSync(filePath, backupPath)
+      }
+      
+      // Écriture directe
+      fs.writeFileSync(filePath, jsonContent, { mode: 0o644 })
+      
+      console.log(`✅ Sauvegarde directe réussie: ${path.basename(filePath)}`)
+      
+    } catch (directError: any) {
+      console.error(`💥 Échec total sauvegarde ${path.basename(filePath)}:`, directError.message)
+      throw new Error(`Impossible de sauvegarder ${path.basename(filePath)}: ${directError.message}`)
     }
   }
 

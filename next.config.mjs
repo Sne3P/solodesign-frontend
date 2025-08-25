@@ -54,6 +54,9 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'res.cloudinary.com' },
+      // Autoriser les images du domaine local pour les uploads
+      { protocol: 'https', hostname: 'solodesign.fr' },
+      { protocol: 'http', hostname: 'localhost' },
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: isDev ? 60 : 31536000, // Cache court en dev
@@ -61,6 +64,8 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Autoriser les images locales
+    domains: ['localhost', 'solodesign.fr'],
   },
 
   // Configuration de base

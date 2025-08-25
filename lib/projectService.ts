@@ -7,6 +7,10 @@ import path from 'path'
 const DATA_DIR = path.join(process.cwd(), 'data')
 const PROJECTS_FILE = path.join(DATA_DIR, 'projects.json')
 
+// Configuration pour la sauvegarde sécurisée
+const MAX_RETRIES = 3
+const RETRY_DELAY = 100
+
 // Utiliser globalThis pour persister les données entre les requêtes
 declare global {
   // eslint-disable-next-line no-var
@@ -19,6 +23,13 @@ declare global {
 const projects: Project[] = globalThis.__projectsStore || []
 if (!globalThis.__projectsStore) {
   globalThis.__projectsStore = projects
+}
+
+/**
+ * Attendre un délai
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 // Charger les projets depuis le fichier
@@ -49,23 +60,64 @@ function loadProjects(): void {
   }
 }
 
-// Sauvegarder les projets dans le fichier
-function saveProjects(): void {
+// Sauvegarder les projets dans le fichier avec méthode sécurisée
+async function saveProjects(): Promise<void> {
+  const jsonContent = JSON.stringify(projects, null, 2)
+  
+  // Créer le dossier si nécessaire
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o755 })
+  }
+  
+  // Stratégie 1: Sauvegarde atomique avec retry
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const tempFile = `${PROJECTS_FILE}.tmp.${Date.now()}.${process.pid}`
+      fs.writeFileSync(tempFile, jsonContent, { mode: 0o644 })
+      
+      // Forcer la synchronisation avant le rename
+      const fd = fs.openSync(tempFile, 'r+')
+      fs.fsyncSync(fd)
+      fs.closeSync(fd)
+      
+      // Rename atomique
+      fs.renameSync(tempFile, PROJECTS_FILE)
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`✅ Sauvegarde projects.json réussie (tentative ${attempt})`)
+      }
+      return
+      
+    } catch (error: any) {
+      if (error.code === 'EBUSY' && attempt < MAX_RETRIES) {
+        console.warn(`⚠️ EBUSY détecté, retry ${attempt}/${MAX_RETRIES} pour projects.json`)
+        await sleep(RETRY_DELAY * attempt)
+        continue
+      }
+      
+      console.warn(`❌ Échec sauvegarde atomique projects.json: ${error.message}`)
+      break
+    }
+  }
+  
+  // Stratégie 2: Sauvegarde directe (fallback pour Docker)
   try {
-    // Créer le dossier si nécessaire
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true })
+    console.log(`🔄 Fallback: sauvegarde directe pour projects.json`)
+    
+    // Backup l'ancien fichier si il existe
+    if (fs.existsSync(PROJECTS_FILE)) {
+      const backupPath = `${PROJECTS_FILE}.backup.${Date.now()}`
+      fs.copyFileSync(PROJECTS_FILE, backupPath)
     }
     
-    // Sauvegarder de manière atomique
-    const tempFile = PROJECTS_FILE + '.tmp'
-    fs.writeFileSync(tempFile, JSON.stringify(projects, null, 2))
-    fs.renameSync(tempFile, PROJECTS_FILE)
+    // Écriture directe
+    fs.writeFileSync(PROJECTS_FILE, jsonContent, { mode: 0o644 })
     
-    if (process.env.NODE_ENV === 'development') {
-    }
-  } catch (error) {
-    console.error('❌ Erreur lors de la sauvegarde:', error)
+    console.log(`✅ Sauvegarde directe projects.json réussie`)
+    
+  } catch (directError: any) {
+    console.error(`💥 Échec total sauvegarde projects.json:`, directError.message)
+    throw new Error(`Impossible de sauvegarder projects.json: ${directError.message}`)
   }
 }
 
@@ -170,7 +222,7 @@ export class ProjectService {
     return fullProject
   }
 
-  static createProject(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Project {
+  static async createProject(projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<Project> {
     this.initialize()
     
     const newProject: Project = {
@@ -185,8 +237,8 @@ export class ProjectService {
     projects.push(newProject)
     globalThis.__projectsStore = projects // Synchroniser avec le store global
     
-    // Sauvegarder immédiatement
-    saveProjects()
+    // Sauvegarder de façon asynchrone
+    await saveProjects()
     
     if (process.env.NODE_ENV === 'development') {
     }
@@ -194,7 +246,7 @@ export class ProjectService {
     return newProject
   }
 
-  static updateProject(id: string, projectData: Partial<Project>): Project | null {
+  static async updateProject(id: string, projectData: Partial<Project>): Promise<Project | null> {
     const index = projects.findIndex(project => project.id === id)
     if (index === -1) return null
 
@@ -222,7 +274,7 @@ export class ProjectService {
     projects[index] = updated
     
     globalThis.__projectsStore = projects // Synchroniser avec le store global
-    saveProjects() // Sauvegarder après mise à jour
+    await saveProjects() // Sauvegarder après mise à jour de façon asynchrone
     
     // Retourner avec les médias actuels
     const updatedAfter = projects[index]!
@@ -233,7 +285,7 @@ export class ProjectService {
     }
   }
 
-  static deleteProject(id: string): boolean {
+  static async deleteProject(id: string): Promise<boolean> {
     this.initialize()
     
     const index = projects.findIndex(project => project.id === id)
@@ -256,8 +308,8 @@ export class ProjectService {
     projects.splice(index, 1)
     globalThis.__projectsStore = projects // Synchroniser avec le store global
     
-    // Sauvegarder immédiatement
-    saveProjects()
+    // Sauvegarder de façon asynchrone
+    await saveProjects()
     
     if (process.env.NODE_ENV === 'development') {
     }
@@ -266,7 +318,7 @@ export class ProjectService {
   }
 
   // Définir l'image de couverture
-  static setCoverImage(projectId: string, imageUrl: string): Project | null {
+  static async setCoverImage(projectId: string, imageUrl: string): Promise<Project | null> {
     const project = projects.find(p => p.id === projectId)
     if (!project) return null
 
@@ -274,7 +326,7 @@ export class ProjectService {
     project.updatedAt = new Date().toISOString()
     globalThis.__projectsStore = projects // Synchroniser avec le store global
 
-    saveProjects() // Sauvegarder après mise à jour image de couverture
+    await saveProjects() // Sauvegarder après mise à jour image de couverture de façon asynchrone
 
     return {
       ...project,

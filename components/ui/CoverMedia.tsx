@@ -1,8 +1,8 @@
 import { motion } from "framer-motion"
-import Image from "next/image"
 import { useState } from "react"
 import { Play, Pause } from "lucide-react"
 import { getMediaType } from "@/lib/mediaUtils"
+import UploadedImage from "./UploadedImage"
 
 interface CoverMediaProps {
   src: string
@@ -41,7 +41,8 @@ export default function CoverMedia({
 
   // Utiliser le fallback si l'URL est vide ou invalide
   const mediaSrc = src && src.trim() ? src.trim() : fallbackSrc
-  const mediaType = getMediaType(mediaSrc)
+  const mediaType = getMediaType(mediaSrc)
+
     if (process.env.NODE_ENV === 'development') {
       console.log('CoverMedia Debug:', {
     originalSrc: src,
@@ -84,14 +85,13 @@ export default function CoverMedia({
   if (hasError || (mediaType === 'unknown' && mediaSrc !== fallbackSrc)) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
-        <Image
+        <UploadedImage
           src={fallbackSrc}
           alt={alt}
           width={200}
           height={150}
           className="object-contain w-1/2 h-1/2"
           priority={priority}
-          onLoad={handleLoad}
         />
       </div>
     )
@@ -161,16 +161,13 @@ export default function CoverMedia({
   // Affichage image avec bords arrondis sur le container
   return (
     <div className="relative w-full h-full overflow-hidden rounded-lg">
-      <Image
+      <UploadedImage
         src={mediaSrc}
         alt={alt}
         width={800}
         height={600}
         className={`object-cover w-full h-full ${className}`}
         priority={priority}
-        onClick={onClick}
-        onError={handleError}
-        onLoad={handleLoad}
       />
 
       {/* Indicateur de chargement */}

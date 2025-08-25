@@ -6,6 +6,10 @@ import path from 'path'
 const DATA_DIR = path.join(process.cwd(), 'data')
 const MEDIA_FILE = path.join(DATA_DIR, 'media.json')
 
+// Configuration pour la sauvegarde sécurisée
+const MAX_RETRIES = 3
+const RETRY_DELAY = 100
+
 // Déclarer les types globaux pour la persistance
 declare global {
   // eslint-disable-next-line no-var
@@ -13,6 +17,13 @@ declare global {
     images: Map<string, ProjectImage[]>
     videos: Map<string, ProjectVideo[]>
   } | undefined
+}
+
+/**
+ * Attendre un délai
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 class MediaService {
@@ -73,35 +84,87 @@ class MediaService {
     }
   }
 
-  // Sauvegarder les données dans le fichier
-  private saveMediaData(): void {
+  // Sauvegarder les données dans le fichier avec méthode sécurisée
+  private async saveMediaData(): Promise<void> {
+    const mediaData = {
+      images: Object.fromEntries(this.projectImages),
+      videos: Object.fromEntries(this.projectVideos)
+    }
+    
+    const jsonContent = JSON.stringify(mediaData, null, 2)
+    
     try {
       // Créer le dossier si nécessaire
       if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true })
+        fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o755 })
       }
       
-      // Convertir les Maps en objets pour la sérialisation JSON
-      const mediaData = {
-        images: Object.fromEntries(this.projectImages),
-        videos: Object.fromEntries(this.projectVideos)
+      // Stratégie 1: Sauvegarde atomique avec retry
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const tempFile = `${MEDIA_FILE}.tmp.${Date.now()}.${process.pid}`
+          fs.writeFileSync(tempFile, jsonContent, { mode: 0o644 })
+          
+          // Forcer la synchronisation avant le rename
+          const fd = fs.openSync(tempFile, 'r+')
+          fs.fsyncSync(fd)
+          fs.closeSync(fd)
+          
+          // Rename atomique
+          fs.renameSync(tempFile, MEDIA_FILE)
+          
+          // Synchroniser avec le store global
+          if (globalThis.__mediaStore) {
+            globalThis.__mediaStore.images = this.projectImages
+            globalThis.__mediaStore.videos = this.projectVideos
+          }
+          
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`✅ Sauvegarde media.json réussie (tentative ${attempt})`)
+          }
+          return
+          
+        } catch (error: any) {
+          if (error.code === 'EBUSY' && attempt < MAX_RETRIES) {
+            console.warn(`⚠️ EBUSY détecté, retry ${attempt}/${MAX_RETRIES} pour media.json`)
+            await sleep(RETRY_DELAY * attempt)
+            continue
+          }
+          
+          console.warn(`❌ Échec sauvegarde atomique media.json: ${error.message}`)
+          break
+        }
       }
       
-      // Sauvegarder de manière atomique
-      const tempFile = MEDIA_FILE + '.tmp'
-      fs.writeFileSync(tempFile, JSON.stringify(mediaData, null, 2))
-      fs.renameSync(tempFile, MEDIA_FILE)
-      
-      // Synchroniser avec le store global
-      if (globalThis.__mediaStore) {
-        globalThis.__mediaStore.images = this.projectImages
-        globalThis.__mediaStore.videos = this.projectVideos
+      // Stratégie 2: Sauvegarde directe (fallback pour Docker)
+      try {
+        console.log(`🔄 Fallback: sauvegarde directe pour media.json`)
+        
+        // Backup l'ancien fichier si il existe
+        if (fs.existsSync(MEDIA_FILE)) {
+          const backupPath = `${MEDIA_FILE}.backup.${Date.now()}`
+          fs.copyFileSync(MEDIA_FILE, backupPath)
+        }
+        
+        // Écriture directe
+        fs.writeFileSync(MEDIA_FILE, jsonContent, { mode: 0o644 })
+        
+        // Synchroniser avec le store global
+        if (globalThis.__mediaStore) {
+          globalThis.__mediaStore.images = this.projectImages
+          globalThis.__mediaStore.videos = this.projectVideos
+        }
+        
+        console.log(`✅ Sauvegarde directe media.json réussie`)
+        
+      } catch (directError: any) {
+        console.error(`💥 Échec total sauvegarde media.json:`, directError.message)
+        throw new Error(`Impossible de sauvegarder media.json: ${directError.message}`)
       }
       
-      if (process.env.NODE_ENV === 'development') {
-      }
     } catch (error) {
       console.error('❌ Erreur sauvegarde médias:', error)
+      throw error
     }
   }
 
@@ -187,7 +250,7 @@ class MediaService {
         globalThis.__mediaStore.images = this.projectImages
       }
       
-      this.saveMediaData() // Sauvegarder après ajout
+      await this.saveMediaData() // Sauvegarder après ajout de façon asynchrone
       return imageInfo
     } else {
       const videoInfo = mediaInfo as ProjectVideo
@@ -201,7 +264,7 @@ class MediaService {
         globalThis.__mediaStore.videos = this.projectVideos
       }
       
-      this.saveMediaData() // Sauvegarder après ajout
+      await this.saveMediaData() // Sauvegarder après ajout de façon asynchrone
       return videoInfo
     }
   }

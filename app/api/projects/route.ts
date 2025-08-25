@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Création du projet avec données validées
-    const newProject = ProjectService.createProject(validatedData.data!)
+    const newProject = await ProjectService.createProject(validatedData.data!)
     return NextResponse.json({
       success: true,
       project: newProject,
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const updatedProject = ProjectService.updateProject(id, validatedData.data!)
+    const updatedProject = await ProjectService.updateProject(id, validatedData.data!)
     
     if (!updatedProject) {
       return NextResponse.json(
@@ -155,7 +155,7 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       )
     }
-    const deleted = ProjectService.deleteProject(projectId)
+    const deleted = await ProjectService.deleteProject(projectId)
     
     if (!deleted) {
       return NextResponse.json(

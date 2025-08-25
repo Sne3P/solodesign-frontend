@@ -35,6 +35,14 @@ yarn-error.log*
 .env.test
 .env.local
 
+# Données persistantes (uploads, projets, médias)
+/data/
+/logs/
+/backups/
+
+# Anciens dossiers uploads (migration)
+/public/uploads/
+
 
 # vercel
 .vercel

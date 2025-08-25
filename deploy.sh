@@ -124,30 +124,51 @@ fi
 log "🧱 Mise à jour docker-compose service application..."
 
 # Préparation des dossiers avec permissions correctes
-log "📁 Préparation des dossiers de données..."
-mkdir -p ./public/uploads ./logs
-chmod 755 ./public/uploads ./logs
+log "📁 Préparation des dossiers de données persistantes..."
+
+# Créer la structure de données persistantes
+mkdir -p ./data/uploads ./logs ./data
+
+# Initialiser les fichiers JSON s'ils n'existent pas
+if [ ! -f "./data/projects.json" ]; then
+    echo "[]" > ./data/projects.json
+    log "📄 Fichier projects.json initialisé"
+fi
+
+if [ ! -f "./data/media.json" ]; then
+    echo "{\"images\":{},\"videos\":{}}" > ./data/media.json
+    log "📄 Fichier media.json initialisé"
+fi
+
+# Migration des anciennes données si elles existent
+if [ -d "./public/uploads" ] && [ ! -d "./data/uploads" ]; then
+    log "📦 Migration des uploads existants..."
+    cp -r ./public/uploads/* ./data/uploads/ 2>/dev/null || true
+fi
+
+chmod 755 ./data/uploads ./logs ./data
+chmod 644 ./data/projects.json ./data/media.json
 
 # S'assurer que le propriétaire du dossier uploads correspond à l'UID/GID du conteneur (1001:1001)
 # Ceci est crucial pour que l'application puisse écrire dans les dossiers montés via volumes
 log "🔑 Configuration des permissions pour les volumes Docker..."
 if [ "$(id -u)" -eq 0 ]; then
     # En tant que root, on peut directement changer le propriétaire
-    chown -R 1001:1001 ./public/uploads ./logs
+    chown -R 1001:1001 ./data/uploads ./logs ./data
     log "✅ Propriétaire des dossiers configuré (1001:1001)"
 else
     # En tant qu'utilisateur normal, tenter via sudo
     if command -v sudo >/dev/null 2>&1; then
-        if sudo -n chown -R 1001:1001 ./public/uploads ./logs 2>/dev/null; then
+        if sudo -n chown -R 1001:1001 ./data/uploads ./logs ./data 2>/dev/null; then
             log "✅ Propriétaire des dossiers configuré via sudo"
         else
             warning "Impossible de changer le propriétaire des dossiers"
-            warning "Exécutez: sudo chown -R 1001:1001 ./public/uploads ./logs"
-            warning "Ou donnez les permissions 777 temporairement: chmod -R 777 ./public/uploads"
+            warning "Exécutez: sudo chown -R 1001:1001 ./data ./logs"
+            warning "Ou donnez les permissions 777 temporairement: chmod -R 777 ./data/uploads"
         fi
     else
         warning "sudo non disponible - permissions manuelles requises"
-        log "💡 Exécutez: chown -R 1001:1001 ./public/uploads ./logs"
+        log "💡 Exécutez: chown -R 1001:1001 ./data ./logs"
     fi
 fi
 

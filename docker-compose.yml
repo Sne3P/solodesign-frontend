@@ -11,7 +11,12 @@ services:
       LOG_TO_FILE: "true"
       LOG_LEVEL: "info"
     volumes:
-      - ./public/uploads:/app/public/uploads
+      # Persistance des uploads et médias (CRUCIAL pour conserver les fichiers)
+      - ./data/uploads:/app/public/uploads
+      # Persistance des données JSON (projets, médias)
+      - ./data/projects.json:/app/data/projects.json
+      - ./data/media.json:/app/data/media.json
+      # Logs pour monitoring
       - ./logs:/app/logs
     restart: unless-stopped
     healthcheck:
